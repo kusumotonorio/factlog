@@ -4,7 +4,7 @@ USING: accessors arrays kernel locals sequences classes.parser
 words.symbol namespaces continuations lexer parser words sets
 assocs combinators quotations math hashtables lists classes
 classes.tuple prettyprint prettyprint.custom formatting
-compiler.units ;
+compiler.units io strings ;
 
 IN: factor-logica
 
@@ -22,7 +22,7 @@ SINGLETON: LOGIC-VAR
 >>
 
 : logic-var? ( obj -- ? )
-    dup symbol? [ get LOGIC-VAR = ] [ drop f ] if ; inline
+    dup symbol? [ get LOGIC-VAR? ] [ drop f ] if ; inline
 
 PRIVATE>
 
@@ -72,20 +72,18 @@ TUPLE: logic-env table ;
 
 :: env-get ( env x -- pair/f ) x env table>> at ; inline
 
-:: env-at* ( x env -- pair/f ? ) x env table>> at* ; inline
+! :: env-at* ( x env -- pair/f ? ) x env table>> at* ; inline
 
 :: env-delete ( env x -- ) x env table>> delete-at ; inline
 
 : env-clear ( env -- ) table>> clear-assoc ; inline
 
 :: dereference ( env! term! -- env' term' )
-    [
-        [ term logic-var? ] [
-            env term env-get :> p
-            p [ return ] unless
-            p first2 env! term!
-        ] while
-    ] with-return
+    t :> loop?!
+    [ term logic-var? loop? and ] [
+        env term env-get :> p
+        p [ p first2 env! term! ] [ f loop?! ] if
+    ] while
     env term ;
 
 : list-except-nil? ( obj -- ? ) [ list? ] [ nil? not ] bi and ; inline
@@ -129,7 +127,8 @@ TUPLE: callback-env env trail ;
 
 : <callback-env> ( env trail -- cb-env ) callback-env boa ;
 
-M:: callback-env at* ( term cb-env -- value/f ? ) term cb-env env>> at* ;
+M:: callback-env at* ( term cb-env -- value/f ? )
+    term cb-env env>> at* ;
 
 TUPLE: cut-info cut? ;
 
@@ -139,7 +138,8 @@ C: <cut> cut-info
 
 : set-info ( ? cut-info -- ) cut?<< ; inline
 
-: set-info-if-f ( ? cut-info -- ) dup cut?>> [ 2drop ] [ cut?<< ] if ; inline
+: set-info-if-f ( ? cut-info -- )
+    dup cut?>> [ 2drop ] [ cut?<< ] if ; inline
 
 PRIVATE>
 
@@ -149,71 +149,75 @@ SYMBOL: vel   ! disjunction, or      in prolog: ;
 SYMBOL: non   ! negation             in prolog: not, \+
 
 <PRIVATE
-
+ 
 :: unify* ( x! x-env! y! y-env! trail tmp-env -- success? )
-    f :> ret-value!
-    [
-        f :> ret?! 
-        [
-            [ t ] [
-                { { [ x logic-var? ] [
-                        x-env x env-get :> xp!
-                        xp not [
-                            y-env y dereference y! y-env!
-                            x y = x-env y-env eq? and [
-                                x-env x { y y-env } env-put
-                                x-env tmp-env eq? [
-                                    { x x-env } trail push
-                                ] unless
-                            ] unless
-                            t ret?!  t ret-value! return
-                        ] [
-                            xp first2 x-env! x!
-                            x-env x dereference x! x-env!
-                        ] if
-                    ] }
-                  { [ y logic-var? ] [
-                        x y x! y!  x-env y-env x-env! y-env!
-                    ] }                 
-                  [ return ]
-                } cond
-            ] while
-        ] with-return
-        ret? [ return ] when
-        
-        x y [ logic-goal? ] both? [
-            x pred>> y pred>> = [ f ret-value! return ] unless
-            x args>> x!  y args>> y!
-        ] when
-
-        x y [ tuple? ] both? [
-            x y [ class-of ] same? [
-                f ret-value! return
-            ] unless
-            x y [ tuple-slots ] bi@
-            [| x-value y-value |
-             x-value x-env y-value y-env trail tmp-env unify* [
-                 f ret-value! return
-             ] unless
-            ] 2each
-            t ret-value! return
-        ] when
-        
-        x y [ sequence? ] both? [
-            x y [ class-of ] same? x y [ length ] same? and [
-                f ret-value! return
-            ] unless
-            x y [| x-item y-item |
-                 x-item x-env y-item y-env trail tmp-env unify* [
-                     f ret-value! return
-                 ] unless
-                ] 2each
-            t ret-value! return
-        ] when
-        
-        x y = ret-value!
-        
-    ] with-return
+    f :> ret-value!  f :> ret?! f :> ret2?!
+    t :> loop?!
+    [ loop? ] [
+        { { [ x logic-var? ] [
+                x-env x env-get :> xp!
+                xp not [
+                    y-env y dereference y! y-env!
+                    x y = x-env y-env eq? and [
+                        x-env x { y y-env } env-put
+                        x-env tmp-env eq? [
+                            { x x-env } trail push
+                        ] unless
+                    ] unless
+                    f loop?!  t ret?!  t ret-value!
+                ] [
+                    xp first2 x-env! x!
+                    x-env x dereference x! x-env!
+                ] if
+            ] }
+          { [ y logic-var? ] [
+                x y x! y!  x-env y-env x-env! y-env!
+            ] }                 
+          [ f loop?! ]
+        } cond
+    ] while
+    
+     ret? [
+         x y [ logic-goal? ] both? [
+             x pred>> y pred>> = [
+                 x args>> x!  y args>> y!
+             ] [
+                 f ret-value! t ret2?!
+             ] if
+         ] when
+         ret2? [           
+            {
+                { [ x y [ tuple? ] both? ] [                      
+                      x y [ class-of ] same? [
+                          x y [ tuple-slots ] bi@ :> ( x-slots y-slots )
+                          x-slots length 1 - :> i!  t :> loop?!  t ret-value!                          
+                          [ i 0 >= loop? and ] [
+                              x-slots y-slots [ i swap nth ] bi@  :> ( x-value y-value )
+                              x-value x-env y-value y-env trail tmp-env unify* [                           
+                                  f loop?!
+                                  f ret-value!
+                              ] unless
+                              i 1 - i!
+                          ] while
+                      ] [ f ret-value! ] if     
+                  ] }                
+                { [ x y [ sequence? ] both? ] [
+                      x y [ class-of ] same? x y [ length ] same? and [
+                          x length 1 - :> i! t :> loop?! t ret-value!
+                          [ i 0 >= loop? and ] [
+                              x y [ i swap nth ] bi@ :> ( x-item y-item )
+                              x-item x-env y-item y-env trail tmp-env unify* [
+                                  f loop?!
+                                  f ret-value!
+                              ] unless
+                              i 1 - i!
+                          ] while
+                      ] [ f ret-value! ] if
+                  ] }              
+                [  x y = ret-value! ]
+            } cond
+        ] unless
+    ] unless
     ret-value ;
 
 :: resolve-body ( body env cut quot: ( -- ) -- success? )
@@ -232,12 +236,14 @@ SYMBOL: non   ! negation             in prolog: not, \+
                 first-goal call( -- goal ) first-goal! 
             ] when
             <env> :> d-env!
-            f <cut> :> d-cut!
-            [
-                first-goal pred>> defs>> [
-                    [ first ] [ second ] bi :> ( d-head d-body )
-                    d-cut cut? cut cut? or [ return ] when
-                    V{ } clone :> trail!
+            f <cut> :> d-cut!            
+            t :> loop?!
+            first-goal pred>> defs>> :> defs
+            defs length 1 - :> i!
+            [   
+                i defs nth [ first ] [ second ] bi :> ( d-head d-body )
+                d-cut cut? cut cut? or [ f loop?! ] [
+                    V{ } clone :> trail
                     first-goal env d-head d-env trail d-env unify* first-goal not?>> xor [
                         d-body callable? [
                             d-env trail <callback-env> d-body call( cb-env -- ? ) [
@@ -256,8 +262,10 @@ SYMBOL: non   ! negation             in prolog: not, \+
                         x-env x env-delete
                     ] each
                     d-env env-clear
-                ] each
-            ] with-return
+                ] if
+                i 1 - i!
+                loop? i 0 >= and
+            ] loop                
         ] if
     ] if
     satisfied ;
@@ -283,7 +291,7 @@ SYMBOL: *anonymouse-var-no*
 
 : proxy-var-for-'_' ( -- var-symbol )
     [
-        *anonymouse-var-no* counter "ANONYMOUSE-VAR%d_" sprintf
+        *anonymouse-var-no* counter "ANONYMOUSE-VAR-%d_" sprintf
         "factor-logica" create-word dup dup
         define-symbol
         LOGIC-VAR swap set-global
@@ -393,10 +401,11 @@ SYMBOL: anonymous(is)
 
 M: array >list sequence>list ;
 
-
+    
 ! Built-in definition -----------------------------------------------------
 
-LOGIC-PREDS: (<) (>) (>=) (=<) (=:=) (=\=) (=) (\=)
+LOGIC-PREDS: (<) (>) (>=) (=<) (=:=) (=\=) (==) (\==) (=) (\=)
+             writeo nlo
              true false
              membero appendo lengtho conco
 ;
@@ -412,9 +421,21 @@ LOGIC-VARS: A_ B_ C_ X_ Y_ Z_ ;
 { (=<)  X_ Y_ } [ [ X_ of ] [ Y_ of ] bi 2dup [ number? ] both? [ <= ] [ 2drop f ] if ] voca
 { (=:=) X_ Y_ } [ [ X_ of ] [ Y_ of ] bi 2dup [ number? ] both? [ = ] [ 2drop f ] if ] voca
 { (=\=) X_ Y_ } [ [ X_ of ] [ Y_ of ] bi 2dup [ number? ] both? [ = not ] [ 2drop f ] if ] voca
+{ (==)  X_ Y_ } [ [ X_ of ] [ Y_ of ] bi = ] voca
+{ (\==) X_ Y_ } [ [ X_ of ] [ Y_ of ] bi = not ] voca
 
-{ (=)  X_ Y_ } [ dup [ X_ of ] [ Y_ of ] bi unify ] voca
-{ (\=) X_ Y_ } [ dup [ X_ of ] [ Y_ of ] bi unify not ] voca
+{ (=)   X_ Y_ } [ dup [ X_ of ] [ Y_ of ] bi unify ] voca
+{ (\=)  X_ Y_ } [ dup [ X_ of ] [ Y_ of ] bi unify not ] voca
+
+
+{ writeo X_ } [
+    X_ of [
+        dup string? [ printf ] [ pprint ] if
+    ] each t
+] voca
+
+{ nlo } [ drop nl t ] voca
+
 
 { membero X_ [ X_ Z_ cons ] } semper
 { membero X_ [ Y_ Z_ cons ] } { membero X_ Z_ } si
@@ -440,4 +461,3 @@ LOGIC-VARS: L_ L1_ L2_ L3_ ;
 { conco [ X_ L1_ cons ] L2_ [ X_ L3_ cons ] } {
     { conco L1_ L2_ L3_ }
 } si
-
