@@ -4,7 +4,7 @@ USING: logica lists kernel assocs math ;
 IN: logica.test.fib
 
 LOGIC-VARS: F F1 F2 N N1 N2 L A ;
-LOGIC-PREDS: fib F_is_F1+F2 N2_is_N-1 ;
+LOGIC-PREDS: fib ;
 
 { fib N [ F F1 F2 L cons cons cons ] } {
     { (>) N 1 }
