@@ -1,1 +1,0 @@
-norio@mac-mini.local.86352
