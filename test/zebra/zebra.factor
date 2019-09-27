@@ -1,7 +1,7 @@
 ! Copyright (C) 2019 KUSUMOTO Norio.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: factor-logica lists ;
-IN: factor-logica.test.zebra
+USING: logica lists ;
+IN: logica.test.zebra
 LOGIC-PREDS: houseso neighboro zebrao watero nexto lefto ;
 LOGIC-VARS: Hs A B Ls X Y ;
 SYMBOLS: red blue green white yellow ;

@@ -1,7 +1,7 @@
 ! Copyright (C) 2019 KUSUMOTO Norio.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: factor-logica lists arrays ;
-IN: factor-logica.test.zebra-short
+USING: logica lists arrays ;
+IN: logica.test.zebra-short
 
 ! Do the same as this Prolog program
 !
