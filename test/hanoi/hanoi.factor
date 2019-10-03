@@ -18,7 +18,7 @@ SYMBOLS: left center right ;
 
 { hanoi N } { moveo N left center right } si
 
-{ moveo 0 _ _ _ } | si
+{ moveo 0 __ __ __ } | si
 
 { moveo N A B C } {
     [ [ N of 1 - ] M is ]

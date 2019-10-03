@@ -9,11 +9,12 @@ compiler.units io strings ;
 IN: logica
 
 SYMBOL: |     ! cut                  in prolog: !
-SYMBOL: _     ! anonymous variable
+SYMBOL: __    ! anonymous variable   in prolog: _
 SYMBOL: vel   ! disjunction, or      in prolog: ;
-SYMBOL: non   ! negation             in prolog: not, \+
 
 <PRIVATE
+
+SYMBOLS: *trace?* *trace-depth* ;
 
 <<
 SYMBOL: a-pred
@@ -32,6 +33,10 @@ SINGLETON: LOGIC-VAR
     dup symbol? [ get LOGIC-VAR? ] [ drop f ] if ; inline
 
 PRIVATE>
+
+: trace ( -- ) t *trace?* set-global ;
+
+: notrace ( -- ) f *trace?* set-global ;
 
 <<
 SYNTAX: LOGIC-VARS:
@@ -56,13 +61,13 @@ SYNTAX: L{ \ }
 
 <PRIVATE
 
-TUPLE: logic-goal pred args not? ;
+TUPLE: logic-goal pred args ;
 
 : called-args ( args -- args' )
     [ dup callable? [ call( -- term ) ] when ] map ;
 
 :: <goal> ( pred args -- goal )
-    pred get args called-args f logic-goal boa ; inline
+    pred get args called-args logic-goal boa ; inline
 
 : normalize ( goal-def/defs -- goal-defs )
     dup | = [ 1array ] [
@@ -77,22 +82,21 @@ TUPLE: logic-env table ;
 
 : <env> ( -- env ) logic-env new H{ } clone >>table ; inline
 
-:: env-put ( env x pair -- ) pair x env table>> set-at ; inline
+:: env-put ( x pair env -- ) pair x env table>> set-at ; inline
 
-:: env-get ( env x -- pair/f ) x env table>> at ; inline
+:: env-get ( x env -- pair/f ) x env table>> at ; inline
 
-:: env-delete ( env x -- ) x env table>> delete-at ; inline
+:: env-delete ( x env -- ) x env table>> delete-at ; inline
 
 : env-clear ( env -- ) table>> clear-assoc ; inline
 
-:: dereference ( env! term! -- env' term' )
+:: dereference ( term! env! -- term' env' )
     t :> loop?!
-    f :> p!
     [ term logic-var? loop? and ] [
-        env term env-get p!
-        p [ p first2 env! term! ] [ f loop?! ] if
+        term env env-get :> pair!
+        pair [ pair first2 env! term! ] [ f loop?! ] if
     ] while
-    env term ;
+    term env ;
 
 : list-except-nil? ( obj -- ? ) [ list? ] [ nil? not ] bi and ; inline
 
@@ -113,7 +117,7 @@ M: cons-state pprint* pprint-object ;
 PRIVATE>
 
 M:: logic-env at* ( term! env! -- value/f ? )
-    env term dereference term! env!
+    term env dereference env! term!
     term {
         { [ dup logic-goal? ] [
               drop term pred>> term args>> env at <goal> t
@@ -148,17 +152,19 @@ C: <cut> cut-info
 
 : set-info-if-f ( ? cut-info -- )
     dup cut?>> [ 2drop ] [ cut?<< ] if ; inline
- 
-:: unify* ( x! x-env! y! y-env! trail tmp-env -- success? )
+
+DEFER: unify*
+
+:: (unify*) ( x! x-env! y! y-env! trail tmp-env -- success? )
     f :> ret-value!  f :> ret?! f :> ret2?!
     t :> loop?!
     [ loop? ] [
         { { [ x logic-var? ] [
-                x-env x env-get :> xp!
+                x x-env env-get :> xp!
                 xp not [
-                    y-env y dereference y! y-env!
+                    y y-env dereference y-env! y!
                     x y = x-env y-env eq? and [
-                        x-env x { y y-env } env-put
+                        x { y y-env } x-env env-put
                         x-env tmp-env eq? [
                             { x x-env } trail push
                         ] unless
@@ -166,7 +172,7 @@ C: <cut> cut-info
                     f loop?!  t ret?!  t ret-value!
                 ] [
                     xp first2 x-env! x!
-                    x-env x dereference x! x-env!
+                    x x-env dereference x-env! x!
                 ] if
             ] }
           { [ y logic-var? ] [
@@ -192,7 +198,8 @@ C: <cut> cut-info
                           x y [ tuple-slots ] bi@ :> ( x-slots y-slots )
                           0 :> i!  x-slots length 1 - :> stop-i  t :> loop?!
                           [ i stop-i <= loop? and ] [
-                              x-slots y-slots [ i swap nth ] bi@ :> ( x-value y-value )
+                              x-slots y-slots [ i swap nth ] bi@
+                              :> ( x-value y-value )
                               x-value x-env y-value y-env trail tmp-env unify* [                           
                                   f loop?!
                                   f ret-value!
@@ -220,51 +227,69 @@ C: <cut> cut-info
     ] unless
     ret-value ;
 
-:: resolve-body ( body env cut quot: ( -- ) -- success? )
-    f :> satisfied!    
+:: unify* ( x x-env y y-env trail tmp-env -- success? )
+    *trace?* get-global :> trace?
+    0 :> depth!
+    trace? [
+        *trace-depth* counter depth!
+        depth [ "\t" printf ] times
+        "Unification of " printf x-env x of pprint
+        " and " printf y pprint
+        nl
+    ] when
+    x x-env y y-env trail tmp-env (unify*) :> success?
+    trace? [
+        depth [ "\t" printf ] times
+        success? [ "==> Success\n" ] [ "==> Fail\n" ] if "%s\n" printf
+        *trace-depth* get-global 1 - *trace-depth* set-global
+    ] when
+    success? ;
+
+:: resolve-body ( body env cut quot: ( -- ) -- success? )   
+    t :> satisfied?!
     body empty? [
         quot call( -- )
-        t satisfied!
+        t satisfied?!
     ] [
         body first :> first-goal!
-        body rest  :> rest-goals    
+        body rest  :> rest-goals!
+        f :> satisfied?!
         first-goal | = [          ! cut
-            rest-goals env cut [ quot call( -- ) ] resolve-body satisfied!
+            rest-goals env cut [ quot call( -- ) ] resolve-body satisfied?!
             t cut set-info
         ] [
             first-goal callable? [ 
                 first-goal call( -- goal ) first-goal! 
-            ] when
+            ] when            
             <env> :> d-env!
             f <cut> :> d-cut!            
-            t :> loop?!
-            first-goal pred>> defs>> :> defs
-            0 :> i!  defs length 1 - :> stop-i
-            [
-                i defs nth [ first ] [ second ] bi :> ( d-head d-body )
-                d-cut cut? cut cut? or [ f loop?! ] [
+            first-goal pred>> defs>> [
+                [ first ] [ second ] bi :> ( d-head d-body )
+                d-cut cut? cut cut? or [ t ] [
                     V{ } clone :> trail
-                    first-goal env d-head d-env trail d-env unify* first-goal not?>> xor [
-                        d-body callable? [
+                    first-goal env d-head d-env trail d-env unify*
+                    [
+                        d-body callable? [                            
                             d-env trail <callback-env> d-body call( cb-env -- ? ) [
-                                rest-goals env cut [ quot call( -- ) ] resolve-body satisfied!
+                                rest-goals env cut [ quot call( -- ) ]
+                                resolve-body satisfied?!
                             ] when
                         ] [
                             d-body d-env d-cut
-                            [ rest-goals env cut [ quot call( -- ) ] resolve-body satisfied!
+                            [ rest-goals env cut [ quot call( -- ) ]
+                              resolve-body satisfied?!
                               cut cut? d-cut set-info-if-f ]
-                            resolve-body satisfied!
-                        ] if
+                            resolve-body satisfied?!
+                        ] if                        
                     ] when
-                    trail [ first2 swap env-delete ] each
+                    trail [ first2 env-delete ] each
                     d-env env-clear
-                ] if
-                i 1 + i!
-                loop? i stop-i <= and
-            ] loop                
+                    f
+                ] if                
+            ] find 2drop            
         ] if
     ] if
-    satisfied ;
+    satisfied? ;
 
 SYMBOL: anonymous(is)
 SYMBOL: anonymous(t/f)
@@ -285,65 +310,57 @@ SYMBOL: *anonymouse-var-no*
 
 : reset-anonymouse-var-no ( -- )  0 *anonymouse-var-no* set-global ;
 
-: proxy-var-for-'_' ( -- var-symbol )
+: proxy-var-for-'__' ( -- var-symbol )
     [
-        *anonymouse-var-no* counter "ANONYMOUSE-VAR-%d_" sprintf
+        *anonymouse-var-no* counter "ANON-%d_" sprintf
         "logica" create-word dup dup
         define-symbol
         LOGIC-VAR swap set-global
     ] with-compilation-unit ;
 
-: replace-'_' ( before -- after )
+: replace-'__' ( before -- after )
     {
-        { [ dup _ = ] [ drop proxy-var-for-'_' ] }
-        { [ dup sequence? ] [ [ replace-'_' ] map ] }
+        { [ dup __ = ] [ drop proxy-var-for-'__' ] }
+        { [ dup sequence? ] [ [ replace-'__' ] map ] }
         { [ dup tuple? ] [
-              [ tuple-slots [ replace-'_' ] map ]
+              [ tuple-slots [ replace-'__' ] map ]
               [ class-of slots>tuple ] bi ] }
         [ ]
     } cond ;
+
+SYMBOL: dummy-item
 
 PRIVATE>
 
 :: si ( head body -- )
     reset-anonymouse-var-no
-    head replace-'_' [ first ] [ rest ] bi <goal> :> head-goal
-    body replace-'_' normalize split-body  ! disjunction
+    head replace-'__' [ first ] [ rest ] bi <goal> :> head-goal
+    body replace-'__' normalize split-body  ! disjunction
     dup empty? [
         head-goal swap 2array head-goal pred>>
         [ swap 1array append ] change-defs drop
     ] [
         [
             [
-                f :> negation-goal?!
                 {
                     { [ dup array? ] [
-                          [ first ] [ rest ] bi <goal> negation-goal? >>not?
-                          f negation-goal?!
+                          [ first ] [ rest ] bi <goal>
                       ] }
                     { [ dup callable? ] [
-                          call( -- goal ) negation-goal? >>not?
-                          f negation-goal?!
+                          call( -- goal )
                       ] }
                     { [ dup [ t = ] [ f = ] bi or ] [
                           :> t/f
                           V{ } clone :> defs
                           f [ drop t/f ] 2array defs push
                           anonymous(t/f) defs logic-pred boa { } clone <goal>
-                          negation-goal? >>not?
-                          f negation-goal?!
                       ] }
-                    { [ dup non = ] [
-                          drop f                           ! dummy
-                          t negation-goal?! 
-                      ] }
-                    { [ dup | = ] [ f negation-goal?! ] }  ! as '|'     
-                    [ drop f f negation-goal?! ]           ! dummy
+                    { [ dup | = ] [ ] }  ! as '|'     
+                    [ drop dummy-item ]
                 } cond
-            ] map f swap remove :> body-goals
+            ] map dummy-item swap remove :> body-goals
             head-goal body-goals
             2array head-goal pred>> [ swap 1array append ] change-defs drop
-
         ] each    
     ] if ;
 
@@ -356,26 +373,37 @@ PRIVATE>
 
 :: unify ( cb-env x y -- success? )
     cb-env env>> :> env
-    x env y env cb-env trail>> env unify* ;
+    x env y env cb-env trail>> env (unify*) ;
+
+<PRIVATE
 
 :: (resolve) ( goal-def/defs quot: ( env -- ) -- success? )
-    goal-def/defs replace-'_' normalize [
+    goal-def/defs replace-'__' normalize [
         [ first ] [ rest ] bi <goal>
     ] map :> goals
     <env> :> env
     goals env f <cut> [ env quot call( env -- ) ] resolve-body ;
+
+PRIVATE>
 
 : resolve ( goal-def/defs quot: ( env -- ) -- ) (resolve) drop ;
 
 : resolve* ( goal-def/defs -- ) [ drop ] resolve ;
 
 :: query ( goal-def/defs -- bindings-array/success? )
+    *trace?* get-global :> trace?
     V{ } clone :> bindings-seq
     goal-def/defs normalize
     [| env |
      V{ } clone :> bindings
-     env table>> keys [ dup env at 2array bindings push ] each
-     bindings >hashtable bindings-seq push ]
+     env table>> keys
+     [| key |
+      key dup env at 2array bindings push
+      trace? [ key "%s: " printf  key env at pprint nl ] when
+     ] each
+     bindings >hashtable bindings-seq push
+     trace? [ "------------\n" printf ] when
+    ]
     (resolve) :> success?
     bindings-seq >array
     dup empty? [
@@ -387,6 +415,8 @@ PRIVATE>
     ] if ;
 
 SYMBOL: anonymous(is)
+
+<PRIVATE
 
 :: collect-logic-vars ( seq -- vars-array )
     V{ } clone :> vars
@@ -404,14 +434,16 @@ SYMBOL: anonymous(is)
     ] each
     vars >array ;
 
+PRIVATE>
+
 :: is ( quot: ( env -- value ) dist -- goal )
     quot collect-logic-vars
     dup dist swap member? [ dist 1array append ] unless :> args 
     anonymous(is) <pred> :> is-pred
-    is-pred args f logic-goal boa :> is-goal
+    is-pred args logic-goal boa :> is-goal
     is-goal [| env | env dist env quot call( env -- value ) unify ]
     2array is-goal pred>> [ swap 1array append ] change-defs drop
-    is-pred args f logic-goal boa ;
+    is-pred args logic-goal boa ;
 
 M: array >list sequence>list ;
 
@@ -419,13 +451,11 @@ M: array >list sequence>list ;
 ! Built-in definition -----------------------------------------------------
 
 LOGIC-PREDS: (<) (>) (>=) (=<) (=:=) (=\=) (==) (\==) (=) (\=)
+             true fail
+             varo nonvaro
              writeo writenlo nlo
-             true false
-             membero appendo lengtho conco
+             membero appendo lengtho conco listo
 ;
-
-{ true }  [ drop t ] voca
-{ false } [ drop f ] voca
 
 LOGIC-VARS: A_ B_ C_ X_ Y_ Z_ ;
 
@@ -440,6 +470,14 @@ LOGIC-VARS: A_ B_ C_ X_ Y_ Z_ ;
 
 { (=)   X_ Y_ } [ dup [ X_ of ] [ Y_ of ] bi unify ] voca
 { (\=)  X_ Y_ } [ dup [ X_ of ] [ Y_ of ] bi unify not ] voca
+
+
+{ true } [ drop t ] voca
+{ fail } [ drop f ] voca
+
+
+{ varo X_ }    [ X_ of logic-var? ] voca
+{ nonvaro X_ } [ X_ of logic-var? not ] voca
 
 
 { writeo X_ } [
@@ -465,7 +503,7 @@ LOGIC-VARS: A_ B_ C_ X_ Y_ Z_ ;
 LOGIC-VARS: Tail_ N_ N1_ ;
 
 { lengtho +nil+ 0 } semper
-{ lengtho [ _ Tail_ cons ] N_ } {
+{ lengtho [ __ Tail_ cons ] N_ } {
     { lengtho Tail_ N1_ }
     [ [ N1_ of 1 + ] N_ is ]
 } si
@@ -477,3 +515,7 @@ LOGIC-VARS: L_ L1_ L2_ L3_ ;
 { conco [ X_ L1_ cons ] L2_ [ X_ L3_ cons ] } {
     { conco L1_ L2_ L3_ }
 } si
+
+
+{ listo +nil+ } semper
+{ listo [ __ __ cons ] } semper

@@ -22,15 +22,15 @@ SYMBOLS: english spanish japanese ;
 SYMBOLS: dog cat zebra ;
 TUPLE: house color nationality pet ;
 
-{ neighboro L R [ L R _ cons cons ] } semper
-{ neighboro L R [ _ Xs cons ] } { neighboro L R Xs } si
+{ neighboro L R [ L R __ cons cons ] } semper
+{ neighboro L R [ __ Xs cons ] } { neighboro L R Xs } si
 
 { zebrao X } {
    { (=) Street [ { H1 H2 H3 } >list ] }
-   { membero [ T{ house f red english _ } ] Street }
-   { membero [ T{ house f _ spanish dog } ] Street }
-   { neighboro [ T{ house f _ _ cat } ] [ T{ house f _ japanese _ } ]  Street }
-   { neighboro [ T{ house f _ _ cat } ] [ T{ house f blue _ _ } ] Street }
-   { membero [ T{ house f _ X zebra } ] Street }
+   { membero [ T{ house f red english __ } ] Street }
+   { membero [ T{ house f __ spanish dog } ] Street }
+   { neighboro [ T{ house f __ __ cat } ] [ T{ house f __ japanese __ } ]  Street }
+   { neighboro [ T{ house f __ __ cat } ] [ T{ house f blue __ __ } ] Street }
+   { membero [ T{ house f __ X zebra } ] Street }
 } si
 
