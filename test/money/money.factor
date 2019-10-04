@@ -4,9 +4,9 @@ USING: logica lists assocs sequences kernel math
 locals formatting io ;
 IN: logica.test.money
 
-LOGIC-PREDS: sumo sum1o digitsumo delo nonzeroo donaldo moneyo ;
+LOGIC-PREDS: sumo sum1o digitsumo delo donaldo moneyo ;
 LOGIC-VARS: S E N D M O R Y A L G B T
-            N1 N2 C C1 C2 D1 D2 L1 X
+            N1 N2 C C1 C2 D1 D2 L1
             Digits Digs Digs1 Digs2 Digs3 ;
 
 { sumo N1 N2 N } {
@@ -28,19 +28,21 @@ LOGIC-VARS: S E N D M O R Y A L G B T
     [ [ S of 10 / >integer ] C is ]
 } si
 
-{ delo A L L } { { nonvaro A } | } si
+{ delo A L L } { { nonvaro A } meti } si
 { delo A [ A L cons ] L } semper
 { delo A [ B L cons ] [ B L1 cons ] } { delo A L L1 } si
 
 
-{ moneyo L{ 0 S E N D }
-         L{ 0 M O R E }
-         L{ M O N E Y }
+{ moneyo
+  L{ 0 S E N D }
+  L{ 0 M O R E }
+  L{ M O N E Y }
 } semper
 
-{ donaldo  L{ D O N A L D }
-           L{ G E R A L D }
-           L{ R O B E R T } 
+{ donaldo
+  L{ D O N A L D }
+  L{ G E R A L D }
+  L{ R O B E R T } 
 } semper
 
 :: S-and-M-can't-be-zero ( seq -- seq' )

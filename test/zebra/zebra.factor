@@ -30,15 +30,19 @@ TUPLE: house color nationality drink smoke pet ;
     { membero T{ house f __ __ beer blue-master __ } Hs }                         ! #13
     { membero T{ house f __ german __ prince __ } Hs }                            ! #14
     { nexto T{ house f __ __ water __ __ } T{ house f __ __ __ blend __ } Hs }    ! #16
-
     
     { membero T{ house f __ X water __ __ } Hs }
     { membero T{ house f __ Y __ __ zebra } Hs }
 } si
 
 { nexto A B Ls } {
-    { appendo __ [ A B __ cons cons ] Ls } vel
-    { appendo __ [ B A __ cons cons ] Ls }
+!    { appendo __ [ A B __ cons cons ] Ls } vel
+!    { appendo __ [ B A __ cons cons ] Ls }
+    { appendo __ L{ A B || __ } Ls } vel
+    { appendo __ L{ B A || __ } Ls }
+
 } si
 
-{ lefto A B Ls } { appendo __ [ A B __ cons cons ] Ls } si
+! { lefto A B Ls } { appendo __ [ A B __ cons cons ] Ls } si
+{ lefto A B Ls } { appendo __ L{ A B || __ } Ls } si
+

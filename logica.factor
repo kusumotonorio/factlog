@@ -1,14 +1,14 @@
 ! Copyright (C) 2019 KUSUMOTO Norio.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays kernel locals sequences classes.parser
-words.symbol namespaces continuations lexer parser words sets
-assocs combinators quotations math hashtables lists classes
+words.symbol namespaces lexer parser words sets assocs
+combinators quotations math hashtables lists classes
 classes.tuple prettyprint prettyprint.custom formatting
 compiler.units io strings ;
 
 IN: logica
 
-SYMBOL: |     ! cut                  in prolog: !
+SYMBOL: meti  ! cut operator         in prolog: !
 SYMBOL: __    ! anonymous variable   in prolog: _
 SYMBOL: vel   ! disjunction, or      in prolog: ;
 
@@ -27,6 +27,20 @@ TUPLE: logic-pred name defs ;
     { } clone >>defs ;
 
 SINGLETON: LOGIC-VAR
+
+PRIVATE>
+
+SYMBOL: ||
+
+<PRIVATE
+
+:: parse-list ( seq -- list )
+    seq [ || = ] find drop :> d-pos
+    d-pos [
+        d-pos 1 + seq nth
+        seq d-pos head dup length 1 > [ reverse ] when ! [ 1array ] if
+        [ swap cons ] each
+    ] [ seq sequence>list ] if ;
 >>
 
 : logic-var? ( obj -- ? )
@@ -56,7 +70,10 @@ SYNTAX: LOGIC-PREDS:
     ] each-token ;
 
 SYNTAX: L{ \ }
-    [ >array sequence>list ] parse-literal ;
+    [ >array parse-list ] parse-literal ;
+
+! SYNTAX: L{ \ }
+!    [ >array sequence>list ] parse-literal ;
 >>
 
 <PRIVATE
@@ -70,7 +87,7 @@ TUPLE: logic-goal pred args ;
     pred get args called-args logic-goal boa ; inline
 
 : normalize ( goal-def/defs -- goal-defs )
-    dup | = [ 1array ] [
+    dup meti = [ 1array ] [
         dup length 0 > [
             dup first dup symbol? [
                 get logic-pred? [ 1array ] when
@@ -109,7 +126,7 @@ M:: cons-state >pprint-sequence ( x -- seq )
    x-cdr nil? [ x-car 1array ] [
         x-cdr cons-state? [
             x-car 1array x-cdr >pprint-sequence append
-        ] [ x-car \ . x-cdr 3array ] if
+        ] [ x-car \ || x-cdr 3array ] if
    ] if ;
 
 M: cons-state pprint* pprint-object ;
@@ -254,7 +271,7 @@ DEFER: unify*
         body first :> first-goal!
         body rest  :> rest-goals!
         f :> satisfied?!
-        first-goal | = [          ! cut
+        first-goal meti = [          ! cut
             rest-goals env cut [ quot call( -- ) ] resolve-body satisfied?!
             t cut set-info
         ] [
@@ -267,20 +284,21 @@ DEFER: unify*
                 [ first ] [ second ] bi :> ( d-head d-body )
                 d-cut cut? cut cut? or [ t ] [
                     V{ } clone :> trail
-                    first-goal env d-head d-env trail d-env unify*
-                    [
+                    first-goal env d-head d-env trail d-env unify* [
                         d-body callable? [                            
                             d-env trail <callback-env> d-body call( cb-env -- ? ) [
-                                rest-goals env cut [ quot call( -- ) ]
-                                resolve-body satisfied?!
+                                rest-goals env cut [
+                                    quot call( -- )
+                                ] resolve-body satisfied?!
                             ] when
                         ] [
-                            d-body d-env d-cut
-                            [ rest-goals env cut [ quot call( -- ) ]
-                              resolve-body satisfied?!
-                              cut cut? d-cut set-info-if-f ]
-                            resolve-body satisfied?!
-                        ] if                        
+                            d-body d-env d-cut [
+                                rest-goals env cut [
+                                    quot call( -- )
+                                ] resolve-body satisfied?!
+                                cut cut? d-cut set-info-if-f
+                            ] resolve-body satisfied?!
+                        ] if                    
                     ] when
                     trail [ first2 env-delete ] each
                     d-env env-clear
@@ -355,7 +373,7 @@ PRIVATE>
                           f [ drop t/f ] 2array defs push
                           anonymous(t/f) defs logic-pred boa { } clone <goal>
                       ] }
-                    { [ dup | = ] [ ] }  ! as '|'     
+                    { [ dup meti = ] [ ] }  ! as 'meti'     
                     [ drop dummy-item ]
                 } cond
             ] map dummy-item swap remove :> body-goals
@@ -451,7 +469,7 @@ M: array >list sequence>list ;
 ! Built-in definition -----------------------------------------------------
 
 LOGIC-PREDS: (<) (>) (>=) (=<) (=:=) (=\=) (==) (\==) (=) (\=)
-             true fail
+             trueo failo
              varo nonvaro
              writeo writenlo nlo
              membero appendo lengtho conco listo
@@ -472,8 +490,8 @@ LOGIC-VARS: A_ B_ C_ X_ Y_ Z_ ;
 { (\=)  X_ Y_ } [ dup [ X_ of ] [ Y_ of ] bi unify not ] voca
 
 
-{ true } [ drop t ] voca
-{ fail } [ drop f ] voca
+{ trueo } [ drop t ] voca
+{ failo } [ drop f ] voca
 
 
 { varo X_ }    [ X_ of logic-var? ] voca
@@ -491,19 +509,19 @@ LOGIC-VARS: A_ B_ C_ X_ Y_ Z_ ;
 { nlo } [ drop nl t ] voca
 
 
-{ membero X_ [ X_ Z_ cons ] } semper
-{ membero X_ [ Y_ Z_ cons ] } { membero X_ Z_ } si
+{ membero X_ L{ X_ || Z_ } } semper
+{ membero X_ L{ Y_ || Z_ } } { membero X_ Z_ } si
 
-{ appendo +nil+ A_ A_ } semper
-{ appendo [ A_ X_ cons ] Y_ [ A_ Z_ cons ] } {
+{ appendo L{ } A_ A_ } semper
+{ appendo L{ A_ || X_ } Y_ L{ A_ || Z_ } } {
     { appendo X_ Y_ Z_ }
 } si
 
 
 LOGIC-VARS: Tail_ N_ N1_ ;
 
-{ lengtho +nil+ 0 } semper
-{ lengtho [ __ Tail_ cons ] N_ } {
+{ lengtho L{ } 0 } semper
+{ lengtho L{ __ || Tail_ } N_ } {
     { lengtho Tail_ N1_ }
     [ [ N1_ of 1 + ] N_ is ]
 } si
@@ -511,11 +529,11 @@ LOGIC-VARS: Tail_ N_ N1_ ;
 
 LOGIC-VARS: L_ L1_ L2_ L3_ ;
 
-{ conco +nil+ L_ L_ } semper
-{ conco [ X_ L1_ cons ] L2_ [ X_ L3_ cons ] } {
+{ conco L{ } L_ L_ } semper
+{ conco L{ X_ || L1_ } L2_ L{ X_ || L3_ } } {
     { conco L1_ L2_ L3_ }
 } si
 
 
-{ listo +nil+ } semper
-{ listo [ __ __ cons ] } semper
+{ listo L{ } } semper
+{ listo L{ __ || __ } } semper
