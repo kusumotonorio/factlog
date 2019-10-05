@@ -8,15 +8,14 @@ compiler.units sequences.generalizations io strings ;
 
 IN: logica
 
+<<
 SYMBOL: !!    ! cut operator         in prolog: !
-SYMBOL: vel   ! disjunction, or      in prolog: ;
 SYMBOL: __    ! anonymous variable   in prolog: _
+SYMBOL: ||    ! Head Tail separator  in prolog: |
+SYMBOL: vel   ! disjunction, or      in prolog: ;
 
 <PRIVATE
 
-SYMBOLS: *trace?* *trace-depth* ;
-
-<<
 SYMBOL: a-pred
 
 TUPLE: logic-pred name defs ;
@@ -27,12 +26,6 @@ TUPLE: logic-pred name defs ;
     { } clone >>defs ;
 
 SINGLETON: LOGIC-VAR
-
-PRIVATE>
-
-SYMBOL: ||  ! usage: L{ Head Body ... || Tail }
-
-<PRIVATE
 
 :: parse-list ( seq -- list )
     seq [ || = ] find drop :> d-pos
@@ -45,6 +38,8 @@ SYMBOL: ||  ! usage: L{ Head Body ... || Tail }
 
 : logic-var? ( obj -- ? )
     dup symbol? [ get LOGIC-VAR? ] [ drop f ] if ; inline
+
+SYMBOLS: *trace?* *trace-depth* ;
 
 PRIVATE>
 
