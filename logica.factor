@@ -11,7 +11,7 @@ IN: logica
 <<
 SYMBOL: !!    ! cut operator         in prolog: !
 SYMBOL: __    ! anonymous variable   in prolog: _
-SYMBOL: ||    ! Head Tail separator  in prolog: |
+SYMBOL: ||    ! Head-Tail separator  in prolog: |
 SYMBOL: vel   ! disjunction, or      in prolog: ;
 
 <PRIVATE
@@ -201,9 +201,7 @@ DEFER: unify*
             ] if
         ] when
         ret2? [           
-            {
-
-
+            {                
                 { [ x y [ tuple? ] both? ] [                      
                       x y [ class-of ] same? [
                           x y [ tuple-slots ] bi@ :> ( x-slots y-slots )
@@ -256,52 +254,55 @@ DEFER: unify*
     ] when
     success? ;
 
-:: resolve-body ( body env cut quot: ( -- ) -- success? )   
-    t :> satisfied?!
+:: resolve-body ( body env cut quot: ( -- ) -- )   
     body empty? [
         quot call( -- )
-        t satisfied?!
     ] [
         body first :> first-goal!
         body rest  :> rest-goals!
-        f :> satisfied?!
-        first-goal !! = [  ! cut
-            rest-goals env cut [ quot call( -- ) ] resolve-body satisfied?!
+        first-goal !! = [           ! cut
+            rest-goals env cut [
+                quot call( -- )
+            ] resolve-body
             t cut set-info
         ] [
             first-goal callable? [ 
                 first-goal call( -- goal ) first-goal! 
-            ] when            
+            ] when
+            *trace?* get-global [
+                first-goal
+                [ pred>> name>> "in: { %s " printf ]
+                [ args>> [ "%s " printf ] each "}\n" printf ] bi
+            ] when
             <env> :> d-env!
-            f <cut> :> d-cut!            
+            f <cut> :> d-cut!   
             first-goal pred>> defs>> [
                 [ first ] [ second ] bi :> ( d-head d-body )
                 d-cut cut? cut cut? or [ t ] [
                     V{ } clone :> trail
                     first-goal env d-head d-env trail d-env unify* [
-                        d-body callable? [                            
+                        d-body callable? [                  
                             d-env trail <callback-env> d-body call( cb-env -- ? ) [
                                 rest-goals env cut [
                                     quot call( -- )
-                                ] resolve-body satisfied?!
+                                ] resolve-body
                             ] when
                         ] [
                             d-body d-env d-cut [
                                 rest-goals env cut [
                                     quot call( -- )
-                                ] resolve-body satisfied?!
+                                ] resolve-body
                                 cut cut? d-cut set-info-if-f
-                            ] resolve-body satisfied?!
-                        ] if                    
+                            ] resolve-body
+                        ] if
                     ] when
                     trail [ first2 env-delete ] each
                     d-env env-clear
                     f
-                ] if                
-            ] find 2drop            
+                ] if
+            ] find 2drop
         ] if
-    ] if
-    satisfied? ;
+    ] if ;
 
 SYMBOL: anonymous(is)
 SYMBOL: anonymous(t/f)
@@ -389,7 +390,7 @@ PRIVATE>
 
 <PRIVATE
 
-:: (resolve) ( goal-def/defs quot: ( env -- ) -- success? )
+:: (resolve) ( goal-def/defs quot: ( env -- ) -- )
     goal-def/defs replace-'__' normalize [
         [ first ] [ rest ] bi <goal>
     ] map :> goals
@@ -398,26 +399,29 @@ PRIVATE>
 
 PRIVATE>
 
-: resolve ( goal-def/defs quot: ( env -- ) -- ) (resolve) drop ;
+: resolve ( goal-def/defs quot: ( env -- ) -- ) (resolve) ;
 
 : resolve* ( goal-def/defs -- ) [ drop ] resolve ;
 
 :: query ( goal-def/defs -- bindings-array/success? )
     *trace?* get-global :> trace?
+    f :> success?!
     V{ } clone :> bindings-seq
     goal-def/defs normalize
     [| env |
      V{ } clone :> bindings
-     env table>> keys
-     [| key |
-      key dup env at 2array bindings push
-      trace? [ key "%s: " printf  key env at pprint nl ] when
-     ] each
+     env table>> keys [| key |
+                       key dup env at 2array bindings push
+                       trace? [
+                           key "%s: " printf key env at pprint nl
+                       ] when
+                      ] each
      bindings >hashtable bindings-seq push
+     t success?!
      trace? [ "------------\n" printf ] when
-    ]
-    (resolve) :> success?
+    ] (resolve)
     bindings-seq >array
+
     dup empty? [
         drop success?
     ] [    
@@ -471,24 +475,46 @@ LOGIC-PREDS: (<) (>) (>=) (=<) (=:=) (=\=) (==) (\==) (=) (\=)
 
 LOGIC-VARS: A_ B_ C_ X_ Y_ Z_ ;
 
-{ (<)   X_ Y_ } [ [ X_ of ] [ Y_ of ] bi 2dup [ number? ] both? [ < ] [ 2drop f ] if ] voca
-{ (>)   X_ Y_ } [ [ X_ of ] [ Y_ of ] bi 2dup [ number? ] both? [ > ] [ 2drop f ] if ] voca
-{ (>=)  X_ Y_ } [ [ X_ of ] [ Y_ of ] bi 2dup [ number? ] both? [ >= ] [ 2drop f ] if ] voca
-{ (=<)  X_ Y_ } [ [ X_ of ] [ Y_ of ] bi 2dup [ number? ] both? [ <= ] [ 2drop f ] if ] voca
-{ (=:=) X_ Y_ } [ [ X_ of ] [ Y_ of ] bi 2dup [ number? ] both? [ = ] [ 2drop f ] if ] voca
-{ (=\=) X_ Y_ } [ [ X_ of ] [ Y_ of ] bi 2dup [ number? ] both? [ = not ] [ 2drop f ] if ] voca
-{ (==)  X_ Y_ } [ [ X_ of ] [ Y_ of ] bi = ] voca
+{ (<) X_ Y_ } [
+    [ X_ of ] [ Y_ of ] bi 2dup [ number? ] both? [ < ] [ 2drop f ] if
+] voca
+
+{ (>) X_ Y_ } [
+    [ X_ of ] [ Y_ of ] bi 2dup [ number? ] both? [ > ] [ 2drop f ] if
+] voca
+
+{ (>=) X_ Y_ } [
+    [ X_ of ] [ Y_ of ] bi 2dup [ number? ] both? [ >= ] [ 2drop f ] if
+] voca
+
+{ (=<) X_ Y_ } [
+    [ X_ of ] [ Y_ of ] bi 2dup [ number? ] both? [ <= ] [ 2drop f ] if
+] voca
+
+{ (=:=) X_ Y_ } [
+    [ X_ of ] [ Y_ of ] bi 2dup [ number? ] both? [ = ] [ 2drop f ] if
+] voca
+
+{ (=\=) X_ Y_ } [
+    [ X_ of ] [ Y_ of ] bi 2dup [ number? ] both? [ = not ] [ 2drop f ] if
+] voca
+
+{ (==) X_ Y_ } [ [ X_ of ] [ Y_ of ] bi = ] voca
+
 { (\==) X_ Y_ } [ [ X_ of ] [ Y_ of ] bi = not ] voca
 
-{ (=)   X_ Y_ } [ dup [ X_ of ] [ Y_ of ] bi unify ] voca
-{ (\=)  X_ Y_ } [ dup [ X_ of ] [ Y_ of ] bi unify not ] voca
+{ (=) X_ Y_ } [ dup [ X_ of ] [ Y_ of ] bi unify ] voca
+
+{ (\=) X_ Y_ } [ dup [ X_ of ] [ Y_ of ] bi unify not ] voca
 
 
 { trueo } [ drop t ] voca
+
 { failo } [ drop f ] voca
 
 
 { varo X_ }    [ X_ of logic-var? ] voca
+
 { nonvaro X_ } [ X_ of logic-var? not ] voca
 
 
