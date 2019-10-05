@@ -1,5 +1,8 @@
 ! Copyright (C) 2019 KUSUMOTO Norio.
 ! See http://factorcode.org/license.txt for BSD license.
+
+! Zebra Puzzle: https://rosettacode.org/wiki/Zebra_puzzle
+
 USING: logica lists ;
 IN: logica.test.zebra
 LOGIC-PREDS: houseso neighboro zebrao watero nexto lefto ;
@@ -37,7 +40,6 @@ TUPLE: house color nationality drink smoke pet ;
 { nexto A B Ls } {
     { appendo __ L{ A B || __ } Ls } vel
     { appendo __ L{ B A || __ } Ls }
-
 } si
 
 { lefto A B Ls } { appendo __ L{ A B || __ } Ls } si
