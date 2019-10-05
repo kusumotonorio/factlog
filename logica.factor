@@ -4,13 +4,13 @@ USING: accessors arrays kernel locals sequences classes.parser
 words.symbol namespaces lexer parser words sets assocs
 combinators quotations math hashtables lists classes
 classes.tuple prettyprint prettyprint.custom formatting
-compiler.units io strings ;
+compiler.units sequences.generalizations io strings ;
 
 IN: logica
 
-SYMBOL: meti  ! cut operator         in prolog: !
-SYMBOL: __    ! anonymous variable   in prolog: _
+SYMBOL: !!    ! cut operator         in prolog: !
 SYMBOL: vel   ! disjunction, or      in prolog: ;
+SYMBOL: __    ! anonymous variable   in prolog: _
 
 <PRIVATE
 
@@ -30,7 +30,7 @@ SINGLETON: LOGIC-VAR
 
 PRIVATE>
 
-SYMBOL: ||
+SYMBOL: ||  ! usage: L{ Head Body ... || Tail }
 
 <PRIVATE
 
@@ -38,7 +38,7 @@ SYMBOL: ||
     seq [ || = ] find drop :> d-pos
     d-pos [
         d-pos 1 + seq nth
-        seq d-pos head dup length 1 > [ reverse ] when ! [ 1array ] if
+        seq d-pos head dup length 1 > [ reverse ] when
         [ swap cons ] each
     ] [ seq sequence>list ] if ;
 >>
@@ -71,9 +71,6 @@ SYNTAX: LOGIC-PREDS:
 
 SYNTAX: L{ \ }
     [ >array parse-list ] parse-literal ;
-
-! SYNTAX: L{ \ }
-!    [ >array sequence>list ] parse-literal ;
 >>
 
 <PRIVATE
@@ -87,7 +84,7 @@ TUPLE: logic-goal pred args ;
     pred get args called-args logic-goal boa ; inline
 
 : normalize ( goal-def/defs -- goal-defs )
-    dup meti = [ 1array ] [
+    dup !! = [ 1array ] [
         dup length 0 > [
             dup first dup symbol? [
                 get logic-pred? [ 1array ] when
@@ -171,7 +168,7 @@ C: <cut> cut-info
     dup cut?>> [ 2drop ] [ cut?<< ] if ; inline
 
 DEFER: unify*
-
+    
 :: (unify*) ( x! x-env! y! y-env! trail tmp-env -- success? )
     f :> ret-value!  f :> ret?! f :> ret2?!
     t :> loop?!
@@ -201,23 +198,25 @@ DEFER: unify*
     
     ret? [
         t ret-value!
-         x y [ logic-goal? ] both? [
-             x pred>> y pred>> = [
-                 x args>> x!  y args>> y!
-             ] [
-                 f ret-value! t ret2?!
-             ] if
-         ] when
-         ret2? [           
+        x y [ logic-goal? ] both? [
+            x pred>> y pred>> = [
+                x args>> x!  y args>> y!
+            ] [
+                f ret-value! t ret2?!
+            ] if
+        ] when
+        ret2? [           
             {
+
+
                 { [ x y [ tuple? ] both? ] [                      
                       x y [ class-of ] same? [
                           x y [ tuple-slots ] bi@ :> ( x-slots y-slots )
                           0 :> i!  x-slots length 1 - :> stop-i  t :> loop?!
                           [ i stop-i <= loop? and ] [
                               x-slots y-slots [ i swap nth ] bi@
-                              :> ( x-value y-value )
-                              x-value x-env y-value y-env trail tmp-env unify* [                           
+                              :> ( x-item y-item )
+                              x-item x-env y-item y-env trail tmp-env unify* [                           
                                   f loop?!
                                   f ret-value!
                               ] unless
@@ -271,7 +270,7 @@ DEFER: unify*
         body first :> first-goal!
         body rest  :> rest-goals!
         f :> satisfied?!
-        first-goal meti = [          ! cut
+        first-goal !! = [  ! cut
             rest-goals env cut [ quot call( -- ) ] resolve-body satisfied?!
             t cut set-info
         ] [
@@ -373,7 +372,7 @@ PRIVATE>
                           f [ drop t/f ] 2array defs push
                           anonymous(t/f) defs logic-pred boa { } clone <goal>
                       ] }
-                    { [ dup meti = ] [ ] }  ! as 'meti'     
+                    { [ dup !! = ] [ ] }  ! as '!!'     
                     [ drop dummy-item ]
                 } cond
             ] map dummy-item swap remove :> body-goals

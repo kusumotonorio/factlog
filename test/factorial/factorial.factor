@@ -10,6 +10,6 @@ LOGIC-VARS: N F N2 F2 ;
     { (>) N 0 }
     [ [ N of 1 - ] N2 is ]
     { factorial N2 F2 }
-    [ [ [ F2 of ] [ N of ] bi * ] F is ] meti
+    [ [ [ F2 of ] [ N of ] bi * ] F is ] !!
 } si
 { factorial 0 1 } semper

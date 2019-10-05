@@ -28,7 +28,7 @@ LOGIC-VARS: S E N D M O R Y A L G B T
     [ [ S of 10 / >integer ] C is ]
 } si
 
-{ delo A L L } { { nonvaro A } meti } si
+{ delo A L L } { { nonvaro A } !! } si
 { delo A [ A L cons ] L } semper
 { delo A [ B L cons ] [ B L1 cons ] } { delo A L L1 } si
 
