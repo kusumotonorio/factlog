@@ -1,8 +1,8 @@
 ! Copyright (C) 2019 KUSUMOTO Norio.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays kernel locals sequences classes.parser
-words.symbol namespaces lexer parser words sets assocs
-combinators quotations math hashtables lists classes
+continuations words.symbol namespaces lexer parser words sets
+assocs combinators quotations math hashtables lists classes
 classes.tuple prettyprint prettyprint.custom formatting
 compiler.units sequences.generalizations io strings ;
 
@@ -16,8 +16,6 @@ SYMBOL: vel   ! disjunction, or      in prolog: ;
 SYMBOL: non   ! negation             in prolog: not, \+
 
 <PRIVATE
-
-SYMBOL: a-pred
 
 TUPLE: logic-pred name defs ;
 
@@ -62,7 +60,7 @@ SYNTAX: LOGIC-VARS: ";"
 
 SYNTAX: LOGIC-PREDS: ";"
     [ create-class-in dup define-symbol
-      [ dup <pred> swap set-global ]
+      [ dup "%s" sprintf <pred> swap set-global ]
       \ call
       [ suffix! ] tri@
     ] each-token ;
@@ -261,9 +259,7 @@ DEFER: unify*
         body first :> first-goal!
         body rest  :> rest-goals!
         first-goal !! = [           ! cut
-            rest-goals env cut [
-                quot call( -- )
-            ] resolve-body
+            rest-goals env cut [ quot call( -- ) ] resolve-body
             t cut set-info
         ] [
             first-goal callable? [ 
@@ -272,7 +268,7 @@ DEFER: unify*
             *trace?* get-global [
                 first-goal
                 [ pred>> name>> "in: { %s " printf ]
-                [ args>> [ "%s " printf ] each "}\n" printf ] bi
+                [ args>> [ "%u " printf ] each "}\n" printf ] bi
             ] when
             <env> :> d-env!
             f <cut> :> d-cut!   
@@ -299,8 +295,6 @@ DEFER: unify*
             ] find 2drop
         ] if
     ] if ;
-
-SYMBOLS: anonymous(is) anonymous(t/f) ;
 
 :: split-body ( body -- bodies )
     V{ } clone :> bodies
@@ -362,21 +356,17 @@ SYMBOL: *anonymouse-var-no*
 SYMBOL: dummy-item
 
 :: non-goal ( goal -- non-goal )
-    anonymous(t/f) <pred> :> f-pred
+    "failo" <pred> :> f-pred
     f-pred { } clone logic-goal boa :> f-goal
     f-goal [ drop f ] 2array 1array f-pred defs<<
-
-    anonymous(t/f) <pred> :> t-pred
+    "trueo" <pred> :> t-pred
     t-pred { } clone logic-goal boa :> t-goal
     t-goal [ drop t ] 2array 1array t-pred defs<<
-    
-    goal pred>> name>> "non-%s" sprintf <pred> :> non-pred
+    goal pred>> name>> "non-%s_" sprintf <pred> :> non-pred
     non-pred goal args>> clone logic-goal boa :> non-goal
-    ! not P :- P, !, fail ; true  
     non-goal goal !! f-goal 3array 2array
     non-goal t-goal 1array 2array
-    2array
-    non-pred defs<<  
+    2array non-pred defs<<  ! non-P_ { P !! { failo } vel { trueo } } si  
     non-goal ;
 
 PRIVATE>
@@ -404,7 +394,7 @@ PRIVATE>
                       ] }
                     { [ dup [ t = ] [ f = ] bi or ] [
                           :> t/f! non? [ t/f not t/f! ] when
-                          anonymous(t/f) <pred> :> t/f-pred
+                          t/f [ "trueo" ] [ "failo" ] if <pred> :> t/f-pred
                           { } clone :> args
                           t/f-pred args logic-goal boa :> t/f-goal
                           t/f-goal [ drop t/f ] 2array 1array t/f-pred defs<<
@@ -434,7 +424,7 @@ PRIVATE>
 :: is ( quot: ( env -- value ) dist -- goal )
     quot collect-logic-vars
     dup dist swap member? [ dist 1array append ] unless :> args 
-    anonymous(is) <pred> :> is-pred
+    quot dist "[ %u %s is ]" sprintf <pred> :> is-pred
     is-pred args logic-goal boa :> is-goal
     is-goal [| env | env dist env quot call( env -- value ) unify ] 2array
     1array is-pred defs<<
@@ -446,24 +436,31 @@ M: array >list sequence>list ;
 
 : resolve* ( goal-def/defs -- ) [ drop ] resolve ;
 
-:: query ( goal-def/defs -- bindings-array/success? )
+:: query-n ( goal-def/defs n/f -- bindings-array/success? )
     *trace?* get-global :> trace?
+    0 :> count!
     f :> success?!
     V{ } clone :> bindings-seq
-    goal-def/defs normalize
-    [| env |
-     V{ } clone :> bindings
-     env table>>
-     keys [| key |
-           key dup env at 2array bindings push
-           trace? [
-               key "%s: " printf key env at pprint nl
-           ] when
-          ] each
-     bindings >hashtable bindings-seq push
-     t success?!
-    ] (resolve)
-    bindings-seq >array
+    [
+        goal-def/defs normalize
+        [| env |
+         V{ } clone :> bindings
+         env table>>
+         keys [| key |
+               key dup env at 2array bindings push
+               trace? [
+                   key "%u: " printf key env at pprint nl
+               ] when
+              ] each
+         bindings >hashtable bindings-seq push
+         t success?!
+         n/f [
+             count 1 + count!
+             count n/f >= [ return ] when
+         ] when
+        ] (resolve)
+    ] with-return
+    bindings-seq >array    
     {
         { [ dup empty? ] [ drop success? ] }
         { [ dup first keys [ get NORMAL-LOGIC-VAR? ] filter empty? ] [
@@ -472,7 +469,9 @@ M: array >list sequence>list ;
         [ ]
         } cond ;
 
-    
+: query ( goal-def/defs -- bindings-array/success? ) f query-n ;
+
+
 ! Built-in definition -----------------------------------------------------
 
 LOGIC-PREDS: (<) (>) (>=) (=<) (=:=) (=\=) (==) (\==) (=) (\=)
