@@ -565,3 +565,4 @@ LOGIC-VARS: L_ L1_ L2_ L3_ ;
 
 { listo L{ } } semper
 { listo L{ __ || __ } } semper
+
