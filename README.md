@@ -1,6 +1,6 @@
 # logica
 
-logica is a Prolog subset DSL running on Factor.
+logica is a DSL like subset Prolog running on Factor.
 
 
 ## Usage
