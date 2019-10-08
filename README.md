@@ -46,7 +46,7 @@ The following code shows that if something is a cat, it's an animal. Use `si` to
 ```
 { animalo X } { cato X } si
 ```
-According to the rules above, "Tom is an animal." is answered to the following questions:.
+According to the rules above, "Tom is an animal." is answered to the following questions:
 ```
 { animalo Y } query .
 ⟹ { H{ { Y Tom } } }
@@ -57,7 +57,7 @@ Gh { Gb1 Gb2 ... Gbn } si
 ```
 This means Gh when all goals of Gb1, Gb2, ..., Gbn are met.
 ```
-LOGIC-PREDS: youngo young-mouse ;
+LOGIC-PREDS: youngo young-mouseo ;
 
 { youngo Nibbles } semper
 
@@ -100,7 +100,7 @@ You can use `query-n` to limit the number of answers to a query. Specify a numbe
 { animalo Y } 2 query-n .
 ⟹ { H{ { Y Tom } } H{ { Y Jerry } } }
 ```
-Use `non` to indicate negation. This affects the goal immediately after `non`.
+Use `non` to indicate negation. `non` acts on the goal immediately following it.
 ```
 LOGIC-PREDS: likeso dislikeso ;
 
@@ -111,4 +111,25 @@ LOGIC-PREDS: likeso dislikeso ;
 ⟹ f
 { dislikes-cheeseo Tom } query .
 ⟹ t
+```
+You can also use sequences, lists, and tuples as goal definition arguments. The list in Factor is created by a chain of `cons-state` tuples, but you can use a special syntax in logica to describe it.
+```
+L{ Tom Jerry Nibbles } .
+⟹ L{ Tom Jerry Nibbles }
+```
+The syntax of list descriptions allows you to describe "head" and "tail".
+```
+L{ HEAD || TAIL }
+L{ ITEM1 ITEM2 ITEM3 || TAIL }
+```
+You can also write a quote that returns a single term in the goal definition argument.
+```
+USE: lists
+
+[ Tom Jerry Nibbles +nil+ cons cons cons ]
+```
+Each line below has the same meaning as above.
+```
+L{ Tom Jerry Nibbles }
+L{ Tom Jerry Nibles || +nil+ }
 ```
