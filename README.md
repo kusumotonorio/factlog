@@ -127,7 +127,7 @@ You can also write a quote that returns a single term in a goal definition argum
 USE: lists
 [ Tom Jerry Nibbles +nil+ cons cons cons ]
 ```
-Each line below has the same meaning as above.
+When written as an argument to a goal definition, the following lines have the same meaning as above:
 ```
 L{ Tom Jerry Nibbles }
 L{ Tom Jerry Nibbles || +nil+ }
