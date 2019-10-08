@@ -55,7 +55,7 @@ The general form of `si` is:
 ```
 Gh { Gb1 Gb2 ... Gbn } si
 ```
-This means Gh when all goals of Gb1, Gb2... Gbn are met.
+This means Gh when all goals of Gb1, Gb2, ..., Gbn are met.
 ```
 LOGIC-PREDS: youngo young-mouse ;
 
