@@ -12,7 +12,7 @@ LOGIC-PREDS: cato mouseo animalo ;
 LOGIC-VARS: X Y ;
 SYMBOLS: Tom Jerry Nibbles ;
 ```
-Use ```LOGIC-PREDS:``` to declare the predicates you want to use. And, use `LOGIC-VARS: `to declare the variables you want to use. The predicates end with the character `o`, which is a custom borrowed from miniKanren and so on, and means relations. This is not necessary, but it is useful for reducing conflicts with the words of, the parent language, Factor. We really want to write them as: ```cat°```, ```mouse°``` and ```animal°```, but we use `o` because it's easy to type.
+Use `LOGIC-PREDS:` to declare the predicates you want to use. And, use `LOGIC-VARS:` to declare the variables you want to use. The predicates end with the character `o`, which is a custom borrowed from miniKanren and so on, and means relations. This is not necessary, but it is useful for reducing conflicts with the words of, the parent language, Factor. We really want to write them as: `cat°`, `mouse°` and `animal°`, but we use `o` because it's easy to type.
 
 
 ```
@@ -20,13 +20,13 @@ Use ```LOGIC-PREDS:``` to declare the predicates you want to use. And, use `LOGI
 { mouseo Jerry } semper
 { mouseo Nibbles } semper
 ```
-The above code means that Tom is a cat and Jerry and Nibbles are mice. Use ```semper``` to describe the facts.
+The above code means that Tom is a cat and Jerry and Nibbles are mice. Use `semper` to describe the facts.
 
 ```
 { cato Tom } query .
 ⟹ t
 ```
-The above code asks, "Is Tom a cat?". We said,"Tom is a cat.", so the answer is ```t```. The general form of a query is: 
+The above code asks, "Is Tom a cat?". We said,"Tom is a cat.", so the answer is `t`. The general form of a query is: 
 ```
 { G1 G2 ... Gn } query
 ```
@@ -35,7 +35,7 @@ The parentheses are omitted because there was only one goal to be satisfied earl
 { { cato Tom } { cato Jerry } } query .
 ⟹ f
 ```
-Tom is a cat, but Jerry is not declared a cat, so ```f``` is returned in response to this query.
+Tom is a cat, but Jerry is not declared a cat, so `f` is returned in response to this query.
 
 If you query with variable(s), you will get the answer for the variable(s). For such queries, an array of hashtables with variables as keys is returned.
 ```
