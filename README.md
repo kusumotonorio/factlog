@@ -102,7 +102,7 @@ You can use `query-n` to limit the number of answers to a query. Specify a numbe
 ```
 Use `non` to indicate negation. `non` acts on the goal immediately following it.
 ```
-LOGIC-PREDS: likeso dislikeso ;
+LOGIC-PREDS: likes-cheeseo dislikes-cheeseo ;
 
 { likes-cheeseo X } { mouseo X } si
 { dislikes-cheeseo Y } { non { likeso Y } } si
@@ -120,7 +120,7 @@ L{ Tom Jerry Nibbles } .
 The syntax of list descriptions allows you to describe "head" and "tail".
 ```
 L{ HEAD || TAIL }
-L{ ITEM1 ITEM2 ITEM3 || TAIL }
+L{ ITEM1 ITEM2 ITEM3 || OTHERS }
 ```
 You can also write a quote that returns a single term in a goal definition argument.
 ```
