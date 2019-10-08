@@ -122,7 +122,7 @@ The syntax of list descriptions allows you to describe "head" and "tail".
 L{ HEAD || TAIL }
 L{ ITEM1 ITEM2 ITEM3 || TAIL }
 ```
-You can also write a quote that returns a single term in the goal definition argument.
+You can also write a quote that returns a single term in a goal definition argument.
 ```
 USE: lists
 
