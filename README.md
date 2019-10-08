@@ -100,4 +100,15 @@ You can use `query-n` to limit the number of answers to a query. Specify a numbe
 { animalo Y } 2 query-n .
 ⟹ { H{ { Y Tom } } H{ { Y Jerry } } }
 ```
+Use `non` to indicate negation. This affects the goal immediately after `non`.
+```
+LOGIC-PREDS: likeso dislikeso ;
 
+{ likes-cheeseo X } { mouseo X } si
+{ dislikes-cheeseo Y } { non { likeso Y } } si
+
+{ dislikes-cheeseo Jerry } query .
+⟹ f
+{ dislikes-cheeseo Tom } query .
+⟹ t
+```
