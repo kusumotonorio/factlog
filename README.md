@@ -105,7 +105,7 @@ Use `non` to indicate negation. `non` acts on the goal immediately following it.
 LOGIC-PREDS: likes-cheeseo dislikes-cheeseo ;
 
 { likes-cheeseo X } { mouseo X } si
-{ dislikes-cheeseo Y } { non { likeso Y } } si
+{ dislikes-cheeseo Y } { non { likes-cheeseo Y } } si
 
 { dislikes-cheeseo Jerry } query .
 ⟹ f
