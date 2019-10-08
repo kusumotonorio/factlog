@@ -125,11 +125,12 @@ L{ ITEM1 ITEM2 ITEM3 || TAIL }
 You can also write a quote that returns a single term in a goal definition argument.
 ```
 USE: lists
-
 [ Tom Jerry Nibbles +nil+ cons cons cons ]
 ```
 Each line below has the same meaning as above.
 ```
 L{ Tom Jerry Nibbles }
-L{ Tom Jerry Nibles || +nil+ }
+L{ Tom Jerry Nibbles || +nil+ }
+[ { Tom Jerry Nibbles } >list ]
 ```
+
