@@ -12,7 +12,7 @@ LOGIC-PREDS: cato mouseo creatureo ;
 LOGIC-VARS: X Y ;
 SYMBOLS: Tom Jerry Nibbles ;
 ```
-Use `LOGIC-PREDS:` to declare the predicates you want to use. And, use `LOGIC-VARS:` to declare the variables you want to use. The predicates end with the character `o`, which is a convention borrowed from miniKanren and so on, and means relations. This is not necessary, but it is useful for reducing conflicts with the words of, the parent language, Factor. We really want to write them as: `cat°`, `mouse°` and `creature°`, but we use `o` because it's easy to type.
+Use `LOGIC-PREDS:` to declare the predicates you want to use. And, use `LOGIC-VARS:` to declare the variables you want to use. The predicates end with the character `o`, which is a convention borrowed from miniKanren and so on, and means relation. This is not necessary, but it is useful for reducing conflicts with the words of, the parent language, Factor. We really want to write them as: `cat°`, `mouse°` and `creature°`, but we use `o` because it's easy to type.
 
 To represent a goal with logica, write an array with a predicate followed by zero or more arguments.
 ```
@@ -111,6 +111,7 @@ Use `non` to indicate negation. `non` acts on the goal immediately following it.
 LOGIC-PREDS: likes-cheeseo dislikes-cheeseo ;
 
 { likes-cheeseo X } { mouseo X } si
+
 { dislikes-cheeseo Y } {
     { creatureo Y }
     non { likes-cheeseo Y }
