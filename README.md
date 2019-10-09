@@ -146,7 +146,7 @@ L{ Tom Jerry Nibbles || +nil+ }
 ```
 `membero` is a built-in predicate for the relationship an element is in a list.
 ```
-{ membero Jerry L{ Tom Jerry Nibbles } query .
+{ membero Jerry L{ Tom Jerry Nibbles } } query .
 ⟹ t
 
 SYMBOL: Spike
