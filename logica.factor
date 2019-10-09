@@ -447,9 +447,9 @@ M: array >list sequence>list ;
          V{ } clone :> bindings
          env table>>
          keys [| key |
-               key dup env at 2array bindings push
-               trace? [
-                   key "%u: " printf key env at pprint nl
+               key get NORMAL-LOGIC-VAR? [
+                   key dup env at 2array bindings push
+                   trace? [ key "%u: " printf key env at pprint nl ] when
                ] when
               ] each
          bindings >hashtable bindings-seq push

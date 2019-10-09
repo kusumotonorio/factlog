@@ -13,11 +13,13 @@ LOGIC-VARS: X Y ;
 SYMBOLS: Tom Jerry Nibbles ;
 ```
 Use `LOGIC-PREDS:` to declare the predicates you want to use. And, use `LOGIC-VARS:` to declare the variables you want to use. The predicates end with the character `o`, which is a convention borrowed from miniKanren and so on, and means relations. This is not necessary, but it is useful for reducing conflicts with the words of, the parent language, Factor. We really want to write them as: `cat°`, `mouse°` and `creature°`, but we use `o` because it's easy to type.
+
+To represent a goal with logica, write an array with a predicate followed by zero or more arguments.
 ```
 { PREDICATE ARG1 ARG2 ... }
 { PREDICATE }
 ```
-To represent a goal with logica, write an array with a predicate followed by zero or more arguments.
+We will write logica programs using these goals.
 
 ```
 { cato Tom } semper
@@ -109,13 +111,18 @@ Use `non` to indicate negation. `non` acts on the goal immediately following it.
 LOGIC-PREDS: likes-cheeseo dislikes-cheeseo ;
 
 { likes-cheeseo X } { mouseo X } si
-{ dislikes-cheeseo Y } { non { likes-cheeseo Y } } si
+{ dislikes-cheeseo Y } {
+    { creatureo Y }
+    non { likes-cheeseo Y }
+} si
 
 { dislikes-cheeseo Jerry } query .
 ⟹ f
 { dislikes-cheeseo Tom } query .
 ⟹ t
 ```
+Other creatures might also like cheese...
+
 You can also use sequences, lists, and tuples as goal definition arguments. The list in Factor is created by a chain of `cons-state` tuples, but you can use a special syntax in logica to describe it.
 ```
 L{ Tom Jerry Nibbles } .
@@ -137,4 +144,29 @@ L{ Tom Jerry Nibbles }
 L{ Tom Jerry Nibbles || +nil+ }
 [ { Tom Jerry Nibbles } >list ]
 ```
+`membero` is a built-in predicate for the relationship an element is in a list.
+```
+{ membero Jerry L{ Tom Jerry Nibbles } query .
+⟹ t
 
+SYMBOL: Spike
+{ membero Spike [ Tom Jerry Nibbles +nil+ cons cons cons ] } query .
+⟹ f
+```
+Recently, they moved into a small house. The house has a living room, dining room and kitchen. Well, humans feel that way. Each of them seems to be in their favorite room.
+```
+TUPLE: house living dining kitchen in-the-wall ;
+LOGIC-PREDS: houseo ;
+SYMBOL: nobody
+
+{ houseo T{ house { living Tom } { dining nobody } { kitchen Nibbles } { in-the-wall Jerry } } } semper
+```
+Let's ask who is in the kitchen.
+```
+{ houseo T{ house { living __ } { dining __ } { kitchen X } { in-the-wall __ } } } query .
+```
+These two consecutive underbars are called anonymous variables. Use in place of a regular variable when you do not need a name or value.
+```
+{ houseo T{ house { living __ } { dining __ } { kitchen X } { in-the-wall __ } } } query .
+⟹ { H{ { X Nibbles } } }
+```
