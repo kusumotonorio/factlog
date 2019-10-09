@@ -153,19 +153,18 @@ SYMBOL: Spike
 { membero Spike [ Tom Jerry Nibbles +nil+ cons cons cons ] } query .
 ⟹ f
 ```
-Recently, they moved into a small house. The house has a living room, dining room and kitchen. Well, humans feel that way. Each of them seems to be in their favorite room.
+Recently, they moved into a small house. The house has a living room, a dining room and a kitchen. Well, humans feel that way. Each of them seems to be in their favorite room.
 ```
 TUPLE: house living dining kitchen in-the-wall ;
 LOGIC-PREDS: houseo ;
-SYMBOL: nobody
 
-{ houseo T{ house { living Tom } { dining nobody } { kitchen Nibbles } { in-the-wall Jerry } } } semper
+{ houseo T{ house { living Tom } { dining f } { kitchen Nibbles } { in-the-wall Jerry } } } semper
 ```
 Let's ask who is in the kitchen.
 ```
 { houseo T{ house { living __ } { dining __ } { kitchen X } { in-the-wall __ } } } query .
 ```
-These two consecutive underbars are called anonymous variables. Use in place of a regular variable when you do not need a name or value.
+These two consecutive underbars are called anonymous variables. Use in place of a regular variable when you do not need a name or its value.
 ```
 { houseo T{ house { living __ } { dining __ } { kitchen X } { in-the-wall __ } } } query .
 ⟹ { H{ { X Nibbles } } }
