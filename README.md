@@ -163,9 +163,6 @@ LOGIC-PREDS: houseo ;
 Let's ask who is in the kitchen.
 ```
 { houseo T{ house { living __ } { dining __ } { kitchen X } { in-the-wall __ } } } query .
-```
-These two consecutive underbars are called anonymous variables. Use in place of a regular variable when you do not need a name or its value.
-```
-{ houseo T{ house { living __ } { dining __ } { kitchen X } { in-the-wall __ } } } query .
 ⟹ { H{ { X Nibbles } } }
 ```
+These two consecutive underbars are called anonymous variables. Use in place of a regular variable when you do not need a name or its value.
