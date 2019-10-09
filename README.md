@@ -1,6 +1,6 @@
 # logica
 
-logica is a DSL like subset Prolog running on Factor.
+logica is a subset-Prolog-like DSL running on Factor.
 
 
 ## Usage
@@ -8,12 +8,16 @@ logica is a DSL like subset Prolog running on Factor.
 ```
 USE: logica
 
-LOGIC-PREDS: cato mouseo animalo ;
+LOGIC-PREDS: cato mouseo creatureo ;
 LOGIC-VARS: X Y ;
 SYMBOLS: Tom Jerry Nibbles ;
 ```
-Use `LOGIC-PREDS:` to declare the predicates you want to use. And, use `LOGIC-VARS:` to declare the variables you want to use. The predicates end with the character `o`, which is a convention borrowed from miniKanren and so on, and means relations. This is not necessary, but it is useful for reducing conflicts with the words of, the parent language, Factor. We really want to write them as: `cat°`, `mouse°` and `animal°`, but we use `o` because it's easy to type.
-
+Use `LOGIC-PREDS:` to declare the predicates you want to use. And, use `LOGIC-VARS:` to declare the variables you want to use. The predicates end with the character `o`, which is a convention borrowed from miniKanren and so on, and means relations. This is not necessary, but it is useful for reducing conflicts with the words of, the parent language, Factor. We really want to write them as: `cat°`, `mouse°` and `creature°`, but we use `o` because it's easy to type.
+```
+{ PREDICATE ARG1 ARG2 ... }
+{ PREDICATE }
+```
+To represent a goal with logica, write an array with a predicate followed by zero or more arguments.
 
 ```
 { cato Tom } semper
@@ -42,13 +46,13 @@ If you query with variable(s), you will get the answer for the variable(s). For 
 { mouseo X } query .
 ⟹ { H{ { X Jerry } } H{ { X Nibbles } } }
 ```
-The following code shows that if something is a cat, it's an animal. Use `si` to write rules.
+The following code shows that if something is a cat, it's an creature. Use `si` to write rules.
 ```
-{ animalo X } { cato X } si
+{ creatureo X } { cato X } si
 ```
-According to the rules above, "Tom is an animal." is answered to the following questions:
+According to the rules above, "Tom is an creature." is answered to the following questions:
 ```
-{ animalo Y } query .
+{ creatureo Y } query .
 ⟹ { H{ { Y Tom } } }
 ```
 The general form of `si` is:
@@ -71,17 +75,17 @@ LOGIC-PREDS: youngo young-mouseo ;
 
 ```
 
-Let's describe that mice are also animals.
+Let's describe that mice are also creatures.
 
 ```
-{ animalo X } { mouseo X } si
+{ creatureo X } { mouseo X } si
 
-{ animalo X } query .
+{ creatureo X } query .
 ⟹ { H{ { X Tom } } H{ { X Jerry } } H{ { X Nibbles } } }
 ```
-As a matter of fact, we were able to describe at once that cats and mice were animals by doing the following.
+As a matter of fact, we were able to describe at once that cats and mice were creatures by doing the following.
 ```
-{ animalo Y } {
+{ creatureo Y } {
     { cato Y } vel { mouseo Y }
 } si
 ```
@@ -97,7 +101,7 @@ Gh { Gb6 } si
 
 You can use `query-n` to limit the number of answers to a query. Specify a number greater than or equal to 1.
 ```
-{ animalo Y } 2 query-n .
+{ creatureo Y } 2 query-n .
 ⟹ { H{ { Y Tom } } H{ { Y Jerry } } }
 ```
 Use `non` to indicate negation. `non` acts on the goal immediately following it.
