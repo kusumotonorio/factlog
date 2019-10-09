@@ -48,11 +48,11 @@ If you query with variable(s), you will get the answer for the variable(s). For 
 { mouseo X } query .
 ⟹ { H{ { X Jerry } } H{ { X Nibbles } } }
 ```
-The following code shows that if something is a cat, it's an creature. Use `si` to write rules.
+The following code shows that if something is a cat, it's a creature. Use `si` to write rules.
 ```
 { creatureo X } { cato X } si
 ```
-According to the rules above, "Tom is an creature." is answered to the following questions:
+According to the rules above, "Tom is a creature." is answered to the following questions:
 ```
 { creatureo Y } query .
 ⟹ { H{ { Y Tom } } }
