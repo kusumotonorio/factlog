@@ -1,7 +1,6 @@
 # logica
 
-logica is a subset-Prolog-like DSL running on Factor.
-
+logica is an embedded language that runs on Factor with the capabilities of a subset of Prolog.
 
 ## Usage
 
@@ -169,3 +168,44 @@ Let's ask who is in the kitchen.
 ⟹ { H{ { X Nibbles } } }
 ```
 These two consecutive underbars are called anonymous variables. Use in place of a regular variable when you do not need its name and value.
+
+It seems to be meal time. What do they eat?
+
+```
+LOGIC-PREDS: consumeo ;
+SYMBOLS: milk cheese cat mouse ; 
+
+{ consumeo X milk } {
+    { mouseo X } vel
+    { cato X }
+} si
+
+{ consumeo X mouse } { cato X } si
+{ consumeo X cheese } { mouseo X } si
+
+{ consumeo Tom X } query .
+⟹ { H{ { X milk } } H{ { X mouse }
+```
+This is a problematical answer. We have to redefine `consumeo`.
+```
+LOGIC-PREDS: consumeo ;
+
+{ consumeo X milk } {
+    { mouseo X } vel
+    { cato X }
+} si
+
+{ consumeo X cheese } { mouseo X } si
+
+{ comsumeo Tom mouse } { !! f } si 
+{ consumeo X mouse } { cato X } si
+
+SYMBOL: a-cat
+{ cato a-cat } semper
+
+{ consumeo a-cat X } query .
+⟹ { H{ { X milk } } H{ { X mouse } } }
+
+{ consumeo Tom X } query .
+⟹ { H{ { X milk } } }
+```
