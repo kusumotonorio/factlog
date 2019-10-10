@@ -196,6 +196,7 @@ SYMBOLS: mouse cat milk cheese fresh-milk Emmentaler ;
         H{ { X cheese } { Y Emmentaler }
     }
 ```
+```
 { { consumeo Tom X } { is-ao Y X } } query .
 ⟹
     {
