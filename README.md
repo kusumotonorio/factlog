@@ -172,40 +172,63 @@ These two consecutive underbars are called anonymous variables. Use in place of 
 It seems to be meal time. What do they eat?
 
 ```
-LOGIC-PREDS: consumeo ;
-SYMBOLS: milk cheese cat mouse ; 
+LOGIC-PREDS: is-ao consumeo ;
+SYMBOLS: mouse cat milk cheese fresh-milk Emmentaler ;
+
+{ is-ao Tom cat } semper
+{ is-ao Jerry mouse } semper
+{ is-ao Nibbles mouse } semper
+{ is-ao fresh-milk milk } semper
+{ is-ao Emmentaler cheese } semper
 
 { consumeo X milk } {
-    { mouseo X } vel
-    { cato X }
+    { is-ao X mouse } vel
+    { is-ao X cat }
 } si
-
-{ consumeo X mouse } { cato X } si
-{ consumeo X cheese } { mouseo X } si
-
-{ consumeo Tom X } query .
-⟹ { H{ { X milk } } H{ { X mouse }
+{ consumeo X cheese } { is-ao X mouse } si
+{ consumeo X mouse } { is-ao X cat } si
+```
+```
+{ { consumeo Jerry X } { is-ao Y X } } query .
+⟹
+    {
+        H{ { X milk } { Y fresh-milk } }
+        H{ { X cheese } { Y Emmentaler }
+    }
+```
+{ { consumeo Tom X } { is-ao Y X } } query .
+⟹
+    {
+        H{ { X milk } { Y fresh-milk } }
+        H{ { X mouse } { Y Jerry } }
+        H{ { X mouse } { Y Nibbles } }
+    }
 ```
 This is a problematical answer. We have to redefine `consumeo`.
 ```
 LOGIC-PREDS: consumeo ;
 
 { consumeo X milk } {
-    { mouseo X } vel
-    { cato X }
+    { is-ao X mouse } vel
+    { is-ao X cat }
 } si
 
-{ consumeo X cheese } { mouseo X } si
+{ consumeo X cheese } { is-ao X mouse } si
+{ consumeo Tom mouse } { !! f } si 
+{ consumeo X mouse } { is-ao X cat } si
 
-{ comsumeo Tom mouse } { !! f } si 
-{ consumeo X mouse } { cato X } si
+{ { consumeo Tom X } { is-ao Y X } } query .
+⟹ { H{ { X milk } { Y fresh-milk } } }
 
+```
 SYMBOL: a-cat
-{ cato a-cat } semper
+{ is-ao a-cat cat } semper
 
-{ consumeo a-cat X } query .
-⟹ { H{ { X milk } } H{ { X mouse } } }
-
-{ consumeo Tom X } query .
-⟹ { H{ { X milk } } }
+{ { consumeo a-cat X } { is-ao Y X } } query .
+⟹ 
+    {
+        H{ { X milk } { Y fresh-milk } }
+        H{ { X mouse } { Y Jerry } }
+        H{ { X mouse } { Y Nibbles } }
+    }
 ```
