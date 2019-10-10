@@ -220,7 +220,7 @@ LOGIC-PREDS: consumeo ;
 
 { { consumeo Tom X } { is-ao Y X } } query .
 ⟹ { H{ { X milk } { Y fresh-milk } } }
-
+```
 ```
 SYMBOL: a-cat
 { is-ao a-cat cat } semper
