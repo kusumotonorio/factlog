@@ -14,7 +14,7 @@ SYMBOLS: Tom Jerry Nibbles ;
 ```
 Use `LOGIC-PREDS:` to declare the predicates you want to use. And, use `LOGIC-VARS:` to declare the variables you want to use. The predicates end with the character `o`, which is a convention borrowed from miniKanren and so on, and means relation. This is not necessary, but it is useful for reducing conflicts with the words of, the parent language, Factor. We really want to write them as: `cat°`, `mouse°` and `creature°`, but we use `o` because it's easy to type.
 
-To represent a goal with logica, write an array with a predicate followed by zero or more arguments.
+Goals are literals in mathematical logic that attempts to satisfy them. To represent a goal in logica, write an array with a predicate followed by zero or more arguments. logica converts such definitions to internal representations.
 ```
 { PREDICATE ARG1 ARG2 ... }
 { PREDICATE }
@@ -161,9 +161,11 @@ LOGIC-PREDS: houseo ;
 
 { houseo T{ house { living Tom } { dining f } { kitchen Nibbles } { in-the-wall Jerry } } } semper
 ```
+Don't worry about not mentioning the bathroom.
+
 Let's ask who is in the kitchen.
 ```
 { houseo T{ house { living __ } { dining __ } { kitchen X } { in-the-wall __ } } } query .
 ⟹ { H{ { X Nibbles } } }
 ```
-These two consecutive underbars are called anonymous variables. Use in place of a regular variable when you do not need a name or its value.
+These two consecutive underbars are called anonymous variables. Use in place of a regular variable when you do not need its name and value.
