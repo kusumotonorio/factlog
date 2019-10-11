@@ -15,7 +15,7 @@ In logica, words that represent relationships are called **predicates**. Use `LO
 
 In the above code, predicates end with the character `o`, which is a convention borrowed from miniKanren and so on, and means relation. This is not necessary, but it is useful for reducing conflicts with the words of, the parent language, Factor. We really want to write them as: `cat°`, `mouse°` and `creature°`, but we use `o` because it's easy to type.
 
-**Goals** are the questions that logica tries to meet to be true. To represent a goal, write an array with a predicate followed by zero or more arguments. logica converts such definitions to internal representations.
+**Goals** are questions that logica tries to meet to be true. To represent a goal, write an array with a predicate followed by zero or more arguments. logica converts such definitions to internal representations.
 ```
 { PREDICATE ARG1 ARG2 ... }
 { PREDICATE }
@@ -137,7 +137,7 @@ The syntax of list descriptions allows you to describe "head" and "tail".
 L{ HEAD || TAIL }
 L{ ITEM1 ITEM2 ITEM3 || OTHERS }
 ```
-You can also write a quotation that returns a single term as a goal definition argument.
+You can also write a quotation that returns an argument as a goal definition argument.
 ```
 USE: lists
 [ Tom Jerry Nibbles +nil+ cons cons cons ]
@@ -226,7 +226,7 @@ LOGIC-PREDS: consumeo ;
 ```
 I wrote about Tom before about common cats. What two consecutive exclamation marks represent is called a **cut operator**. Use the cut operator to suppress backtracking.
 
-The next letter `f` is an abbreviation for goal `{ failo }` using the built-in predicate `failo`. `{failo}` is a goal that is always `f`. Similarly, there is a goal `{ trueo }` that is always `t`, and its abbreviation is `t`.
+The next letter `f` is an abbreviation for goal `{ failo }` using the built-in predicate `failo`. `{ failo }` is a goal that is always `f`. Similarly, there is a goal `{ trueo }` that is always `t`, and its abbreviation is `t`.
 
 By these actions, "Tom consumes mice." becomes false and suppresses the examination of general eating habits of cats.
 ```
