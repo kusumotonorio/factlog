@@ -11,11 +11,11 @@ LOGIC-PREDS: cato mouseo creatureo ;
 LOGIC-VARS: X Y ;
 SYMBOLS: Tom Jerry Nibbles ;
 ```
-In logica, words that represent relationships are called *predicates*. Use `LOGIC-PREDS:` to declare the predicates you want to use. *Variables* are used to represent relationships. use `LOGIC-VARS:` to declare the variables you want to use.
+In logica, words that represent relationships are called **predicates**. Use `LOGIC-PREDS:` to declare the predicates you want to use. **Variables** are used to represent relationships. use `LOGIC-VARS:` to declare the variables you want to use.
 
 In the above code, predicates end with the character `o`, which is a convention borrowed from miniKanren and so on, and means relation. This is not necessary, but it is useful for reducing conflicts with the words of, the parent language, Factor. We really want to write them as: `cat°`, `mouse°` and `creature°`, but we use `o` because it's easy to type.
 
-*Goals* are the questions that logica tries to meet to be true. To represent a goal, write an array with a predicate followed by zero or more arguments. logica converts such definitions to internal representations.
+**Goals** are the questions that logica tries to meet to be true. To represent a goal, write an array with a predicate followed by zero or more arguments. logica converts such definitions to internal representations.
 ```
 { PREDICATE ARG1 ARG2 ... }
 { PREDICATE }
@@ -109,7 +109,7 @@ You can use `query-n` to limit the number of answers to a query. Specify a numbe
 { creatureo Y } 2 query-n .
 ⟹ { H{ { Y Tom } } H{ { Y Jerry } } }
 ```
-Use `non` to indicate *negation*. `non` acts on the goal immediately following it.
+Use `non` to indicate **negation**. `non` acts on the goal immediately following it.
 ```
 LOGIC-PREDS: likes-cheeseo dislikes-cheeseo ;
 
@@ -173,7 +173,7 @@ Let's ask who is in the kitchen.
 { houseo T{ house { living __ } { dining __ } { kitchen X } { in-the-wall __ } } } query .
 ⟹ { H{ { X Nibbles } } }
 ```
-These two consecutive underbars are called *anonymous variables*. Use in place of a regular variable when you do not need its name and value.
+These two consecutive underbars are called **anonymous variables**. Use in place of a regular variable when you do not need its name and value.
 
 It seems to be meal time. What do they eat?
 
@@ -224,7 +224,7 @@ LOGIC-PREDS: consumeo ;
 { consumeo Tom mouse } { !! f } si 
 { consumeo X mouse } { is-ao X cat } si
 ```
-I wrote about Tom before about common cats. What two consecutive exclamation marks represent is called a *cut operator*. Use the cut operator to suppress backtracking.
+I wrote about Tom before about common cats. What two consecutive exclamation marks represent is called a **cut operator**. Use the cut operator to suppress backtracking.
 
 The next letter `f` is an abbreviation for goal `{ failo }` using the built-in predicate `failo`. `{failo}` is a goal that is always `f`. Similarly, there is a goal `{ trueo }` that is always `t`, and its abbreviation is `t`.
 
