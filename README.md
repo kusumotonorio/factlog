@@ -11,9 +11,11 @@ LOGIC-PREDS: cato mouseo creatureo ;
 LOGIC-VARS: X Y ;
 SYMBOLS: Tom Jerry Nibbles ;
 ```
-Use `LOGIC-PREDS:` to declare the predicates you want to use. And, use `LOGIC-VARS:` to declare the variables you want to use. The predicates end with the character `o`, which is a convention borrowed from miniKanren and so on, and means relation. This is not necessary, but it is useful for reducing conflicts with the words of, the parent language, Factor. We really want to write them as: `cat°`, `mouse°` and `creature°`, but we use `o` because it's easy to type.
+In logica, words that represent relationships are called predicates. Use `LOGIC-PREDS:` to declare the predicates you want to use. Variables are used to represent relationships. use `LOGIC-VARS:` to declare the variables you want to use.
 
-Goals are literals in mathematical logic that attempts to satisfy them. To represent a goal in logica, write an array with a predicate followed by zero or more arguments. logica converts such definitions to internal representations.
+In the above code, predicates end with the character `o`, which is a convention borrowed from miniKanren and so on, and means relation. This is not necessary, but it is useful for reducing conflicts with the words of, the parent language, Factor. We really want to write them as: `cat°`, `mouse°` and `creature°`, but we use `o` because it's easy to type.
+
+Goal are the questions that Logica tries to meet to be true. To represent a goal in logica, write an array with a predicate followed by zero or more arguments. logica converts such definitions to internal representations.
 ```
 { PREDICATE ARG1 ARG2 ... }
 { PREDICATE }
@@ -144,6 +146,8 @@ L{ Tom Jerry Nibbles }
 L{ Tom Jerry Nibbles || +nil+ }
 [ { Tom Jerry Nibbles } >list ]
 ```
+Such quotations are called only once when converting the goal definitions to internal representations.
+
 `membero` is a built-in predicate for the relationship an element is in a list.
 ```
 { membero Jerry L{ Tom Jerry Nibbles } } query .
@@ -188,18 +192,18 @@ SYMBOLS: mouse cat milk cheese fresh-milk Emmentaler ;
 { consumeo X cheese } { is-ao X mouse } si
 { consumeo X mouse } { is-ao X cat } si
 ```
+Let's ask what Jerry consumes.
 ```
 { { consumeo Jerry X } { is-ao Y X } } query .
-⟹
-    {
+⟹ {
         H{ { X milk } { Y fresh-milk } }
         H{ { X cheese } { Y Emmentaler }
     }
 ```
+Well, what about Tom?
 ```
 { { consumeo Tom X } { is-ao Y X } } query .
-⟹
-    {
+⟹ {
         H{ { X milk } { Y fresh-milk } }
         H{ { X mouse } { Y Jerry } }
         H{ { X mouse } { Y Nibbles } }
@@ -217,17 +221,23 @@ LOGIC-PREDS: consumeo ;
 { consumeo X cheese } { is-ao X mouse } si
 { consumeo Tom mouse } { !! f } si 
 { consumeo X mouse } { is-ao X cat } si
+```
+I wrote about Tom before about common cats. What two consecutive exclamation marks represent is called a cut operator. Use the cut operator to suppress backtracking.
 
+The next letter `f` is an abbreviation for goal `{ failo }` using the built-in predicate `failo`. `{failo}` is a goal that is always `f`. Similarly, there is a goal `{ trueo }` that is always `t`, and its abbreviation is `t`.
+
+By these actions, "Tom consumes mice." becomes false and suppresses the examination of general eating habits of cats.
+```
 { { consumeo Tom X } { is-ao Y X } } query .
 ⟹ { H{ { X milk } { Y fresh-milk } } }
 ```
+It's OK. Let's check a cat that is not Tom.
 ```
 SYMBOL: a-cat
 { is-ao a-cat cat } semper
 
 { { consumeo a-cat X } { is-ao Y X } } query .
-⟹ 
-    {
+⟹ {
         H{ { X milk } { Y fresh-milk } }
         H{ { X mouse } { Y Jerry } }
         H{ { X mouse } { Y Nibbles } }
