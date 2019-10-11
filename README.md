@@ -247,4 +247,4 @@ SYMBOL: a-cat
 ```
 Watch out for the other cats, Jerry.
 
-Thanks to them, I was able to explain most of the functions of logica. Thank you, old friends. Have a funny fight. See you.
+Thank you, old friends. I was able to explain most of the functions of logica with fun. Have a good time together with a fun fight. See you.
