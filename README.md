@@ -27,7 +27,7 @@ We will write logica programs using these goals.
 { mouseo Jerry } semper
 { mouseo Nibbles } semper
 ```
-The above code means that Tom is a cat and Jerry and Nibbles are mice. Use `semper` to describe the facts.
+The above code means that Tom is a cat and Jerry and Nibbles are mice. Use `semper` to describe the **facts**.
 
 ```
 { cato Tom } query .
@@ -49,7 +49,7 @@ If you query with variable(s), you will get the answer for the variable(s). For 
 { mouseo X } query .
 ⟹ { H{ { X Jerry } } H{ { X Nibbles } } }
 ```
-The following code shows that if something is a cat, it's a creature. Use `si` to write rules.
+The following code shows that if something is a cat, it's a creature. Use `si` to write **rules**.
 ```
 { creatureo X } { cato X } si
 ```
