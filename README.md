@@ -248,20 +248,90 @@ SYMBOL: a-cat
 Watch out for the other cats, Jerry.
 
 Thank you, old friends. I was able to explain most of the functions of logica with fun. Have a good time together with a fun fight. See you.
+
+Here is the Prolog definition for the factorial predicate `fact`.
 ```
 fact(0, 1).
 fact(N, F) :- N > 0, N2 is N - 1, fact(N2, F2), F is F2 * N.
 ```
+Let's think about how to do the same thing with logica. It is mostly the following code, but is surrounded by back quotes where it has not been explained.
 
 ```
+USE: logica
+
 LOGIC-PREDS: facto ;
 LOGIC-VARS: N N2 F F2 ;
 
 { facto 0 1 } semper
 { facto N F } {
-    \`N > 0\`
-    \`N2 is N - 1\`
+    <p><code>N > 0<p><code>
+    <p><code>N2 is N - 1<p><code>
     { facto N2 F2 }
-    \`F is F2 * N \`
+    <p><code>F is F2 * N<p><code>
+} si
+```
+Within these backquotes are comparisons, calculations, and assignments (To be precise, **unification**). logica has a mechanism to call Factor code to do these things. Here are some examples.
+```
+LOGIC-PREDS: N_>_0  N2_is_N_-_1  F_is_F2_*_N ;
+
+{ N_>_0 N } [ N of 0 > ] voca
+
+{ N2_is_N_-_1 N2 N } [ dup N of 1 - N2 unify ] voca
+
+{ F_is_F2_*_N F F2 N } [ dup [ F2 of ] [ N of ] bi * F unify ] voca
+```
+Use `voca` to set the quotation to be called. Such quotations take a **environment** which holds the binding of variables, and returns `t` or `f` as a result of execution. To retrieve the values of variables in your environment, use `of `or `at`.
+
+Rewrite the definition of facto to use them.
+```
+USE: logica
+
+LOGIC-PREDS: facto N_>_0  N2_is_N_-_1  F_is_F2_*_N ;
+LOGIC-VARS: N N2 F F2 ;
+
+{ facto 0 1 } semper
+{ facto N F } {
+    { N_>_0 N }
+    { N2_is_N_-_1 N2 N }
+    { facto N2 F2 }
+    { F_is_F2_*_N F F2 N }
+} si
+
+{ N_>_0 N } [ N of 0 > ] voca
+
+{ N2_is_N_-_1 N2 N } [ dup N of 1 - N2 unify ] voca
+
+{ F_is_F2_*_N F F2 N } [ dup [ N of ] [ F2 of ] bi * F unify ] voca
+```
+The word `unify` unifies the two following the environment in that environment.
+
+Try `factoro`.
+```
+{ facto 0 F } query .
+⟹ { H{ { F 1 } } }
+{ fact0 1 F } query .
+⟹ { H{ { F 1 } } }
+{ facto 10 F } query .
+⟹ { H{ { F 3628800 } } }
+```
+logica has features that make it easier to meet the typical requirements shown here.
+
+There are the built-in predicates `(<)`, `(>)`, `(>=)`, and `(=<)` to compare numbers. There are also `(==)` and `(\==)` to test for equality and inequality of two things.
+
+The word `is` takes a quote that takes an environment and returns a single value and a single variable to be singulated and returns the internal representation of the goal. logica uses the internal representation of the goal obtained by calling any quotes in the sequence of goal definitions that are arguments to `si`.
+
+If you use these features to rewrite the definition of `factoro`:
+```
+USE: logica
+
+LOGIC-PREDS: facto ;
+LOGIC-VARS: N N2 F F2 ;
+
+{ facto 0 1 } semper
+{ facto N F } {
+    { (>) N 0 }
+    [ [ N of 1 - ] N2 is ]
+    { facto N2 F2 }
+    [ [ [ F2 of ] [ N of ] bi * ] F is ]
 } si
 ```
