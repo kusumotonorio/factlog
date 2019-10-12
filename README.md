@@ -226,7 +226,7 @@ LOGIC-PREDS: consumeo ;
 { consumeo Tom mouse } { !! f } si 
 { consumeo X mouse } { is-ao X cat } si
 ```
-I wrote about Tom before about common cats. What two consecutive exclamation marks represent is called a **cut operator**. Use the cut operator to suppress **backtracking**.
+We wrote about Tom before about common cats. What two consecutive exclamation marks represent is called a **cut operator**. Use the cut operator to suppress **backtracking**.
 
 The next letter `f` is an abbreviation for goal `{ failo }` using the built-in predicate `failo`. `{ failo }` is a goal that is always `f`. Similarly, there is a goal `{ trueo }` that is always `t`, and its abbreviation is `t`.
 
@@ -283,6 +283,8 @@ LOGIC-PREDS: N_>_0  N2_is_N_-_1  F_is_F2_*_N ;
 ```
 Use `voca` to set the quotation to be called. Such quotations take an **environment** which holds the binding of variables, and returns `t` or `f` as a result of execution. To retrieve the values of variables in your environment, use `of `or `at`.
 
+The word `unify` unifies the two following the environment in that environment.
+
 Rewrite the definition of facto to use them.
 ```
 USE: logica
@@ -304,9 +306,7 @@ LOGIC-VARS: N N2 F F2 ;
 
 { F_is_F2_*_N F F2 N } [ dup [ N of ] [ F2 of ] bi * F unify ] voca
 ```
-The word `unify` unifies the two following the environment in that environment.
-
-Try `facto`.
+Let's try `facto`.
 ```
 { facto 0 F } query .
 ⟹ { H{ { F 1 } } }
