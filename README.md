@@ -269,7 +269,7 @@ LOGIC-VARS: N N2 F F2 ;
     `F is F2 * N`
 } si
 ```
-Within these backquotes are comparisons, calculations, and assignments (To be precise, **unification**). logica has a mechanism to call Factor code to do these things. Here are some examples.
+Within these backquotes are comparisons, calculations, and assignments (to be precise, **unification**). logica has a mechanism to call Factor code to do these things. Here are some examples.
 ```
 LOGIC-PREDS: N_>_0  N2_is_N_-_1  F_is_F2_*_N ;
 
