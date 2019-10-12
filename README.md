@@ -319,7 +319,7 @@ logica has features that make it easier to meet the typical requirements shown h
 
 There are the built-in predicates `(<)`, `(>)`, `(>=)`, and `(=<)` to compare numbers. There are also `(==)` and `(\==)` to test for equality and inequality of two things.
 
-The word `is` takes a quotation, that takes an environment and returns a single value, and a single variable to be singulated. and it returns the internal representation of the goal. If there is a quote in the definition of `si, logica uses the internal definition of the goal obtained by calling it.
+The word `is` takes a quotation and a variable to be unified. The quotation takes an environment and returns a single value.  And `is` returns the internal representation of the goal. `is` is intended to be used in a quotation. If there is a quote in the definition of `si`, logica uses the internal definition of the goal obtained by calling it.
 
 Use the built-in predicate `(=)` for unification that does not require processing with a quotation. `(\=)` is true when unification fails.
 
