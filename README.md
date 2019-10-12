@@ -321,6 +321,8 @@ There are the built-in predicates `(<)`, `(>)`, `(>=)`, and `(=<)` to compare nu
 
 The word `is` takes a quotation that takes an environment and returns a single value and a single variable to be singulated and returns the internal representation of the goal. logica uses the internal representation of the goal obtained by calling any quotations in the sequence of goal definitions that are arguments to `si`.
 
+Use the built-in predicate `(=)` for unification that does not require processing with a quotation. `(\=)` is true when unification fails.
+
 If you use these features to rewrite the definition of `facto`:
 ```
 USE: logica
