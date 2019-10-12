@@ -249,13 +249,12 @@ Watch out for the other cats, Jerry.
 
 Thank you, old friends. I was able to explain most of the functions of logica with fun. Have a good time together with a fun fight. See you.
 
-Here is the Prolog definition for the factorial predicate `fact`.
+Here is a Prolog definition for the factorial predicate `fact`.
 ```
 fact(0, 1).
 fact(N, F) :- N > 0, N2 is N - 1, fact(N2, F2), F is F2 * N.
 ```
 Let's think about how to do the same thing with logica. It is mostly the following code, but is surrounded by back quotes where it has not been explained.
-
 ```
 USE: logica
 
@@ -264,10 +263,10 @@ LOGIC-VARS: N N2 F F2 ;
 
 { facto 0 1 } semper
 { facto N F } {
-    <p><code>N > 0<p><code>
-    <p><code>N2 is N - 1<p><code>
+    `N > 0`
+    `N2 is N - 1`
     { facto N2 F2 }
-    <p><code>F is F2 * N<p><code>
+    `F is F2 * N`
 } si
 ```
 Within these backquotes are comparisons, calculations, and assignments (To be precise, **unification**). logica has a mechanism to call Factor code to do these things. Here are some examples.
@@ -310,7 +309,7 @@ Try `facto`.
 { facto 0 F } query .
 ⟹ { H{ { F 1 } } }
 
-{ fact0 1 F } query .
+{ facto 1 F } query .
 ⟹ { H{ { F 1 } } }
 
 { facto 10 F } query .
@@ -320,7 +319,7 @@ logica has features that make it easier to meet the typical requirements shown h
 
 There are the built-in predicates `(<)`, `(>)`, `(>=)`, and `(=<)` to compare numbers. There are also `(==)` and `(\==)` to test for equality and inequality of two things.
 
-The word `is` takes a quote that takes an environment and returns a single value and a single variable to be singulated and returns the internal representation of the goal. logica uses the internal representation of the goal obtained by calling any quotes in the sequence of goal definitions that are arguments to `si`.
+The word `is` takes a quotation that takes an environment and returns a single value and a single variable to be singulated and returns the internal representation of the goal. logica uses the internal representation of the goal obtained by calling any quotations in the sequence of goal definitions that are arguments to `si`.
 
 If you use these features to rewrite the definition of `facto`:
 ```
