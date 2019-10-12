@@ -245,7 +245,7 @@ SYMBOL: a-cat
         H{ { X mouse } { Y Nibbles } }
     }
 ```
-Watch out for the other cats, Jerry.
+Jerry, watch out for the other cats.
 
 Thank you, old friends. I was able to explain most of the functions of logica with fun. Have a good time together with a fun fight. See you.
 
@@ -319,11 +319,11 @@ logica has features that make it easier to meet the typical requirements shown h
 
 There are the built-in predicates `(<)`, `(>)`, `(>=)`, and `(=<)` to compare numbers. There are also `(==)` and `(\==)` to test for equality and inequality of two things.
 
-The word `is` takes a quotation that takes an environment and returns a single value and a single variable to be singulated and returns the internal representation of the goal. logica uses the internal representation of the goal obtained by calling any quotations in the sequence of goal definitions that are arguments to `si`.
+The word `is` takes a quotation, that takes an environment and returns a single value, and a single variable to be singulated. and it returns the internal representation of the goal. If there is a quote in the definition of `si, logica uses the internal definition of the goal obtained by calling it.
 
 Use the built-in predicate `(=)` for unification that does not require processing with a quotation. `(\=)` is true when unification fails.
 
-If you use these features to rewrite the definition of `facto`:
+If you use these features to rewrite the definition of `facto`.
 ```
 USE: logica
 
@@ -338,3 +338,4 @@ LOGIC-VARS: N N2 F F2 ;
     [ [ [ F2 of ] [ N of ] bi * ] F is ]
 } si
 ```
+Now almost everything about logica is explained.
