@@ -1,6 +1,8 @@
 # logica
 
-logica is an embedded language that runs on Factor with the capabilities of a subset of Prolog.
+logica is an embedded language that runs on [Factor](https://github.com/factor/factor) with the capabilities of a subset of Prolog.
+
+It is a extended port from tiny_prolog and its descendants, [ruby-prolog](https://github.com/preston/ruby-prolog).
 
 ## Usage
 
@@ -224,7 +226,7 @@ LOGIC-PREDS: consumeo ;
 { consumeo Tom mouse } { !! f } si 
 { consumeo X mouse } { is-ao X cat } si
 ```
-I wrote about Tom before about common cats. What two consecutive exclamation marks represent is called a **cut operator**. Use the cut operator to suppress backtracking.
+I wrote about Tom before about common cats. What two consecutive exclamation marks represent is called a **cut operator**. Use the cut operator to suppress **backtracking**.
 
 The next letter `f` is an abbreviation for goal `{ failo }` using the built-in predicate `failo`. `{ failo }` is a goal that is always `f`. Similarly, there is a goal `{ trueo }` that is always `t`, and its abbreviation is `t`.
 
@@ -319,7 +321,7 @@ logica has features that make it easier to meet the typical requirements shown h
 
 There are the built-in predicates `(<)`, `(>)`, `(>=)`, and `(=<)` to compare numbers. There are also `(==)` and `(\==)` to test for equality and inequality of two things.
 
-The word `is` takes a quotation and a variable to be unified. The quotation takes an environment and returns a single value.  And `is` returns the internal representation of the goal. `is` is intended to be used in a quotation. If there is a quote in the definition of `si`, logica uses the internal definition of the goal obtained by calling it.
+The word `is` takes a quotation and a variable to be unified. The quotation takes an environment and returns a value.  And `is` returns the internal representation of the goal. `is` is intended to be used in a quotation. If there is a quotation in the definition of `si`, logica uses the internal definition of the goal obtained by calling it.
 
 Use the built-in predicate `(=)` for unification that does not require processing with a quotation. `(\=)` is true when unification fails.
 
