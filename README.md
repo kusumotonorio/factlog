@@ -281,7 +281,7 @@ LOGIC-PREDS: N_>_0  N2_is_N_-_1  F_is_F2_*_N ;
 
 { F_is_F2_*_N F F2 N } [ dup [ F2 of ] [ N of ] bi * F unify ] voca
 ```
-Use `voca` to set the quotation to be called. Such quotations take a **environment** which holds the binding of variables, and returns `t` or `f` as a result of execution. To retrieve the values of variables in your environment, use `of `or `at`.
+Use `voca` to set the quotation to be called. Such quotations take an **environment** which holds the binding of variables, and returns `t` or `f` as a result of execution. To retrieve the values of variables in your environment, use `of `or `at`.
 
 Rewrite the definition of facto to use them.
 ```
