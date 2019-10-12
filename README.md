@@ -325,7 +325,7 @@ The word `is` takes a quotation and a variable to be unified. The quotation take
 
 Use the built-in predicate `(=)` for unification that does not require processing with a quotation. `(\=)` is true when unification fails.
 
-If you use these features to rewrite the definition of `facto`.
+If you use these features to rewrite the definition of `facto`:
 ```
 USE: logica
 
