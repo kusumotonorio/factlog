@@ -305,12 +305,14 @@ LOGIC-VARS: N N2 F F2 ;
 ```
 The word `unify` unifies the two following the environment in that environment.
 
-Try `factoro`.
+Try `facto`.
 ```
 { facto 0 F } query .
 ⟹ { H{ { F 1 } } }
+
 { fact0 1 F } query .
 ⟹ { H{ { F 1 } } }
+
 { facto 10 F } query .
 ⟹ { H{ { F 3628800 } } }
 ```
@@ -320,7 +322,7 @@ There are the built-in predicates `(<)`, `(>)`, `(>=)`, and `(=<)` to compare nu
 
 The word `is` takes a quote that takes an environment and returns a single value and a single variable to be singulated and returns the internal representation of the goal. logica uses the internal representation of the goal obtained by calling any quotes in the sequence of goal definitions that are arguments to `si`.
 
-If you use these features to rewrite the definition of `factoro`:
+If you use these features to rewrite the definition of `facto`:
 ```
 USE: logica
 
