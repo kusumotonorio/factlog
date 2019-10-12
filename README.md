@@ -2,7 +2,7 @@
 
 logica is an embedded language that runs on [Factor](https://github.com/factor/factor) with the capabilities of a subset of Prolog.
 
-It is a extended port from tiny_prolog and its descendants, [ruby-prolog](https://github.com/preston/ruby-prolog).
+It is an extended port from tiny_prolog and its descendants, [ruby-prolog](https://github.com/preston/ruby-prolog).
 
 ## Usage
 
@@ -249,7 +249,7 @@ SYMBOL: a-cat
 ```
 Jerry, watch out for the other cats.
 
-Thank you, old friends. I was able to explain most of the functions of logica with fun. Have a good time together with a fun fight. See you.
+Thank you, old friends. I was able to explain most of the functions of logica with fun. Have a good time together with fun fights. See you.
 
 Here is a Prolog definition for the factorial predicate `fact`.
 ```
