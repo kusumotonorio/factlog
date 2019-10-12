@@ -248,3 +248,20 @@ SYMBOL: a-cat
 Watch out for the other cats, Jerry.
 
 Thank you, old friends. I was able to explain most of the functions of logica with fun. Have a good time together with a fun fight. See you.
+```
+fact(0, 1).
+fact(N, F) :- N > 0, N2 is N - 1, fact(N2, F2), F is F2 * N.
+```
+
+```
+LOGIC-PREDS: facto ;
+LOGIC-VARS: N N2 F F2 ;
+
+{ facto 0 1 } semper
+{ facto N F } {
+    \`N > 0\`
+    \`N2 is N - 1\`
+    { facto N2 F2 }
+    \`F is F2 * N \`
+} si
+```
