@@ -285,7 +285,7 @@ Use `voca` to set the quotation to be called. Such quotations take an **environm
 
 The word `unify` unifies the two following the environment in that environment.
 
-Rewrite the definition of facto to use them.
+Now we can rewrite the definition of facto to use them.
 ```
 USE: logica
 
