@@ -319,7 +319,7 @@ Let's try `facto`.
 ```
 logica has features that make it easier to meet the typical requirements shown here.
 
-There are the built-in predicates `(<)`, `(>)`, `(>=)`, and `(=<)` to compare numbers. There are also `(==)` and `(\==)` to test for equality and inequality of two things.
+There are the built-in predicates `(<)`, `(>)`, `(>=)`, and `(=<)` to compare numbers. There are also `(==)` and `(\==)` to test for equality and inequality of two arguments.
 
 The word `is` takes a quotation and a variable to be unified. The quotation takes an environment and returns a value.  And `is` returns the internal representation of the goal. `is` is intended to be used in a quotation. If there is a quotation in the definition of `si`, logica uses the internal definition of the goal obtained by calling it.
 
