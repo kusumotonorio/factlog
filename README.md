@@ -260,24 +260,24 @@ in: { creatureo Y }
     Unification of T{ logic-goal { args { Y } } } and T{ logic-goal
 	       	  	       	                          { pred
       						              T{ logic-pred
-							        { name "creatureo" }
- 							        { defs
-								    {
-								        {
-                       						            ~circularity~
-                       							    {
-									        T{ logic-goal
-                               						            { pred ~logic-pred~ }
-                               							    { args ~array~ }
-                           							        }
-                        							}
-									    }
-                							}
-            						 	    }
-        							}
-    							    }
-    							    { args { X } }
-							}
+							          { name "creatureo" }
+ 							          { defs
+								      {
+								          {
+                       						              ~circularity~
+                       							      {
+									          T{ logic-goal
+                               						              { pred ~logic-pred~ }
+                               							      { args ~array~ }
+                        							  }
+									      }
+                							  }
+            						 	      }
+        							  }
+    							      }
+							  }
+    							  { args { X } }
+						      }
         Unification of Y and X
         ==> Success
 
