@@ -377,10 +377,6 @@ There are the built-in predicates `(<)`, `(>)`, `(>=)`, and `(=<)` to compare nu
 
 The word `is` takes a quotation and a variable to be unified. The quotation takes an environment and returns a value.  And `is` returns the internal representation of the goal. `is` is intended to be used in a quotation. If there is a quotation in the definition of `si`, logica uses the internal definition of the goal obtained by calling it.
 
-Use the built-in predicate `(=)` for unification that does not require processing with a quotation. `(\=)` is true when unification fails.
-
-`varo` takes a argument and is true if it is a variable with no value. On the other hand, `nonvaro` is true if its argument is not a variable or is a concrete variable.
-
 If you use these features to rewrite the definition of `facto`:
 ```
 USE: logica
@@ -396,4 +392,8 @@ LOGIC-VARS: N N2 F F2 ;
     [ [ [ F2 of ] [ N of ] bi * ] F is ]
 } si
 ```
+Use the built-in predicate `(=)` for unification that does not require processing with a quotation. `(\=)` is true when unification fails. Note that `(\=)` does not actually do the unification.
+
+`varo` takes a argument and is true if it is a variable with no value. On the other hand, `nonvaro` is true if its argument is not a variable or is a concrete variable.
+
 Now almost everything about logica is explained.
