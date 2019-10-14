@@ -392,7 +392,7 @@ LOGIC-VARS: N N2 F F2 ;
     [ [ [ F2 of ] [ N of ] bi * ] F is ]
 } si
 ```
-Use the built-in predicate `(=)` for unification that does not require processing with a quotation. `(\=)` is true when unification fails. Note that `(\=)` does not actually do the unification.
+Use the built-in predicate `(=)` for unification that does not require processing with a quotation. `(\=)` will be true when such a unification fails. Note that `(\=)` does not actually do the unification.
 
 `varo` takes a argument and is true if it is a variable with no value. On the other hand, `nonvaro` is true if its argument is not a variable or is a concrete variable.
 
