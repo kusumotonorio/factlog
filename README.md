@@ -96,7 +96,7 @@ LOGIC-PREDS: creatureo ;
     { cato Y } vel { mouseo Y }
 } si
 ```
-`vel `is used to represent **disjunction**. The code below it has the same meaning as the code below it.
+`vel` is used to represent **disjunction**. The code below it has the same meaning as the code below it.
 ```
 Gh { Gb1 Gb2 Gb3 vel Gb4 Gb5 vel Gb6 } si
 ```
