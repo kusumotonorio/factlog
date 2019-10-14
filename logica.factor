@@ -369,9 +369,9 @@ SYMBOL: dummy-item
     2array non-pred defs<<  ! non-P_ { P !! { failo } vel { trueo } } si  
     non-goal ;
 
-PRIVATE>
+SYMBOLS: at-the-beginning and at-the-end ;
 
-:: si ( head body -- )
+:: (si) ( head body pos -- )
     reset-anonymouse-var-no
     head replace-'__' [ first ] [ rest ] bi <goal> :> head-goal
     body replace-'__' normalize split-body  ! disjunction
@@ -406,9 +406,15 @@ PRIVATE>
                 } cond
             ] map dummy-item swap remove :> body-goals
             head-goal body-goals 2array
-            head-goal pred>> [ swap 1array append ] change-defs drop
+            head-goal pred>> [
+                swap 1array pos at-the-beginning = [ swap ] when append
+            ] change-defs drop
         ] each    
     ] if ;
+
+PRIVATE>
+
+: si ( head body -- ) at-the-end (si) ;
 
 : semper ( head -- ) { } clone si ;
 
@@ -429,6 +435,30 @@ PRIVATE>
     is-goal [| env | env dist env quot call( env -- value ) unify ] 2array
     1array is-pred defs<<
     is-goal ;
+
+:: =:= ( quot1: ( env -- value ) quot2: ( env -- value )  -- goal )
+    quot1 quot2 [ collect-logic-vars ] bi@ union :> args
+    quot1 quot2 "[ %u %u =:= ]" sprintf <pred> :> =:=-pred
+    =:=-pred args logic-goal boa :> =:=-goal
+    =:=-goal [| env |
+              env quot1 call( env -- value )
+              env quot2 call( env -- value )
+              2dup [ number? ] both? [ = ] [ 2drop f ] if ]
+    2array
+    1array =:=-pred defs<<
+    =:=-goal ;
+
+:: =\= ( quot1: ( env -- value ) quot2: ( env -- value )  -- goal )
+    quot1 quot2 [ collect-logic-vars ] bi@ union :> args
+    quot1 quot2 "[ %u %u =\\= ]" sprintf <pred> :> =\=-pred
+    =\=-pred args logic-goal boa :> =\=-goal
+    =\=-goal [| env |    
+              env quot1 call( env -- value )
+              env quot2 call( env -- value )
+              2dup [ number? ] both? [ = not ] [ 2drop f ] if ]
+    2array
+    1array =\=-pred defs<<
+    =\=-goal ;
 
 M: array >list sequence>list ;
 
@@ -472,16 +502,47 @@ M: array >list sequence>list ;
 : query ( goal-def/defs -- bindings-array/success? ) f query-n ;
 
 
-! Built-in definition -----------------------------------------------------
+! Built-in predicate definitions -----------------------------------------------------
 
-LOGIC-PREDS: (<) (>) (>=) (=<) (=:=) (=\=) (==) (\==) (=) (\=)
-             trueo failo
+LOGIC-PREDS: trueo failo
              varo nonvaro
+             asserto assertao assertzo retracto
+             (<) (>) (>=) (=<) (==) (\==) (=) (\=)
              writeo writenlo nlo
              membero appendo lengtho conco listo
 ;
 
+{ trueo } [ drop t ] voca
+
+{ failo } [ drop f ] voca
+
 LOGIC-VARS: A_ B_ C_ X_ Y_ Z_ ;
+
+{ asserto X_ } [ X_ of call( -- ) t ] voca
+
+{ assertzo X_ } [ X_ of call( -- ) t ] voca
+
+{ assertao X_ }
+[| env |
+ [ ] clone :> quot!
+ env X_ of [
+     dup \ si = [
+         drop { at-the-beginning \ (si) } clone
+     ] [ 1array ] if
+     quot swap append quot!
+ ] each
+ quot call( -- )
+ t
+] voca
+
+{ retracto X_ } [
+    X_ of get [ dup length 1 >= [ rest ] when ] change-defs drop t
+] voca
+
+{ varo X_ }    [ X_ of logic-var? ] voca
+
+{ nonvaro X_ } [ X_ of logic-var? not ] voca
+
 
 { (<) X_ Y_ } [
     [ X_ of ] [ Y_ of ] bi 2dup [ number? ] both? [ < ] [ 2drop f ] if
@@ -499,39 +560,29 @@ LOGIC-VARS: A_ B_ C_ X_ Y_ Z_ ;
     [ X_ of ] [ Y_ of ] bi 2dup [ number? ] both? [ <= ] [ 2drop f ] if
 ] voca
 
-{ (=:=) X_ Y_ } [
-    [ X_ of ] [ Y_ of ] bi 2dup [ number? ] both? [ = ] [ 2drop f ] if
-] voca
-
-{ (=\=) X_ Y_ } [
-    [ X_ of ] [ Y_ of ] bi 2dup [ number? ] both? [ = not ] [ 2drop f ] if
-] voca
-
 { (==) X_ Y_ } [ [ X_ of ] [ Y_ of ] bi = ] voca
 
 { (\==) X_ Y_ } [ [ X_ of ] [ Y_ of ] bi = not ] voca
 
 { (=) X_ Y_ } [ dup [ X_ of ] [ Y_ of ] bi unify ] voca
 
-{ (\=) X_ Y_ } [ dup [ X_ of ] [ Y_ of ] bi unify not ] voca
-
-
-{ trueo } [ drop t ] voca
-
-{ failo } [ drop f ] voca
-
-
-{ varo X_ }    [ X_ of logic-var? ] voca
-
-{ nonvaro X_ } [ X_ of logic-var? not ] voca
+{ (\=) X_ Y_ } [ clone dup [ X_ of ] [ Y_ of ] bi unify not ] voca
 
 
 { writeo X_ } [
-    X_ of [ dup string? [ printf ] [ pprint ] if ] each t
+    X_ of dup sequence? [
+        [ dup string? [ printf ] [ pprint ] if ] each
+    ] [
+        dup string? [ printf ] [ pprint ] if
+    ] if t
 ] voca
 
 { writenlo X_ } [
-    X_ of [ dup string? [ printf ] [ pprint ] if ] each nl t
+    X_ of dup sequence? [
+        [ dup string? [ printf ] [ pprint ] if ] each
+    ] [
+        dup string? [ printf ] [ pprint ] if
+    ] if nl t
 ] voca
 
 { nlo } [ drop nl t ] voca

@@ -379,7 +379,7 @@ The word `is` takes a quotation and a variable to be unified. The quotation take
 
 Use the built-in predicate `(=)` for unification that does not require processing with a quotation. `(\=)` is true when unification fails.
 
-`varo` takes a single argument and is true if it is a variable with no value. On the other hand, `nonvaro` is true if its argument is not a variable or is a concrete variable.
+`varo` takes a argument and is true if it is a variable with no value. On the other hand, `nonvaro` is true if its argument is not a variable or is a concrete variable.
 
 If you use these features to rewrite the definition of `facto`:
 ```
