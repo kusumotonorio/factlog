@@ -251,61 +251,57 @@ Jerry, watch out for the other cats.
 
 You can **trace** logica's execution. The word to do this is `trace`.
 ```
-{ creatureo Y } query .
-⟹ { H{ { Y Tom } } }
-
 trace
-{ creatureo Y } query .
-in: { creatureo Y }
-    Unification of T{ logic-goal { args { Y } } } and T{ logic-goal
-	       	  	       	                          { pred
-      						              T{ logic-pred
-							          { name "creatureo" }
- 							          { defs
-								      {
-								          {
-                       						              ~circularity~
-                       							      {
-									          T{ logic-goal
-                               						              { pred ~logic-pred~ }
-                               							      { args ~array~ }
-                        							  }
-									      }
-                							  }
-            						 	      }
-        							  }
-    							      }
-							  }
-    							  { args { X } }
-						      }
-        Unification of Y and X
+{ creatureo Tom } query .
+in: { creatureo Tom }
+    Unification of T{ logic-goal { args { Tom } } } and T{ logic-goal
+		                                            { pred
+        	    						T{ logic-pred
+            							    { name "creatureo" }
+            							    { defs
+                							{
+                    							    {
+                        							~circularity~
+                        							{
+                            							    T{ logic-goal
+                                							{ pred ~logic-pred~ }
+                                							{ args ~array~ }
+                            							    }
+                        							}
+                    							    }
+                							}
+            							    }
+        							}
+    							    }
+    							    { args { X } }
+							}
+    Unification of Tom and X
         ==> Success
 
     ==> Success
 
 in: { cato X }
-    Unification of T{ logic-goal { args { X } } } and T{ logic-goal
-							  { pred
-       							      T{ logic-pred
-           						          { name "cato" }
-          							  { defs { { ~circularity~ { } } } }
-     							      }
-    							  }
-    							  { args { Tom } }
-						      }
-        Unification of X and Tom
-        ==> Success
+    Unification of T{ logic-goal { args { Tom } } } and T{ logic-goal
+     		                                            { pred
+        						        T{ logic-pred
+            							    { name "cato" }
+            							    { defs { { ~circularity~ { } } } }
+        							}
+    							    }
+    							    { args { Tom } }
+							}
+        Unification of Tom and Tom
+	==> Success
 
     ==> Success
 
-Y: Tom
-⟹ { H{ { Y Tom } } }
+⟹ t
 ```
 The word to stop tracing is `notrace`.
 ```
 notrace
-{ creatureo Y } query .
-⟹ { H{ { Y Tom } } }
+{ creatureo Tom } query .
+⟹ t
 ```
 Thank you, old friends. I was able to explain most of the functions of logica with fun. Have a good time together with fun fights. See you.
 
