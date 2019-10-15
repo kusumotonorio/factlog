@@ -412,11 +412,13 @@ SYMBOLS: at-the-beginning and at-the-end ;
         ] each    
     ] if ;
 
+: (semper) ( head pos -- ) { } clone swap (si) ;
+    
 PRIVATE>
 
 : si ( head body -- ) at-the-end (si) ;
 
-: semper ( head -- ) { } clone si ;
+: semper ( head -- ) at-the-end (semper) ;
 
 :: voca ( head quot: ( callback-env -- ? ) -- )
     head [ first ] [ rest ] bi <goal> :> head-goal
@@ -436,7 +438,7 @@ PRIVATE>
     1array is-pred defs<<
     is-goal ;
 
-:: =:= ( quot1: ( env -- value ) quot2: ( env -- value )  -- goal )
+:: =:= ( quot1: ( env -- value ) quot2: ( env -- value ) -- goal )
     quot1 quot2 [ collect-logic-vars ] bi@ union :> args
     quot1 quot2 "[ %u %u =:= ]" sprintf <pred> :> =:=-pred
     =:=-pred args logic-goal boa :> =:=-goal
@@ -448,7 +450,7 @@ PRIVATE>
     1array =:=-pred defs<<
     =:=-goal ;
 
-:: =\= ( quot1: ( env -- value ) quot2: ( env -- value )  -- goal )
+:: =\= ( quot1: ( env -- value ) quot2: ( env -- value ) -- goal )
     quot1 quot2 [ collect-logic-vars ] bi@ union :> args
     quot1 quot2 "[ %u %u =\\= ]" sprintf <pred> :> =\=-pred
     =\=-pred args logic-goal boa :> =\=-goal
@@ -516,30 +518,37 @@ LOGIC-PREDS: trueo failo
 
 { failo } [ drop f ] voca
 
+
 LOGIC-VARS: A_ B_ C_ X_ Y_ Z_ ;
 
 { asserto X_ } [ X_ of call( -- ) t ] voca
 
 { assertzo X_ } [ X_ of call( -- ) t ] voca
 
-{ assertao X_ }
-[| env |
- [ ] clone :> quot!
- env X_ of [
-     dup \ si = [
-         drop { at-the-beginning \ (si) } clone
-     ] [ 1array ] if
-     quot swap append quot!
- ] each
- quot call( -- )
- t
-] voca
+{ assertao X_ } [| env |
+                 [ ] clone :> quot!
+                 env X_ of [
+                     {
+                         { [ dup \ semper = ] [
+                               drop { at-the-beginning \ (semper) } clone
+                           ] }
+                         { [ dup \ si = ] [
+                               drop { at-the-beginning \ (si) } clone
+                           ] }
+                         [ 1array ]
+                     } cond
+                     quot swap append quot!
+                 ] each
+                 quot call( -- )
+                 t
+                ] voca
 
 { retracto X_ } [
     X_ of get [ dup length 1 >= [ rest ] when ] change-defs drop t
 ] voca
 
-{ varo X_ }    [ X_ of logic-var? ] voca
+
+{ varo X_ } [ X_ of logic-var? ] voca
 
 { nonvaro X_ } [ X_ of logic-var? not ] voca
 
@@ -566,7 +575,10 @@ LOGIC-VARS: A_ B_ C_ X_ Y_ Z_ ;
 
 { (=) X_ Y_ } [ dup [ X_ of ] [ Y_ of ] bi unify ] voca
 
-{ (\=) X_ Y_ } [ clone dup [ X_ of ] [ Y_ of ] bi unify not ] voca
+{ (\=) X_ Y_ } [
+    clone [ clone ] change-env [ clone ] change-trail 
+    dup [ X_ of ] [ Y_ of ] bi unify not
+] voca
 
 
 { writeo X_ } [

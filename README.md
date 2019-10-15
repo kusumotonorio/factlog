@@ -111,7 +111,7 @@ You can use `query-n` to limit the number of answers to a query. Specify a numbe
 { creatureo Y } 2 query-n .
 ⟹ { H{ { Y Tom } } H{ { Y Jerry } } }
 ```
-Use `non` to indicate **negation**. `non` acts on the goal immediately following it.
+Use `non` to express **negation**. `non` acts on the goal immediately following it.
 ```
 LOGIC-PREDS: likes-cheeseo dislikes-cheeseo ;
 
