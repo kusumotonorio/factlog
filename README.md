@@ -13,14 +13,14 @@ LOGIC-PREDS: cato mouseo creatureo ;
 LOGIC-VARS: X Y ;
 SYMBOLS: Tom Jerry Nibbles ;
 ```
-In logica, words that represent relationships are called **predicates**. Use `LOGIC-PREDS:` to declare the predicates you want to use. **Variables** are used to represent relationships. use `LOGIC-VARS:` to declare the variables you want to use.
+In logica, words that represent relationships are called **logic predicates**. Use `LOGIC-PREDS:` to declare the predicates you want to use. **Logic variables** are used to represent relationships. use `LOGIC-VARS:` to declare the logic variables you want to use.
 
-In the above code, predicates end with the character `o`, which is a convention borrowed from miniKanren and so on, and means relation. This is not necessary, but it is useful for reducing conflicts with the words of, the parent language, Factor. We really want to write them as: `cat°`, `mouse°` and `creature°`, but we use `o` because it's easy to type.
+In the above code, logic predicates end with the character `o`, which is a convention borrowed from miniKanren and so on, and means relation. This is not necessary, but it is useful for reducing conflicts with the words of, the parent language, Factor. We really want to write them as: `cat°`, `mouse°` and `creature°`, but we use `o` because it's easy to type.
 
-**Goals** are questions that logica tries to meet to be true. To represent a goal, write an array with a predicate followed by zero or more arguments. logica converts such definitions to internal representations.
+**Goals** are questions that logica tries to meet to be true. To represent a goal, write an array with a logic predicate followed by zero or more arguments. logica converts such definitions to internal representations.
 ```
-{ PREDICATE ARG1 ARG2 ... }
-{ PREDICATE }
+{ LOGIC-PREDICATE ARG1 ARG2 ... }
+{ LOGIC-PREDICATE }
 ```
 We will write logica programs using these goals.
 
@@ -46,7 +46,7 @@ The parentheses are omitted because there was only one goal to be satisfied earl
 ```
 Tom is a cat, but Jerry is not declared a cat, so `f` is returned in response to this query.
 
-If you query with variable(s), you will get the answer for the variable(s). For such queries, an array of hashtables with variables as keys is returned.
+If you query with logic variable(s), you will get the answer for the logic variable(s). For such queries, an array of hashtables with logic variables as keys is returned.
 ```
 { mouseo X } query .
 ⟹ { H{ { X Jerry } } H{ { X Nibbles } } }
@@ -152,7 +152,7 @@ L{ Tom Jerry Nibbles || +nil+ }
 ```
 Such quotations are called only once when converting the goal definitions to internal representations.
 
-`membero` is a built-in predicate for the relationship an element is in a list.
+`membero` is a built-in logic predicate for the relationship an element is in a list.
 ```
 { membero Jerry L{ Tom Jerry Nibbles } } query .
 ⟹ t
@@ -175,7 +175,7 @@ Let's ask who is in the kitchen.
 { houseo T{ house { living __ } { dining __ } { kitchen X } { in-the-wall __ } } } query .
 ⟹ { H{ { X Nibbles } } }
 ```
-These two consecutive underbars are called **anonymous variables**. Use in place of a regular variable when you do not need its name and value.
+These two consecutive underbars are called **anonymous logic variables**. Use in place of a regular logic variable when you do not need its name and value.
 
 It seems to be meal time. What do they eat?
 
@@ -226,9 +226,9 @@ LOGIC-PREDS: consumeo ;
 { consumeo Tom mouse } { !! f } si 
 { consumeo X mouse } { is-ao X cat } si
 ```
-We wrote about Tom before about common cats. What two consecutive exclamation marks represent is called a **cut operator**. Use the cut operator to suppress **backtracking**.
+We wrote about Tom before about common cats. What two consecutive exclamation marks represent is called a **cut** operator. Use the cut operator to suppress **backtracking**.
 
-The next letter `f` is an abbreviation for goal `{ failo }` using the built-in predicate `failo`. `{ failo }` is a goal that is always `f`. Similarly, there is a goal `{ trueo }` that is always `t`, and its abbreviation is `t`.
+The next letter `f` is an abbreviation for goal `{ failo }` using the built-in logic predicate `failo`. `{ failo }` is a goal that is always `f`. Similarly, there is a goal `{ trueo }` that is always `t`, and its abbreviation is `t`.
 
 By these actions, "Tom consumes mice." becomes false and suppresses the examination of general eating habits of cats.
 ```
@@ -335,7 +335,7 @@ LOGIC-PREDS: N_>_0  N2_is_N_-_1  F_is_F2_*_N ;
 
 { F_is_F2_*_N F F2 N } [ dup [ F2 of ] [ N of ] bi * F unify ] voca
 ```
-Use `voca` to set the quotation to be called. Such quotations take an **environment** which holds the binding of variables, and returns `t` or `f` as a result of execution. To retrieve the values of variables in the environment, use `of `or `at`.
+Use `voca` to set the quotation to be called. Such quotations take an **environment** which holds the binding of logic variables, and returns `t` or `f` as a result of execution. To retrieve the values of logic variables in the environment, use `of `or `at`.
 
 The word `unify` unifies the two following the environment in that environment.
 
@@ -373,9 +373,9 @@ Let's try `facto`.
 ```
 logica has features that make it easier to meet the typical requirements shown here.
 
-There are the built-in predicates `(<)`, `(>)`, `(>=)`, and `(=<)` to compare numbers. There are also `(==)` and `(\==)` to test for equality and inequality of two arguments.
+There are the built-in logic predicates `(<)`, `(>)`, `(>=)`, and `(=<)` to compare numbers. There are also `(==)` and `(\==)` to test for equality and inequality of two arguments.
 
-The word `is` takes a quotation and a variable to be unified. The quotation takes an environment and returns a value.  And `is` returns the internal representation of the goal. `is` is intended to be used in a quotation. If there is a quotation in the definition of `si`, logica uses the internal definition of the goal obtained by calling it.
+The word `is` takes a quotation and a logic variable to be unified. The quotation takes an environment and returns a value.  And `is` returns the internal representation of the goal. `is` is intended to be used in a quotation. If there is a quotation in the definition of `si`, logica uses the internal definition of the goal obtained by calling it.
 
 If you use these features to rewrite the definition of `facto`:
 ```
@@ -392,8 +392,8 @@ LOGIC-VARS: N N2 F F2 ;
     [ [ [ F2 of ] [ N of ] bi * ] F is ]
 } si
 ```
-Use the built-in predicate `(=)` for unification that does not require processing with a quotation. `(\=)` will be true when such a unification fails. Note that `(\=)` does not actually do the unification.
+Use the built-in logic predicate `(=)` for unification that does not require processing with a quotation. `(\=)` will be true when such a unification fails. Note that `(\=)` does not actually do the unification.
 
-`varo` takes a argument and is true if it is a variable with no value. On the other hand, `nonvaro` is true if its argument is not a variable or is a concrete variable.
+`varo` takes a argument and is true if it is a logic variable with no value. On the other hand, `nonvaro` is true if its argument is not a logic variable or is a concrete logic variable.
 
 Now almost everything about logica is explained.
