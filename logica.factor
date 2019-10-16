@@ -252,6 +252,8 @@ DEFER: unify*
     ] when
     success? ;
 
+: each-until ( seq quot -- ) find 2drop ; inline
+
 :: resolve-body ( body env cut quot: ( -- ) -- )   
     body empty? [
         quot call( -- )
@@ -292,7 +294,7 @@ DEFER: unify*
                     d-env env-clear
                     f
                 ] if
-            ] find 2drop
+            ] each-until
         ] if
     ] if ;
 
@@ -369,7 +371,7 @@ SYMBOL: dummy-item
     2array non-pred defs<<  ! non-P_ { P !! { failo } vel { trueo } } si  
     non-goal ;
 
-SYMBOLS: at-the-beginning and at-the-end ;
+SYMBOLS: at-the-beginning at-the-end ;
 
 :: (si) ( head body pos -- )
     reset-anonymouse-var-no
@@ -416,9 +418,13 @@ SYMBOLS: at-the-beginning and at-the-end ;
     
 PRIVATE>
 
-: si ( head body -- ) at-the-end (si) ;
+: si ( head body -- ) at-the-end (si) ; inline
 
-: semper ( head -- ) at-the-end (semper) ;
+: si* ( head body -- ) at-the-beginning (si) ; inline
+
+: semper ( head -- ) at-the-end (semper) ; inline
+
+: semper* ( head -- ) at-the-beginning (semper) ; inline
 
 :: voca ( head quot: ( callback-env -- ? ) -- )
     head [ first ] [ rest ] bi <goal> :> head-goal
@@ -508,7 +514,7 @@ M: array >list sequence>list ;
 
 LOGIC-PREDS: trueo failo
              varo nonvaro
-             asserto assertao assertzo retracto
+             asserto assertao assertzo retracto callo
              (<) (>) (>=) (=<) (==) (\==) (=) (\=)
              writeo writenlo nlo
              membero appendo lengtho conco listo
@@ -529,15 +535,11 @@ LOGIC-VARS: A_ B_ C_ X_ Y_ Z_ ;
                  [ ] clone :> quot!
                  env X_ of [
                      {
-                         { [ dup \ semper = ] [
-                               drop { at-the-beginning \ (semper) } clone
-                           ] }
-                         { [ dup \ si = ] [
-                               drop { at-the-beginning \ (si) } clone
-                           ] }
-                         [ 1array ]
+                         { [ dup \ semper = ] [ drop semper* ] }
+                         { [ dup \ si = ] [ drop si* ] }
+                         [ ]
                      } cond
-                     quot swap append quot!
+                     1array quot swap append quot!
                  ] each
                  quot call( -- )
                  t
@@ -547,6 +549,10 @@ LOGIC-VARS: A_ B_ C_ X_ Y_ Z_ ;
     X_ of get [ dup length 1 >= [ rest ] when ] change-defs drop t
 ] voca
 
+! { callo X_ } [
+!     dup X_ of replace-'__' [ first ] [ rest ] bi <goal>
+!     env>> 
+! ] voca
 
 { varo X_ } [ X_ of logic-var? ] voca
 
