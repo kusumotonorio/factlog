@@ -4,7 +4,8 @@
 ! Zebra Puzzle: https://rosettacode.org/wiki/Zebra_puzzle
 
 USING: logica lists ;
-IN: logica.test.zebra
+IN: logica.examples.zebra
+
 LOGIC-PREDS: houseso neighboro zebrao watero nexto lefto ;
 LOGIC-VARS: Hs A B Ls X Y ;
 SYMBOLS: red blue green white yellow ;

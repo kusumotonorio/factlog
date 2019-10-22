@@ -1,7 +1,7 @@
 ! Copyright (C) 2019 KUSUMOTO Norio.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: logica ;
-IN: logica.test.zebra2
+IN: logica.examples.zebra2
 
 LOGIC-PREDS: existso righto middleo firsto nexto
              houseso zebrao watero ;

@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: logica lists assocs sequences kernel math
 locals formatting io ;
-IN: logica.test.money
+IN: logica.examples.money
 
 LOGIC-PREDS: sumo sum1o digitsumo delo donaldo moneyo ;
 LOGIC-VARS: S E N D M O R Y A L G B T
@@ -41,7 +41,7 @@ LOGIC-VARS: S E N D M O R Y A L G B T
 { donaldo
   L{ D O N A L D }
   L{ G E R A L D }
-  L{ R O B E R T } 
+  L{ R O B E R T }
 } semper
 
 :: S-and-M-can't-be-zero ( seq -- seq' )

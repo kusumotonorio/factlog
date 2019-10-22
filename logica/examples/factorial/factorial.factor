@@ -1,7 +1,7 @@
 ! Copyright (C) 2019 KUSUMOTO Norio.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: logica kernel assocs math ;
-IN: logica.test.factorial
+IN: logica.examples.factorial
 
 LOGIC-PREDS: factorial ;
 LOGIC-VARS: N F N2 F2 ;
