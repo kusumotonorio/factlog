@@ -80,6 +80,8 @@ TUPLE: logic-goal pred args ;
 :: <goal> ( pred args -- goal )
     pred get args called-args logic-goal boa ; inline
 
+: def>goal ( goal-def -- goal ) unclip swap <goal> ; inline
+
 : normalize ( goal-def/defs -- goal-defs )
     dup !! = [ 1array ] [
         dup length 0 > [
@@ -322,9 +324,7 @@ SYMBOL: *anonymouse-var-no*
     [ logic-var? ] deep-filter members ;
 
 :: (resolve) ( goal-def/defs quot: ( env -- ) -- )
-    goal-def/defs replace-'__' normalize [
-        [ first ] [ rest ] bi <goal>
-    ] map :> goals
+    goal-def/defs replace-'__' normalize [ def>goal ] map :> goals
     <env> :> env
     goals env f <cut> [ env quot call( env -- ) ] resolve-body ;
 
@@ -349,7 +349,8 @@ SYMBOLS: at-the-beginning at-the-end ;
 
 :: (si) ( head body pos -- )
     reset-anonymouse-var-no
-    head replace-'__' [ first ] [ rest ] bi <goal> :> head-goal
+    head replace-'__' def>goal :> head-goal
+
     body replace-'__' normalize split-body  ! disjunction
     dup empty? [
         head-goal swap 2array
@@ -361,7 +362,7 @@ SYMBOLS: at-the-beginning at-the-end ;
                 {
                     { [ dup non = ] [ drop dummy-item t non?! ] }
                     { [ dup array? ] [
-                          [ first ] [ rest ] bi <goal> non? [ non-goal ] when
+                          def>goal non? [ non-goal ] when
                           f non?!
                       ] }
                     { [ dup callable? ] [
@@ -401,7 +402,7 @@ PRIVATE>
 : semper* ( head -- ) at-the-beginning (semper) ; inline
 
 :: voca ( head quot: ( callback-env -- ? ) -- )
-    head [ first ] [ rest ] bi <goal> :> head-goal
+    head def>goal :> head-goal
     head-goal pred>> [
         { head-goal quot } suffix
     ] change-defs drop ;
