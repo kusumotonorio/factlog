@@ -129,7 +129,7 @@ LOGIC-PREDS: likes-cheeseo dislikes-cheeseo ;
 ```
 Other creatures might also like cheese...
 
-You can also use sequences, lists, and tuples as goal definition arguments. The list in Factor is created by a chain of `cons-state` tuples, but you can use a special syntax in logica to describe it.
+You can also use sequences, lists, and tuples as goal definition arguments. The list in Factor is created by a chain of `cons-pair` tuples, but you can use a special syntax in logica to describe it.
 ```
 L[ Tom Jerry Nibbles ] .
 ⟹ L[ Tom Jerry Nibbles ]
