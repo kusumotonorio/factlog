@@ -8,7 +8,7 @@ IN: logica.examples.zebra2.tests
         H{
             {
                 Hs
-                L{
+                LL{
                     T{ house
                        { color yellow }
                        { nationality norwegian }

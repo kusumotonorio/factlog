@@ -15,13 +15,13 @@ SYMBOLS: tea coffee beer milk water ;
 SYMBOLS: pall-mall dunhill blue-master prince blend ;
 TUPLE: house color nationality drink smoke pet ;
 
-{ houseso Hs X Y } {        
+{ houseso Hs X Y } {
     { (=) Hs                                                                      ! #1
-          L{ T{ house f __ norwegian __ __ __ }                                   ! #10
-             T{ house f blue __ __ __ __ }                                        ! #15
-             T{ house f __ __ milk __ __ }                                        ! #9
-             __
-             __ } }
+          LL{ T{ house f __ norwegian __ __ __ }                                  ! #10
+              T{ house f blue __ __ __ __ }                                       ! #15
+              T{ house f __ __ milk __ __ }                                       ! #9
+              __
+              __ } }
     { membero T{ house f red english __ __ __ } Hs }                              ! #2
     { membero T{ house f __ swede __ __ dog } Hs }                                ! #3
     { membero T{ house f __ dane tea __ __ } Hs }                                 ! #4
@@ -39,9 +39,9 @@ TUPLE: house color nationality drink smoke pet ;
 } si
 
 { nexto A B Ls } {
-    { appendo __ L{ A B || __ } Ls } vel
-    { appendo __ L{ B A || __ } Ls }
+    { appendo __ LL{ A B | __ } Ls } vel
+    { appendo __ LL{ B A | __ } Ls }
 } si
 
-{ lefto A B Ls } { appendo __ L{ A B || __ } Ls } si
+{ lefto A B Ls } { appendo __ LL{ A B | __ } Ls } si
 

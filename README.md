@@ -131,13 +131,13 @@ Other creatures might also like cheese...
 
 You can also use sequences, lists, and tuples as goal definition arguments. The list in Factor is created by a chain of `cons-state` tuples, but you can use a special syntax in logica to describe it.
 ```
-L{ Tom Jerry Nibbles } .
-⟹ L{ Tom Jerry Nibbles }
+LL{ Tom Jerry Nibbles } .
+⟹ LL{ Tom Jerry Nibbles }
 ```
 The syntax of list descriptions allows you to describe "head" and "tail".
 ```
-L{ HEAD || TAIL }
-L{ ITEM1 ITEM2 ITEM3 || OTHERS }
+LL{ HEAD | TAIL }
+LL{ ITEM1 ITEM2 ITEM3 | OTHERS }
 ```
 You can also write a quotation that returns an argument as a goal definition argument.
 ```
@@ -146,15 +146,15 @@ USE: lists
 ```
 When written as an argument to a goal definition, the following lines have the same meaning as above:
 ```
-L{ Tom Jerry Nibbles }
-L{ Tom Jerry Nibbles || +nil+ }
+LL{ Tom Jerry Nibbles }
+LL{ Tom Jerry Nibbles | +nil+ }
 [ { Tom Jerry Nibbles } >list ]
 ```
 Such quotations are called only once when converting the goal definitions to internal representations.
 
 `membero` is a built-in logic predicate for the relationship an element is in a list.
 ```
-{ membero Jerry L{ Tom Jerry Nibbles } } query .
+{ membero Jerry LL{ Tom Jerry Nibbles } } query .
 ⟹ t
 
 SYMBOL: Spike

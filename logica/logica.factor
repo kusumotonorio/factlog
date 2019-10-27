@@ -2,19 +2,38 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs classes classes.parser
 classes.tuple combinators compiler.units continuations
-formatting hashtables io kernel lexer lists locals math
-namespaces parser prettyprint prettyprint.custom quotations
-sequences sequences.deep sets splitting strings words
-words.symbol ;
+formatting fry hashtables io kernel lexer locals make
+math namespaces parser prettyprint prettyprint.config
+prettyprint.custom prettyprint.backend prettyprint.sections
+quotations sequences sequences.deep sets splitting strings
+words words.symbol ;
 
 IN: logica
 
 <<
 SYMBOL: !!    ! cut operator         in prolog: !
 SYMBOL: __    ! anonymous variable   in prolog: _
-SYMBOL: ||    ! head-tail separator  in prolog: |
+SYMBOL: |     ! head-tail separator  in prolog: |
 SYMBOL: vel   ! disjunction, or      in prolog: ;
 SYMBOL: non   ! negation             in prolog: not, \+
+
+TUPLE: cons-pair car cdr ;
+
+C: cons cons-pair
+
+: car ( cons-pair -- car ) car>> ; inline
+
+: cdr ( cons-pair -- cdr ) cdr>> ; inline
+
+: uncons ( cons-pair -- car cdr ) [ car ] [ cdr ] bi ; inline
+
+SINGLETON: +NIL+
+
+: nil? ( x -- ? ) +NIL+? ; inline
+
+MIXIN: logica-list
+INSTANCE: cons-pair logica-list
+INSTANCE: +NIL+ logica-list
 
 <PRIVATE
 
@@ -25,13 +44,16 @@ TUPLE: logic-pred name defs ;
         swap >>name
         { } clone >>defs ;
 
-:: parse-list ( seq -- list )
-    seq [ || = ] find drop :> d-pos
+:: parse-list ( seq -- cons-pair )
+    seq [ | = ] find drop :> d-pos!
     d-pos [
         d-pos 1 + seq nth
-        seq d-pos head dup length 1 > [ reverse ] when
-        [ swap cons ] each
-    ] [ seq sequence>list ] if ;
+    ] [
+        seq length d-pos!
+        +NIL+
+    ] if
+    seq d-pos head dup length 1 > [ reverse ] when
+    [ swap cons ] each ;
 
 MIXIN: LOGIC-VAR
 SINGLETON: NORMAL-LOGIC-VAR
@@ -66,7 +88,7 @@ SYNTAX: LOGIC-PREDS: ";"
       [ suffix! ] tri@
     ] each-token ;
 
-SYNTAX: L{ \ }
+SYNTAX: LL{ \ }
     [ >array parse-list ] parse-literal ;
 >>
 
@@ -106,19 +128,29 @@ TUPLE: logic-env table ;
 : dereference ( term env -- term' env' )
     [ 2dup env-get [ 2nip first2 t ] [ f ] if* ] loop ;
 
-SYMBOL: L{
+M: logica-list pprint-delims drop \ LL{ \ } ;
 
-M: cons-state pprint-delims drop \ L{ \ } ;
-
-M:: cons-state >pprint-sequence ( x -- seq )
-    x [ car ] [ cdr ] bi :> ( x-car x-cdr )
-    x-cdr nil? [ { x-car } ] [
-        x-cdr cons-state? [
-            x-car 1array x-cdr >pprint-sequence append
-        ] [ { x-car || x-cdr } ] if
-    ] if ;
-
-M: cons-state pprint* pprint-object ;
+M: logica-list pprint*
+    [
+        <flow
+        dup pprint-delims [
+            pprint-word
+            dup pprint-narrow? <inset
+            [
+                building get
+                length-limit get
+                '[ dup cons-pair? _ length _ < and ]
+                [ uncons swap , ] while
+            ] { } make
+            [ pprint* ] each
+            dup logica-list? [
+                nil? [ "~more~" text ] unless
+            ] [
+                "|" text pprint*
+            ] if
+            block>
+        ] dip pprint-word block>
+    ] check-recursion ;
 
 PRIVATE>
 
@@ -350,7 +382,6 @@ SYMBOLS: at-the-beginning at-the-end ;
 :: (si) ( head body pos -- )
     reset-anonymouse-var-no
     head replace-'__' def>goal :> head-goal
-
     body replace-'__' normalize split-body  ! disjunction
     dup empty? [
         head-goal swap 2array
@@ -454,7 +485,16 @@ PRIVATE>
     } =\=-pred defs<<
     =\=-goal ;
 
-M: array >list sequence>list ;
+: >list ( seq -- cons-pair ) parse-list ; inline
+
+:: list>array ( list -- array )
+    list nil? [
+        { } clone
+    ] [
+        list [ car ] [ cdr ] bi :> ( l-car l-cdr )
+        l-car cons-pair? [ l-car list>array ] [ list car ] if 1array
+        l-cdr logica-list? [ l-cdr list>array append ] when
+    ] if ;
 
 : resolve ( goal-def/defs quot: ( env -- ) -- ) (resolve) ;
 
@@ -588,19 +628,19 @@ LOGIC-VARS: A_ B_ C_ X_ Y_ Z_ ;
 { nlo } [ drop nl t ] voca
 
 
-{ membero X_ L{ X_ || Z_ } } semper
-{ membero X_ L{ Y_ || Z_ } } { membero X_ Z_ } si
+{ membero X_ LL{ X_ | Z_ } } semper
+{ membero X_ LL{ Y_ | Z_ } } { membero X_ Z_ } si
 
-{ appendo L{ } A_ A_ } semper
-{ appendo L{ A_ || X_ } Y_ L{ A_ || Z_ } } {
+{ appendo LL{ } A_ A_ } semper
+{ appendo LL{ A_ | X_ } Y_ LL{ A_ | Z_ } } {
     { appendo X_ Y_ Z_ }
 } si
 
 
 LOGIC-VARS: Tail_ N_ N1_ ;
 
-{ lengtho L{ } 0 } semper
-{ lengtho L{ __ || Tail_ } N_ } {
+{ lengtho LL{ } 0 } semper
+{ lengtho LL{ __ | Tail_ } N_ } {
     { lengtho Tail_ N1_ }
     [ [ N1_ of 1 + ] N_ is ]
 } si
@@ -608,12 +648,12 @@ LOGIC-VARS: Tail_ N_ N1_ ;
 
 LOGIC-VARS: L_ L1_ L2_ L3_ ;
 
-{ conco L{ } L_ L_ } semper
-{ conco L{ X_ || L1_ } L2_ L{ X_ || L3_ } } {
+{ conco LL{ } L_ L_ } semper
+{ conco LL{ X_ | L1_ } L2_ LL{ X_ | L3_ } } {
     { conco L1_ L2_ L3_ }
 } si
 
 
-{ listo L{ } } semper
-{ listo L{ __ || __ } } semper
+{ listo LL{ } } semper
+{ listo LL{ __ | __ } } semper
 

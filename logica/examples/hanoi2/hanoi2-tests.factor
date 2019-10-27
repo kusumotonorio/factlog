@@ -16,5 +16,5 @@ IN: logica.examples.hanoi2.tests
         "move Top from Left to Center"
         ""
     } [ "%s\n" printf ] each
-    { hanoi L{ "Base" "2nd" "Top" } "Left" "Center" "Right" } query
+    { hanoi LL{ "Base" "2nd" "Top" } "Left" "Center" "Right" } query
 ] unit-test
