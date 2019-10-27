@@ -141,7 +141,6 @@ L[ ITEM1 ITEM2 ITEM3 | OTHERS ]
 ```
 You can also write a quotation that returns an argument as a goal definition argument.
 ```
-USE: lists
 [ Tom Jerry Nibbles +nil+ cons cons cons ]
 ```
 When written as an argument to a goal definition, the following lines have the same meaning as above:
