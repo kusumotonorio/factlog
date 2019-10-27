@@ -141,12 +141,12 @@ L[ ITEM1 ITEM2 ITEM3 | OTHERS ]
 ```
 You can also write a quotation that returns an argument as a goal definition argument.
 ```
-[ Tom Jerry Nibbles +nil+ cons cons cons ]
+[ Tom Jerry Nibbles L[ ] cons cons cons ]
 ```
 When written as an argument to a goal definition, the following lines have the same meaning as above:
 ```
 L[ Tom Jerry Nibbles ]
-L[ Tom Jerry Nibbles | +nil+ ]
+L[ Tom Jerry Nibbles | L[ ] ]
 [ { Tom Jerry Nibbles } >list ]
 ```
 Such quotations are called only once when converting the goal definitions to internal representations.
@@ -157,7 +157,7 @@ Such quotations are called only once when converting the goal definitions to int
 ⟹ t
 
 SYMBOL: Spike
-{ membero Spike [ Tom Jerry Nibbles +nil+ cons cons cons ] } query .
+{ membero Spike [ Tom Jerry Nibbles L[ ] cons cons cons ] } query .
 ⟹ f
 ```
 Recently, they moved into a small house. The house has a living room, a dining room and a kitchen. Well, humans feel that way. Each of them seems to be in their favorite room.
