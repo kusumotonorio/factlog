@@ -8,7 +8,7 @@ IN: logica.examples.zebra.tests
         H{
             {
                 Hs
-                LL{
+                L[
                     T{ house
                        { color yellow }
                        { nationality norwegian }
@@ -44,7 +44,7 @@ IN: logica.examples.zebra.tests
                        { smoke blue-master }
                        { pet dog }
                      }
-                }
+                ]
             }
             { X norwegian }
             { Y german }

@@ -6,9 +6,9 @@ IN: logica.examples.money.tests
 {
     {
         H{
-            { N1 LL{ 0 9 5 6 7 } }
-            { N2 LL{ 0 1 0 8 5 } }
-            { N  LL{ 1 0 6 5 2 } }
+            { N1 L[ 0 9 5 6 7 ] }
+            { N2 L[ 0 1 0 8 5 ] }
+            { N  L[ 1 0 6 5 2 ] }
         }
     }
 }
@@ -20,9 +20,9 @@ IN: logica.examples.money.tests
 {
     {
         H{
-            { N1 LL{ 5 2 6 4 8 5 } }
-            { N2 LL{ 1 9 7 4 8 5 } }
-            { N  LL{ 7 2 3 9 7 0 } }
+            { N1 L[ 5 2 6 4 8 5 ] }
+            { N2 L[ 1 9 7 4 8 5 ] }
+            { N  L[ 7 2 3 9 7 0 ] }
         }
     }
 }

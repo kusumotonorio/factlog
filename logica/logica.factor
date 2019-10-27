@@ -88,7 +88,7 @@ SYNTAX: LOGIC-PREDS: ";"
       [ suffix! ] tri@
     ] each-token ;
 
-SYNTAX: LL{ \ }
+SYNTAX: L[ \ ]
     [ >array parse-list ] parse-literal ;
 >>
 
@@ -128,7 +128,7 @@ TUPLE: logic-env table ;
 : dereference ( term env -- term' env' )
     [ 2dup env-get [ 2nip first2 t ] [ f ] if* ] loop ;
 
-M: logica-list pprint-delims drop \ LL{ \ } ;
+M: logica-list pprint-delims drop \ L[ \ ] ;
 
 M: logica-list pprint*
     [
@@ -628,19 +628,19 @@ LOGIC-VARS: A_ B_ C_ X_ Y_ Z_ ;
 { nlo } [ drop nl t ] voca
 
 
-{ membero X_ LL{ X_ | Z_ } } semper
-{ membero X_ LL{ Y_ | Z_ } } { membero X_ Z_ } si
+{ membero X_ L[ X_ | Z_ ] } semper
+{ membero X_ L[ Y_ | Z_ ] } { membero X_ Z_ } si
 
-{ appendo LL{ } A_ A_ } semper
-{ appendo LL{ A_ | X_ } Y_ LL{ A_ | Z_ } } {
+{ appendo L[ ] A_ A_ } semper
+{ appendo L[ A_ | X_ ] Y_ L[ A_ | Z_ ] } {
     { appendo X_ Y_ Z_ }
 } si
 
 
 LOGIC-VARS: Tail_ N_ N1_ ;
 
-{ lengtho LL{ } 0 } semper
-{ lengtho LL{ __ | Tail_ } N_ } {
+{ lengtho L[ ] 0 } semper
+{ lengtho L[ __ | Tail_ ] N_ } {
     { lengtho Tail_ N1_ }
     [ [ N1_ of 1 + ] N_ is ]
 } si
@@ -648,12 +648,12 @@ LOGIC-VARS: Tail_ N_ N1_ ;
 
 LOGIC-VARS: L_ L1_ L2_ L3_ ;
 
-{ conco LL{ } L_ L_ } semper
-{ conco LL{ X_ | L1_ } L2_ LL{ X_ | L3_ } } {
+{ conco L[ ] L_ L_ } semper
+{ conco L[ X_ | L1_ ] L2_ L[ X_ | L3_ ] } {
     { conco L1_ L2_ L3_ }
 } si
 
 
-{ listo LL{ } } semper
-{ listo LL{ __ | __ } } semper
+{ listo L[ ] } semper
+{ listo L[ __ | __ ] } semper
 

@@ -14,29 +14,29 @@ SYMBOLS: prince dunhill pall-mall blend blue-master ;
 
 TUPLE: house color nationality drink smoke pet ;
 
-{ existso A LL{ A  __  __  __  __ } } semper
-{ existso A LL{ __  A  __  __  __ } } semper
-{ existso A LL{ __  __  A  __  __ } } semper
-{ existso A LL{ __  __  __  A  __ } } semper
-{ existso A LL{ __  __  __  __  A } } semper
+{ existso A L[ A  __  __  __  __ ] } semper
+{ existso A L[ __  A  __  __  __ ] } semper
+{ existso A L[ __  __  A  __  __ ] } semper
+{ existso A L[ __  __  __  A  __ ] } semper
+{ existso A L[ __  __  __  __  A ] } semper
 
-{ righto R L LL{ L R __ __ __ } } semper
-{ righto R L LL{ __ L R __ __ } } semper
-{ righto R L LL{ __ __ L R __ } } semper
-{ righto R L LL{ __ __ __ L R } } semper
+{ righto R L L[ L R __ __ __ ] } semper
+{ righto R L L[ __ L R __ __ ] } semper
+{ righto R L L[ __ __ L R __ ] } semper
+{ righto R L L[ __ __ __ L R ] } semper
 
-{ middleo A LL{ __ __ A __ __ } } semper
+{ middleo A L[ __ __ A __ __ ] } semper
 
-{ firsto A LL{ A __ __ __ __ } } semper
+{ firsto A L[ A __ __ __ __ ] } semper
 
-{ nexto A B LL{ B A __ __ __ } } semper
-{ nexto A B LL{ __ B A __ __ } } semper
-{ nexto A B LL{ __ __ B A __ } } semper
-{ nexto A B LL{ __ __ __ B A } } semper
-{ nexto A B LL{ A B __ __ __ } } semper
-{ nexto A B LL{ __ A B __ __ } } semper
-{ nexto A B LL{ __ __ A B __ } } semper
-{ nexto A B LL{ __ __ __ A B } } semper
+{ nexto A B L[ B A __ __ __ ] } semper
+{ nexto A B L[ __ B A __ __ ] } semper
+{ nexto A B L[ __ __ B A __ ] } semper
+{ nexto A B L[ __ __ __ B A ] } semper
+{ nexto A B L[ A B __ __ __ ] } semper
+{ nexto A B L[ __ A B __ __ ] } semper
+{ nexto A B L[ __ __ A B __ ] } semper
+{ nexto A B L[ __ __ __ A B ] } semper
 
 { houseso Hs X Y } {
     { existso T{ house f red english __ __ __ } Hs }                               ! #2
