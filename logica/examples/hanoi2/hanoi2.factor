@@ -1,6 +1,6 @@
 ! Copyright (C) 2019 KUSUMOTO Norio.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: logica lists sequences assocs formatting ;
+USING: logica sequences assocs formatting ;
 IN: logica.examples.hanoi2
 
 LOGIC-PREDS: hanoi write-move ;

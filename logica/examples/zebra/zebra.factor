@@ -3,7 +3,7 @@
 
 ! Zebra Puzzle: https://rosettacode.org/wiki/Zebra_puzzle
 
-USING: logica lists ;
+USING: logica ;
 IN: logica.examples.zebra
 
 LOGIC-PREDS: houseso neighboro zebrao watero nexto lefto ;

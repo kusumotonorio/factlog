@@ -1,6 +1,6 @@
 ! Copyright (C) 2019 KUSUMOTO Norio.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: logica lists kernel assocs math ;
+USING: logica kernel assocs math ;
 IN: logica.examples.fib
 
 LOGIC-PREDS: fib ;

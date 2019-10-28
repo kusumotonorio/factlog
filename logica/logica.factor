@@ -3,8 +3,8 @@
 USING: accessors arrays assocs classes classes.parser
 classes.tuple combinators compiler.units continuations
 formatting fry hashtables io kernel lexer locals make
-math namespaces parser prettyprint prettyprint.config
-prettyprint.custom prettyprint.backend prettyprint.sections
+math namespaces parser prettyprint prettyprint.backend
+prettyprint.config prettyprint.custom prettyprint.sections
 quotations sequences sequences.deep sets splitting strings
 words words.symbol ;
 
@@ -17,23 +17,21 @@ SYMBOL: |     ! head-tail separator  in prolog: |
 SYMBOL: vel   ! disjunction, or      in prolog: ;
 SYMBOL: non   ! negation             in prolog: not, \+
 
-TUPLE: cons-pair car cdr ;
+TUPLE: cons-pair cons-car cons-cdr ;
 
 C: cons cons-pair
 
-: car ( cons-pair -- car ) car>> ; inline
+: car ( cons-pair -- car ) cons-car>> ; inline
 
-: cdr ( cons-pair -- cdr ) cdr>> ; inline
+: cdr ( cons-pair -- cdr ) cons-cdr>> ; inline
 
 : uncons ( cons-pair -- car cdr ) [ car ] [ cdr ] bi ; inline
 
-SINGLETON: +NIL+
-
-: nil? ( x -- ? ) +NIL+? ; inline
+SINGLETON: NIL
 
 MIXIN: logica-list
 INSTANCE: cons-pair logica-list
-INSTANCE: +NIL+ logica-list
+INSTANCE: NIL logica-list
 
 <PRIVATE
 
@@ -50,7 +48,7 @@ TUPLE: logic-pred name defs ;
         d-pos 1 + seq nth
     ] [
         seq length d-pos!
-        +NIL+
+        NIL
     ] if
     seq d-pos head dup length 1 > [ reverse ] when
     [ swap cons ] each ;
@@ -144,7 +142,7 @@ M: logica-list pprint*
             ] { } make
             [ pprint* ] each
             dup logica-list? [
-                nil? [ "~more~" text ] unless
+                NIL? [ "~more~" text ] unless
             ] [
                 "|" text pprint*
             ] if
@@ -488,7 +486,7 @@ PRIVATE>
 : >list ( seq -- cons-pair ) parse-list ; inline
 
 :: list>array ( list -- array )
-    list nil? [
+    list NIL? [
         { } clone
     ] [
         list [ car ] [ cdr ] bi :> ( l-car l-cdr )
