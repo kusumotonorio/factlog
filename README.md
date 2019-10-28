@@ -134,6 +134,8 @@ You can also use sequences, lists, and tuples as goal definition arguments. The 
 L[ Tom Jerry Nibbles ] .
 ⟹ L[ Tom Jerry Nibbles ]
 ```
+Note that the list used with logica is logica's own, not the `lists` vocabulary that Factor normally has.
+
 The syntax of list descriptions allows you to describe "head" and "tail".
 ```
 L[ HEAD | TAIL ]
