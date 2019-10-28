@@ -129,13 +129,13 @@ LOGIC-PREDS: likes-cheeseo dislikes-cheeseo ;
 ```
 Other creatures might also like cheese...
 
-You can also use sequences, lists, and tuples as goal definition arguments. The list in Factor is created by a chain of `cons-pair` tuples, but you can use a special syntax in logica to describe it.
+You can also use sequences, lists, and tuples as goal definition arguments.
+
+Note that the list used with logica is logica's own, not the list of `lists`vocabulary bundled with Factor. The list is created by a chain of `cons-pair` tuples, but you can use a special syntax to describe it.
 ```
 L[ Tom Jerry Nibbles ] .
 ⟹ L[ Tom Jerry Nibbles ]
 ```
-Note that the list used with logica is logica's own, not the list of `lists`vocabulary bundled with Factor.
-
 The syntax of list descriptions allows you to describe "head" and "tail".
 ```
 L[ HEAD | TAIL ]
