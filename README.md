@@ -6,7 +6,7 @@ It is an extended port from tiny_prolog and its descendants, [ruby-prolog](https
 
 ## Usage
 
-```
+```factor
 USE: logica
 
 LOGIC-PREDS: cato mouseo creatureo ;
@@ -18,54 +18,54 @@ In logica, words that represent relationships are called **logic predicates**. U
 In the above code, logic predicates end with the character `o`, which is a convention borrowed from miniKanren and so on, and means relation. This is not necessary, but it is useful for reducing conflicts with the words of, the parent language, Factor. We really want to write them as: `cat°`, `mouse°` and `creature°`, but we use `o` because it's easy to type.
 
 **Goals** are questions that logica tries to meet to be true. To represent a goal, write an array with a logic predicate followed by zero or more arguments. logica converts such definitions to internal representations.
-```
+```factor
 { LOGIC-PREDICATE ARG1 ARG2 ... }
 { LOGIC-PREDICATE }
 ```
 We will write logica programs using these goals.
 
-```
+```factor
 { cato Tom } semper
 { mouseo Jerry } semper
 { mouseo Nibbles } semper
 ```
 The above code means that Tom is a cat and Jerry and Nibbles are mice. Use `semper` to describe the **facts**.
 
-```
+```factor
 { cato Tom } query .
 ⟹ t
 ```
 The above code asks, "Is Tom a cat?". We said,"Tom is a cat.", so the answer is `t`. The general form of a query is: 
-```
+```factor
 { G1 G2 ... Gn } query
 ```
 The parentheses are omitted because there was only one goal to be satisfied earlier, but here is an example of two goals:
-```
+```factor
 { { cato Tom } { cato Jerry } } query .
 ⟹ f
 ```
 Tom is a cat, but Jerry is not declared a cat, so `f` is returned in response to this query.
 
 If you query with logic variable(s), you will get the answer for the logic variable(s). For such queries, an array of hashtables with logic variables as keys is returned.
-```
+```factor
 { mouseo X } query .
 ⟹ { H{ { X Jerry } } H{ { X Nibbles } } }
 ```
 The following code shows that if something is a cat, it's a creature. Use `si` to write **rules**.
-```
+```factor
 { creatureo X } { cato X } si
 ```
 According to the rules above, "Tom is a creature." is answered to the following questions:
-```
+```factor
 { creatureo Y } query .
 ⟹ { H{ { Y Tom } } }
 ```
 The general form of `si` is:
-```
+```factor
 Gh { Gb1 Gb2 ... Gbn } si
 ```
 This means Gh when all goals of Gb1, Gb2, ..., Gbn are met.
-```
+```factor
 LOGIC-PREDS: youngo young-mouseo ;
 
 { youngo Nibbles } semper
@@ -82,14 +82,14 @@ LOGIC-PREDS: youngo young-mouseo ;
 
 Let's describe that mice are also creatures.
 
-```
+```factor
 { creatureo X } { mouseo X } si
 
 { creatureo X } query .
 ⟹ { H{ { X Tom } } H{ { X Jerry } } H{ { X Nibbles } } }
 ```
 To tell the truth, we were able to describe at once that cats and mice were creatures by doing the following.
-```
+```factor
 LOGIC-PREDS: creatureo ;
 
 { creatureo Y } {
@@ -97,22 +97,22 @@ LOGIC-PREDS: creatureo ;
 } si
 ```
 `vel` is used to represent **disjunction**. The code below it has the same meaning as the code below it.
-```
+```factor
 Gh { Gb1 Gb2 Gb3 vel Gb4 Gb5 vel Gb6 } si
 ```
-```
+```factor
 Gh { Gb1 Gb2 Gb3 } si
 Gh { Gb4 Gb5 } si
 Gh { Gb6 } si
 ```
 
 You can use `query-n` to limit the number of answers to a query. Specify a number greater than or equal to 1.
-```
+```factor
 { creatureo Y } 2 query-n .
 ⟹ { H{ { Y Tom } } H{ { Y Jerry } } }
 ```
 Use `non` to express **negation**. `non` acts on the goal immediately following it.
-```
+```factor
 LOGIC-PREDS: likes-cheeseo dislikes-cheeseo ;
 
 { likes-cheeseo X } { mouseo X } si
@@ -132,21 +132,21 @@ Other creatures might also like cheese...
 You can also use sequences, lists, and tuples as goal definition arguments.
 
 Note that the list used with logica is logica's own, not the list of `lists`vocabulary bundled with Factor. The list is created by a chain of `cons-pair` tuples, but you can use a special syntax to describe it.
-```
+```factor
 L[ Tom Jerry Nibbles ] .
 ⟹ L[ Tom Jerry Nibbles ]
 ```
 The syntax of list descriptions allows you to describe "head" and "tail".
-```
+```factor
 L[ HEAD | TAIL ]
 L[ ITEM1 ITEM2 ITEM3 | OTHERS ]
 ```
 You can also write a quotation that returns an argument as a goal definition argument.
-```
+```factor
 [ Tom Jerry Nibbles L[ ] cons cons cons ]
 ```
 When written as an argument to a goal definition, the following lines have the same meaning as above:
-```
+```factor
 L[ Tom Jerry Nibbles ]
 L[ Tom Jerry Nibbles | L[ ] ]
 [ { Tom Jerry Nibbles } >list ]
@@ -154,7 +154,7 @@ L[ Tom Jerry Nibbles | L[ ] ]
 Such quotations are called only once when converting the goal definitions to internal representations.
 
 `membero` is a built-in logic predicate for the relationship an element is in a list.
-```
+```factor
 { membero Jerry L[ Tom Jerry Nibbles ] } query .
 ⟹ t
 
@@ -163,7 +163,7 @@ SYMBOL: Spike
 ⟹ f
 ```
 Recently, they moved into a small house. The house has a living room, a dining room and a kitchen. Well, humans feel that way. Each of them seems to be in their favorite room.
-```
+```factor
 TUPLE: house living dining kitchen in-the-wall ;
 LOGIC-PREDS: houseo ;
 
@@ -172,7 +172,7 @@ LOGIC-PREDS: houseo ;
 Don't worry about not mentioning the bathroom.
 
 Let's ask who is in the kitchen.
-```
+```factor
 { houseo T{ house { living __ } { dining __ } { kitchen X } { in-the-wall __ } } } query .
 ⟹ { H{ { X Nibbles } } }
 ```
@@ -180,7 +180,7 @@ These two consecutive underbars are called **anonymous logic variables**. Use in
 
 It seems to be meal time. What do they eat?
 
-```
+```factor
 LOGIC-PREDS: is-ao consumeo ;
 SYMBOLS: mouse cat milk cheese fresh-milk Emmentaler ;
 
@@ -198,7 +198,7 @@ SYMBOLS: mouse cat milk cheese fresh-milk Emmentaler ;
 { consumeo X mouse } { is-ao X cat } si
 ```
 Let's ask what Jerry consumes.
-```
+```factor
 { { consumeo Jerry X } { is-ao Y X } } query .
 ⟹ {
         H{ { X milk } { Y fresh-milk } }
@@ -206,7 +206,7 @@ Let's ask what Jerry consumes.
     }
 ```
 Well, what about Tom?
-```
+```factor
 { { consumeo Tom X } { is-ao Y X } } query .
 ⟹ {
         H{ { X milk } { Y fresh-milk } }
@@ -215,7 +215,7 @@ Well, what about Tom?
     }
 ```
 This is a problematical answer. We have to redefine `consumeo`.
-```
+```factor
 LOGIC-PREDS: consumeo ;
 
 { consumeo X milk } {
@@ -232,12 +232,12 @@ We wrote about Tom before about common cats. What two consecutive exclamation ma
 The next letter `f` is an abbreviation for goal `{ failo }` using the built-in logic predicate `failo`. `{ failo }` is a goal that is always `f`. Similarly, there is a goal `{ trueo }` that is always `t`, and its abbreviation is `t`.
 
 By these actions, "Tom consumes mice." becomes false and suppresses the examination of general eating habits of cats.
-```
+```factor
 { { consumeo Tom X } { is-ao Y X } } query .
 ⟹ { H{ { X milk } { Y fresh-milk } } }
 ```
 It's OK. Let's check a cat that is not Tom.
-```
+```factor
 SYMBOL: a-cat
 { is-ao a-cat cat } semper
 
@@ -251,7 +251,7 @@ SYMBOL: a-cat
 Jerry, watch out for the other cats.
 
 You can **trace** logica's execution. The word to do this is `trace`.
-```
+```factor
 trace
 { creatureo Tom } query .
 in: { creatureo Tom }
@@ -297,9 +297,12 @@ in: { cato X }
     ==> Success
 
 ⟹ t
+
+...
+
 ```
 The word to stop tracing is `notrace`.
-```
+```factor
 notrace
 { creatureo Tom } query .
 ⟹ t
@@ -307,12 +310,12 @@ notrace
 Thank you, old friends. I was able to explain most of the functions of logica with fun. Have a good time together with fun fights. See you.
 
 Here is a Prolog definition for the factorial predicate `fact`.
-```
+```factor
 fact(0, 1).
 fact(N, F) :- N > 0, N2 is N - 1, fact(N2, F2), F is F2 * N.
 ```
 Let's think about how to do the same thing with logica. It is mostly the following code, but is surrounded by back quotes where it has not been explained.
-```
+```factor
 USE: logica
 
 LOGIC-PREDS: facto ;
@@ -327,7 +330,7 @@ LOGIC-VARS: N N2 F F2 ;
 } si
 ```
 Within these backquotes are comparisons, calculations, and assignments (to be precise, **unifications**). logica has a mechanism to call Factor code to do these things. Here are some examples.
-```
+```factor
 LOGIC-PREDS: N_>_0  N2_is_N_-_1  F_is_F2_*_N ;
 
 { N_>_0 N } [ N of 0 > ] voca
@@ -341,7 +344,7 @@ Use `voca` to set the quotation to be called. Such quotations take an **environm
 The word `unify` unifies the two following the environment in that environment.
 
 Now we can rewrite the definition of facto to use them.
-```
+```factor
 USE: logica
 
 LOGIC-PREDS: facto N_>_0  N2_is_N_-_1  F_is_F2_*_N ;
@@ -362,7 +365,7 @@ LOGIC-VARS: N N2 F F2 ;
 { F_is_F2_*_N F F2 N } [ dup [ N of ] [ F2 of ] bi * F unify ] voca
 ```
 Let's try `facto`.
-```
+```factor
 { facto 0 F } query .
 ⟹ { H{ { F 1 } } }
 
@@ -379,7 +382,7 @@ There are the built-in logic predicates `(<)`, `(>)`, `(>=)`, and `(=<)` to comp
 The word `is` takes a quotation and a logic variable to be unified. The quotation takes an environment and returns a value.  And `is` returns the internal representation of the goal. `is` is intended to be used in a quotation. If there is a quotation in the definition of `si`, logica uses the internal definition of the goal obtained by calling it.
 
 If you use these features to rewrite the definition of `facto`:
-```
+```factor
 USE: logica
 
 LOGIC-PREDS: facto ;
