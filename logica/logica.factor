@@ -436,6 +436,22 @@ PRIVATE>
         { head-goal quot } suffix
     ] change-defs drop ;
 
+:: retract ( head-def -- )
+    head-def replace-'__' def>goal :> head-goal
+    head-goal pred>> defs>> :> defs
+    defs [ first <env> head-goal <env> V{ } clone <env> (unify*) ] find [
+        head-goal pred>> [ remove-nth ] change-defs drop
+    ] [ drop ] if ;
+
+:: retract-all ( head-def -- )
+    head-def replace-'__' def>goal :> head-goal
+    head-goal pred>> defs>> :> defs
+    defs [
+        first <env> head-goal <env> V{ } clone <env> (unify*)
+    ] reject head-goal pred>> defs<< ;
+
+: clear-pred ( pred -- ) get { } clone swap defs<< ;
+
 :: unify ( cb-env x y -- success? )
     cb-env env>> :> env
     x env y env cb-env trail>> env (unify*) ;
@@ -538,7 +554,7 @@ PRIVATE>
 
 LOGIC-PREDS: trueo failo
              varo nonvaro
-             asserto assertao assertzo retracto callo
+             asserto retracto retractallo
              (<) (>) (>=) (=<) (==) (\==) (=) (\=)
              writeo writenlo nlo
              membero appendo lengtho conco listo
@@ -551,27 +567,12 @@ LOGIC-PREDS: trueo failo
 
 LOGIC-VARS: A_ B_ C_ X_ Y_ Z_ ;
 
+
 { asserto X_ } [ X_ of call( -- ) t ] voca
 
-{ assertzo X_ } [ X_ of call( -- ) t ] voca
+{ retracto X_ } [ X_ of retract t ] voca
 
-{ assertao X_ } [| env |
-                 [ ] clone :> quot!
-                 env X_ of [
-                     {
-                         { [ dup \ semper = ] [ drop semper* ] }
-                         { [ dup \ si = ] [ drop si* ] }
-                         [ ]
-                     } cond
-                     1array quot swap append quot!
-                 ] each
-                 quot call( -- )
-                 t
-                ] voca
-
-{ retracto X_ } [
-    X_ of get [ dup length 1 >= [ rest ] when ] change-defs drop t
-] voca
+{ retractallo X_ } [ X_ of retract-all t ] voca
 
 
 { varo X_ } [ X_ of logic-var? ] voca
