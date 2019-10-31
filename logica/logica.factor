@@ -8,7 +8,6 @@ prettyprint.custom prettyprint.sections quotations sequences
 sequences.deep sets splitting strings words words.symbol ;
 IN: logica
 
-<<
 SYMBOL: !!    ! cut operator         in prolog: !
 SYMBOL: __    ! anonymous variable   in prolog: _
 SYMBOL: |     ! head-tail separator  in prolog: |
@@ -31,16 +30,8 @@ MIXIN: logica-list
 INSTANCE: cons-pair logica-list
 INSTANCE: NIL logica-list
 
-<PRIVATE
-
-TUPLE: logic-pred name defs ;
-
-: <pred> ( name -- pred )
-    logic-pred new
-        swap >>name
-        { } clone >>defs ;
-
-:: parse-list ( seq -- cons-pair )
+<<
+:: >list ( seq -- cons-pair )
     seq [ | = ] find drop :> d-pos!
     d-pos [
         d-pos 1 + seq nth
@@ -48,15 +39,59 @@ TUPLE: logic-pred name defs ;
         seq length d-pos!
         NIL
     ] if
-    seq d-pos head dup length 1 > [ reverse ] when
-    [ swap cons ] each ;
+    seq d-pos head reverse [ swap cons ] each ;
+
+SYNTAX: L[ \ ] [ >list ] parse-literal ;
+>>
+
+:: list>array ( list -- array )
+    list NIL? [
+        { } clone
+    ] [
+        list [ car ] [ cdr ] bi :> ( l-car l-cdr )
+        l-car cons-pair? [ l-car list>array ] [ list car ] if 1array
+        l-cdr logica-list? [ l-cdr list>array append ] when
+    ] if ;
+
+M: logica-list pprint-delims drop \ L[ \ ] ;
+
+M: logica-list pprint*
+    [
+        <flow
+        dup pprint-delims [
+            pprint-word
+            dup pprint-narrow? <inset
+            [
+                building get
+                length-limit get
+                '[ dup cons-pair? _ length _ < and ]
+                [ uncons swap , ] while
+            ] { } make
+            [ pprint* ] each
+            dup logica-list? [
+                NIL? [ "~more~" text ] unless
+            ] [
+                "|" text pprint*
+            ] if
+            block>
+        ] dip pprint-word block>
+    ] check-recursion ;
+
+<PRIVATE
+
+<<
+TUPLE: logic-pred name defs ;
+
+: <pred> ( name -- pred )
+    logic-pred new
+        swap >>name
+        { } clone >>defs ;
 
 MIXIN: LOGIC-VAR
 SINGLETON: NORMAL-LOGIC-VAR
 SINGLETON: ANONYMOUSE-LOGIC-VAR
 INSTANCE: NORMAL-LOGIC-VAR LOGIC-VAR
 INSTANCE: ANONYMOUSE-LOGIC-VAR LOGIC-VAR
->>
 
 : logic-var? ( obj -- ? )
     dup symbol? [ get LOGIC-VAR? ] [ drop f ] if ; inline
@@ -69,7 +104,6 @@ PRIVATE>
 
 : notrace ( -- ) f *trace?* set-global ;
 
-<<
 SYNTAX: LOGIC-VARS: ";"
     [
         create-word-in
@@ -85,9 +119,6 @@ SYNTAX: LOGIC-PREDS: ";"
         [ define-symbol ]
         [ [ name>> <pred> ] keep set-global ] tri
     ] each-token ;
-
-SYNTAX: L[ \ ]
-    [ >array parse-list ] parse-literal ;
 >>
 
 <PRIVATE
@@ -122,30 +153,6 @@ TUPLE: logic-env table ;
 
 : dereference ( term env -- term' env' )
     [ 2dup env-get [ 2nip first2 t ] [ f ] if* ] loop ;
-
-M: logica-list pprint-delims drop \ L[ \ ] ;
-
-M: logica-list pprint*
-    [
-        <flow
-        dup pprint-delims [
-            pprint-word
-            dup pprint-narrow? <inset
-            [
-                building get
-                length-limit get
-                '[ dup cons-pair? _ length _ < and ]
-                [ uncons swap , ] while
-            ] { } make
-            [ pprint* ] each
-            dup logica-list? [
-                NIL? [ "~more~" text ] unless
-            ] [
-                "|" text pprint*
-            ] if
-            block>
-        ] dip pprint-word block>
-    ] check-recursion ;
 
 PRIVATE>
 
@@ -494,17 +501,6 @@ PRIVATE>
         }
     } =\=-pred defs<<
     =\=-goal ;
-
-: >list ( seq -- list ) parse-list ; inline
-
-:: list>array ( list -- array )
-    list NIL? [
-        { } clone
-    ] [
-        list [ car ] [ cdr ] bi :> ( l-car l-cdr )
-        l-car cons-pair? [ l-car list>array ] [ list car ] if 1array
-        l-cdr logica-list? [ l-cdr list>array append ] when
-    ] if ;
 
 : resolve ( goal-def/defs quot: ( env -- ) -- ) (resolve) ;
 
