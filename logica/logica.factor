@@ -424,17 +424,23 @@ PRIVATE>
 
 : si ( head body -- ) at-the-end (si) ; inline
 
-: si* ( head body -- ) at-the-beginning (si) ; inline
+: si@ ( head body -- ) at-the-beginning (si) ; inline
+
+: si* ( defs -- ) [ first2 si ] each ; inline
 
 : semper ( head -- ) at-the-end (semper) ; inline
 
-: semper* ( head -- ) at-the-beginning (semper) ; inline
+: semper@ ( head -- ) at-the-beginning (semper) ; inline
+
+: semper* ( defs -- ) [ semper ] each ; inline
 
 :: voca ( head quot: ( callback-env -- ? ) -- )
     head def>goal :> head-goal
     head-goal pred>> [
         { head-goal quot } suffix
     ] change-defs drop ;
+
+: voca* ( defs -- ) [ first2 voca ] each ; inline
 
 :: retract ( head-def -- )
     head-def replace-'__' def>goal :> head-goal
@@ -499,7 +505,7 @@ PRIVATE>
     } =\=-pred defs<<
     =\=-goal ;
 
-: >list ( seq -- cons-pair ) parse-list ; inline
+: >list ( seq -- list ) parse-list ; inline
 
 :: list>array ( list -- array )
     list NIL? [
