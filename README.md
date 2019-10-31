@@ -203,7 +203,7 @@ SYMBOLS: mouse cat milk cheese fresh-milk Emmentaler ;
     { { consumeso X mouse } { is-ao X cat } }
 } rules
 ```
-Here, `facts` and `rules` are used. They can be used for successive facts and rules.
+Here, `facts` and `rules` are used. They can be used for successive facts or rules.
 
 Let's ask what Jerry consumes.
 ```
@@ -304,8 +304,9 @@ in: { cato X }
 
     ==> Success
 
-⟹ t
+...
 
+⟹ t
 ```
 The word to stop tracing is `notrace`.
 ```
