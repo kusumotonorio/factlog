@@ -1,13 +1,11 @@
 ! Copyright (C) 2019 KUSUMOTO Norio.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs classes classes.parser
-classes.tuple combinators compiler.units continuations
-formatting fry hashtables io kernel lexer locals make
-math namespaces parser prettyprint prettyprint.backend
-prettyprint.config prettyprint.custom prettyprint.sections
-quotations sequences sequences.deep sets splitting strings
-words words.symbol ;
-
+USING: accessors arrays assocs classes classes.tuple combinators
+combinators.short-circuit compiler.units continuations
+formatting fry io kernel lexer locals make math namespaces
+parser prettyprint prettyprint.backend prettyprint.config
+prettyprint.custom prettyprint.sections quotations sequences
+sequences.deep sets splitting strings words words.symbol ;
 IN: logica
 
 <<
@@ -73,17 +71,19 @@ PRIVATE>
 
 <<
 SYNTAX: LOGIC-VARS: ";"
-    [ create-class-in dup define-symbol
-      [ NORMAL-LOGIC-VAR swap set-global ]
-      \ call
-      [ suffix! ] tri@
+    [
+        create-word-in
+        [ reset-generic ]
+        [ define-symbol ]
+        [ NORMAL-LOGIC-VAR swap set-global ] tri
     ] each-token ;
 
 SYNTAX: LOGIC-PREDS: ";"
-    [ create-class-in dup define-symbol
-      [ dup "%s" sprintf <pred> swap set-global ]
-      \ call
-      [ suffix! ] tri@
+    [
+        create-word-in
+        [ reset-generic ]
+        [ define-symbol ]
+        [ [ name>> <pred> ] keep set-global ] tri
     ] each-token ;
 
 SYNTAX: L[ \ ]
@@ -103,13 +103,10 @@ TUPLE: logic-goal pred args ;
 : def>goal ( goal-def -- goal ) unclip swap <goal> ; inline
 
 : normalize ( goal-def/defs -- goal-defs )
-    dup !! = [ 1array ] [
-        dup length 0 > [
-            dup first dup symbol? [
-                get logic-pred? [ 1array ] when
-            ] [ drop ] if
-        ] when
-    ] if ;
+    dup {
+        [ !! = ]
+        [ ?first dup symbol? [ get logic-pred? ] [ drop f ] if ]
+    } 1|| [ 1array ] when ;
 
 TUPLE: logic-env table ;
 
@@ -152,31 +149,25 @@ M: logica-list pprint*
 
 PRIVATE>
 
-M:: logic-env at* ( term! env! -- value/f ? )
-    term env dereference env! term!
-    term {
-        { [ dup logic-goal? ] [
-              drop term pred>> term args>> env at <goal> t
-          ] }
-        { [ dup tuple? ] [
-              drop
-              term [ tuple-slots [ env at ] map ]
-              [ class-of slots>tuple ] bi t
-          ] }
-        { [ dup sequence? ] [
-              drop term [ env at ] map t
-          ] }
-        [ drop term t ]
+M: logic-env at*
+    dereference {
+        { [ over logic-goal? ] [
+            [ [ pred>> ] [ args>> ] bi ] dip at <goal> t ] }
+        { [ over tuple? ] [
+            '[ tuple-slots [ _ at ] map ]
+            [ class-of slots>tuple ] bi t ] }
+        { [ over sequence? ] [
+            '[ _ at ] map t ] }
+        [ drop t ]
     } cond ;
 
 <PRIVATE
 
 TUPLE: callback-env env trail ;
 
-: <callback-env> ( env trail -- cb-env ) callback-env boa ;
+C: <callback-env> callback-env
 
-M:: callback-env at* ( term cb-env -- value/f ? )
-    term cb-env env>> at* ;
+M: callback-env at* env>> at* ;
 
 TUPLE: cut-info cut? ;
 
@@ -400,9 +391,8 @@ SYMBOLS: at-the-beginning at-the-end ;
                       ] }
                     { [ dup [ t = ] [ f = ] bi or ] [
                           :> t/f! negation? [ t/f not t/f! ] when
-                          t/f [ "trueo_" ] [ "failo_" ] if <pred> :> t/f-pred
-                          { } clone :> args
-                          t/f-pred args logic-goal boa :> t/f-goal
+                          t/f "trueo_" "failo_" ? <pred> :> t/f-pred
+                          t/f-pred { } clone logic-goal boa :> t/f-goal
                           { { t/f-goal [ drop t/f ] } } t/f-pred defs<<
                           t/f-goal
                           f negation?!
@@ -413,7 +403,7 @@ SYMBOLS: at-the-beginning at-the-end ;
             ] map dummy-item swap remove :> body-goals
             { head-goal body-goals }
             head-goal pred>> [
-                swap 1array pos at-the-beginning = [ swap ] when append
+                swap pos at-the-beginning = [ prefix ] [ suffix ] if
             ] change-defs drop
         ] each
     ] if ;
@@ -522,36 +512,26 @@ PRIVATE>
 
 :: query-n ( goal-def/defs n/f -- bindings-array/success? )
     *trace?* get-global :> trace?
-    0 :> count!
+    0 :> n!
     f :> success?!
-    V{ } clone :> bindings-seq
+    V{ } clone :> bindings
     [
-        goal-def/defs normalize
-        [| env |
-            V{ } clone :> bindings
-            env table>>
-            keys [| key |
-                key get NORMAL-LOGIC-VAR? [
-                    key dup env at 2array bindings push
-                    trace? [ key "%u: " printf key env at pprint nl ] when
-                ] when
-            ] each
-            bindings >hashtable bindings-seq push
+        goal-def/defs normalize [| env |
+            env table>> keys [ get NORMAL-LOGIC-VAR? ] filter
+            [ dup env at ] H{ } map>assoc
+            trace? get-global [ dup [ "%u: %u\n" printf ] assoc-each ] when
+            bindings push
             t success?!
             n/f [
-                count 1 + count!
-                count n/f >= [ return ] when
+                n 1 + n!
+                n n/f >= [ return ] when
             ] when
         ] (resolve)
     ] with-return
-    bindings-seq >array
-    {
-        { [ dup empty? ] [ drop success? ] }
-        { [ dup first keys [ get NORMAL-LOGIC-VAR? ] filter empty? ] [
-              drop success?
-          ] }
-        [ ]
-    } cond ;
+    bindings dup {
+        [  empty? ]
+        [ first keys [ get NORMAL-LOGIC-VAR? ] any? not ]
+    } 1|| [ drop success? ] [ >array ] if ;
 
 : query ( goal-def/defs -- bindings-array/success? ) f query-n ;
 
