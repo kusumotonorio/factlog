@@ -161,13 +161,3 @@ factorialo clear-pred
 { { H{ { F 1 } } } } [ { factorialo 0 F } query ] unit-test
 { { H{ { F 1 } } } } [ { factorialo 1 F } query ] unit-test
 { { H{ { F 3628800 } } } } [ { factorialo 10 F } query ] unit-test
-
-
-"logica.examples.factorial" test
-"logica.examples.fib" test
-"logica.examples.hanoi" test
-"logica.examples.hanoi2" test
-"logica.examples.money" test
-"logica.examples.zebra" test
-"logica.examples.zebra-short" test
-"logica.examples.zebra2" test
