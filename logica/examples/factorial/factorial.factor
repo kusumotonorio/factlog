@@ -11,5 +11,5 @@ LOGIC-VARS: N F N2 F2 ;
     [ [ N of 1 - ] N2 is ]
     { factorial N2 F2 }
     [ [ [ F2 of ] [ N of ] bi * ] F is ] !!
-} si
-{ factorial 0 1 } semper
+} rule
+{ factorial 0 1 } fact

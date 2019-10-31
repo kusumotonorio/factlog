@@ -13,30 +13,31 @@ SYMBOLS: coffee tea milk beer water ;
 SYMBOLS: prince dunhill pall-mall blend blue-master ;
 
 TUPLE: house color nationality drink smoke pet ;
+{
+    { existso A L[ A  __  __  __  __ ] }
+    { existso A L[ __  A  __  __  __ ] }
+    { existso A L[ __  __  A  __  __ ] }
+    { existso A L[ __  __  __  A  __ ] }
+    { existso A L[ __  __  __  __  A ] }
 
-{ existso A L[ A  __  __  __  __ ] } semper
-{ existso A L[ __  A  __  __  __ ] } semper
-{ existso A L[ __  __  A  __  __ ] } semper
-{ existso A L[ __  __  __  A  __ ] } semper
-{ existso A L[ __  __  __  __  A ] } semper
+    { righto R L L[ L R __ __ __ ] }
+    { righto R L L[ __ L R __ __ ] }
+    { righto R L L[ __ __ L R __ ] }
+    { righto R L L[ __ __ __ L R ] }
 
-{ righto R L L[ L R __ __ __ ] } semper
-{ righto R L L[ __ L R __ __ ] } semper
-{ righto R L L[ __ __ L R __ ] } semper
-{ righto R L L[ __ __ __ L R ] } semper
+    { middleo A L[ __ __ A __ __ ] }
 
-{ middleo A L[ __ __ A __ __ ] } semper
+    { firsto A L[ A __ __ __ __ ] }
 
-{ firsto A L[ A __ __ __ __ ] } semper
-
-{ nexto A B L[ B A __ __ __ ] } semper
-{ nexto A B L[ __ B A __ __ ] } semper
-{ nexto A B L[ __ __ B A __ ] } semper
-{ nexto A B L[ __ __ __ B A ] } semper
-{ nexto A B L[ A B __ __ __ ] } semper
-{ nexto A B L[ __ A B __ __ ] } semper
-{ nexto A B L[ __ __ A B __ ] } semper
-{ nexto A B L[ __ __ __ A B ] } semper
+    { nexto A B L[ B A __ __ __ ] }
+    { nexto A B L[ __ B A __ __ ] }
+    { nexto A B L[ __ __ B A __ ] }
+    { nexto A B L[ __ __ __ B A ] }
+    { nexto A B L[ A B __ __ __ ] }
+    { nexto A B L[ __ A B __ __ ] }
+    { nexto A B L[ __ __ A B __ ] }
+    { nexto A B L[ __ __ __ A B ] }
+} facts
 
 { houseso Hs X Y } {
     { existso T{ house f red english __ __ __ } Hs }                               ! #2
@@ -56,5 +57,5 @@ TUPLE: house color nationality drink smoke pet ;
     { nexto T{ house f __ __ water __ __ } T{ house f __ __ __ blend __ } Hs }     ! #16
     { existso T{ house f __ X water __ __ } Hs }
     { existso T{ house f __ Y __ __ zebra } Hs }
-} si
+} rule
 

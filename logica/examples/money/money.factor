@@ -11,13 +11,13 @@ LOGIC-VARS: S E N D M O R Y A L G B T
 
 { sumo N1 N2 N } {
     { sum1o N1 N2 N 0 0 L[ 0 1 2 3 4 5 6 7 8 9 ] __ }
-} si
+} rule
 
-{ sum1o L[ ] L[ ] L[ ] 0 0 Digits Digits } semper
+{ sum1o L[ ] L[ ] L[ ] 0 0 Digits Digits } fact
 { sum1o L[ D1 | N1 ] L[ D2 | N2 ] L[ D | N ] C1 C Digs1 Digs } {
     { sum1o N1 N2 N C1 C2 Digs1 Digs2 }
     { digitsumo D1 D2 C2 D C Digs2 Digs }
-} si
+} rule
 
 { digitsumo D1 D2 C1 D C Digs1 Digs } {
     { delo D1 Digs1 Digs2 }
@@ -26,23 +26,23 @@ LOGIC-VARS: S E N D M O R Y A L G B T
     [ [ [ D1 of ] [ D2 of ] [ C1 of ] tri + + ] S is ]
     [ [ S of 10 mod ] D is ]
     [ [ S of 10 / >integer ] C is ]
-} si
+} rule
 
-{ delo A L L } { { nonvaro A } !! } si
-{ delo A L[ A | L ] L } semper
-{ delo A L[ B | L ] L[ B | L1 ] } { delo A L L1 } si
+{ delo A L L } { { nonvaro A } !! } rule
+{ delo A L[ A | L ] L } fact
+{ delo A L[ B | L ] L[ B | L1 ] } { delo A L L1 } rule
 
 { moneyo
   L[ 0 S E N D ]
   L[ 0 M O R E ]
   L[ M O N E Y ]
-} semper
+} fact
 
 { donaldo
   L[ D O N A L D ]
   L[ G E R A L D ]
   L[ R O B E R T ]
-} semper
+} fact
 
 :: S-and-M-can't-be-zero ( seq -- seq' )
     seq [| hash |

@@ -36,12 +36,12 @@ TUPLE: house color nationality drink smoke pet ;
     { nexto T{ house f __ __ water __ __ } T{ house f __ __ __ blend __ } Hs }    ! #16
     { membero T{ house f __ X water __ __ } Hs }
     { membero T{ house f __ Y __ __ zebra } Hs }
-} si
+} rule
 
 { nexto A B Ls } {
-    { appendo __ L[ A B | __ ] Ls } vel
+    { appendo __ L[ A B | __ ] Ls } ;;
     { appendo __ L[ B A | __ ] Ls }
-} si
+} rule
 
-{ lefto A B Ls } { appendo __ L[ A B | __ ] Ls } si
+{ lefto A B Ls } { appendo __ L[ A B | __ ] Ls } rule
 

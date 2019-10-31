@@ -6,12 +6,12 @@ IN: logica.examples.hanoi2
 LOGIC-PREDS: hanoi write-move ;
 LOGIC-VARS: A B C X Y Z ;
 
-{ write-move X } [ X of [ printf ] each t ] voca
+{ write-move X } [ X of [ printf ] each t ] callback
 
-{ hanoi L[ ] A B C } semper
+{ hanoi L[ ] A B C } fact
 
 { hanoi L[ X | Y ] A B C } {
     { hanoi Y A C B }
     { write-move { "move " X " from " A " to " B "\n" } }
     { hanoi Y C B A }
-} si
+} rule

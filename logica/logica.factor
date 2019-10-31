@@ -14,8 +14,8 @@ IN: logica
 SYMBOL: !!    ! cut operator         in prolog: !
 SYMBOL: __    ! anonymous variable   in prolog: _
 SYMBOL: |     ! head-tail separator  in prolog: |
-SYMBOL: vel   ! disjunction, or      in prolog: ;
-SYMBOL: non   ! negation             in prolog: not, \+
+SYMBOL: ;;    ! disjunction, or      in prolog: ;
+SYMBOL: \+    ! negation             in prolog: not, \+
 
 TUPLE: cons-pair cons-car cons-cdr ;
 
@@ -326,7 +326,7 @@ DEFER: unify*
     ] if ;
 
 : split-body ( body -- bodies )
-    { vel } split [ >array ] map ;
+    { ;; } split [ >array ] map ;
 
 SYMBOL: *anonymouse-var-no*
 
@@ -360,24 +360,24 @@ SYMBOL: *anonymouse-var-no*
 
 SYMBOL: dummy-item
 
-:: non-goal ( goal -- non-goal )
-    "failo" <pred> :> f-pred
+:: negation-goal ( goal -- negation-goal )
+    "failo_" <pred> :> f-pred
     f-pred { } clone logic-goal boa :> f-goal
     { { f-goal [ drop f ] } } f-pred defs<<
-    "trueo" <pred> :> t-pred
+    "trueo_" <pred> :> t-pred
     t-pred { } clone logic-goal boa :> t-goal
     { { t-goal [ drop t ] } } t-pred defs<<
-    goal pred>> name>> "non-%s_" sprintf <pred> :> non-pred
-    non-pred goal args>> clone logic-goal boa :> non-goal
+    goal pred>> name>> "\\+%s_" sprintf <pred> :> negation-pred
+    negation-pred goal args>> clone logic-goal boa :> negation-goal
     {
-        { non-goal { goal !! f-goal } }
-        { non-goal { t-goal } }
-    } non-pred defs<<  ! non-P_ { P !! { failo } vel { trueo } } si
-    non-goal ;
+        { negation-goal { goal !! f-goal } }
+        { negation-goal { t-goal } }
+    } negation-pred defs<<  ! \+P_ { P !! { failo_ } ;; { trueo_ } } rule
+    negation-goal ;
 
 SYMBOLS: at-the-beginning at-the-end ;
 
-:: (si) ( head body pos -- )
+:: (rule) ( head body pos -- )
     reset-anonymouse-var-no
     head replace-'__' def>goal :> head-goal
     body replace-'__' normalize split-body  ! disjunction
@@ -385,30 +385,30 @@ SYMBOLS: at-the-beginning at-the-end ;
         head-goal swap 2array
         head-goal pred>> [ swap suffix ] change-defs drop
     ] [
-        f :> non?!
+        f :> negation?!
         [
             [
                 {
-                    { [ dup non = ] [ drop dummy-item t non?! ] }
+                    { [ dup \+ = ] [ drop dummy-item t negation?! ] }
                     { [ dup array? ] [
-                          def>goal non? [ non-goal ] when
-                          f non?!
+                          def>goal negation? [ negation-goal ] when
+                          f negation?!
                       ] }
                     { [ dup callable? ] [
-                          call( -- goal ) non? [ non-goal ] when
-                          f non?!
+                          call( -- goal ) negation? [ negation-goal ] when
+                          f negation?!
                       ] }
                     { [ dup [ t = ] [ f = ] bi or ] [
-                          :> t/f! non? [ t/f not t/f! ] when
-                          t/f [ "trueo" ] [ "failo" ] if <pred> :> t/f-pred
+                          :> t/f! negation? [ t/f not t/f! ] when
+                          t/f [ "trueo_" ] [ "failo_" ] if <pred> :> t/f-pred
                           { } clone :> args
                           t/f-pred args logic-goal boa :> t/f-goal
                           { { t/f-goal [ drop t/f ] } } t/f-pred defs<<
                           t/f-goal
-                          f non?!
+                          f negation?!
                       ] }
-                    { [ dup !! = ] [ f non?! ] }  ! as '!!'
-                    [ drop dummy-item f non?! ]
+                    { [ dup !! = ] [ f negation?! ] }  ! as '!!'
+                    [ drop dummy-item f negation?! ]
                 } cond
             ] map dummy-item swap remove :> body-goals
             { head-goal body-goals }
@@ -418,29 +418,29 @@ SYMBOLS: at-the-beginning at-the-end ;
         ] each
     ] if ;
 
-: (semper) ( head pos -- ) { } clone swap (si) ;
+: (fact) ( head pos -- ) { } clone swap (rule) ;
 
 PRIVATE>
 
-: si ( head body -- ) at-the-end (si) ; inline
+: rule ( head body -- ) at-the-end (rule) ; inline
 
-: si@ ( head body -- ) at-the-beginning (si) ; inline
+: rule* ( head body -- ) at-the-beginning (rule) ; inline
 
-: si* ( defs -- ) [ first2 si ] each ; inline
+: rules ( defs -- ) [ first2 rule ] each ; inline
 
-: semper ( head -- ) at-the-end (semper) ; inline
+: fact ( head -- ) at-the-end (fact) ; inline
 
-: semper@ ( head -- ) at-the-beginning (semper) ; inline
+: fact* ( head -- ) at-the-beginning (fact) ; inline
 
-: semper* ( defs -- ) [ semper ] each ; inline
+: facts ( defs -- ) [ fact ] each ; inline
 
-:: voca ( head quot: ( callback-env -- ? ) -- )
+:: callback ( head quot: ( callback-env -- ? ) -- )
     head def>goal :> head-goal
     head-goal pred>> [
         { head-goal quot } suffix
     ] change-defs drop ;
 
-: voca* ( defs -- ) [ first2 voca ] each ; inline
+: callbacks ( defs -- ) [ first2 callback ] each ; inline
 
 :: retract ( head-def -- )
     head-def replace-'__' def>goal :> head-goal
@@ -566,52 +566,52 @@ LOGIC-PREDS: trueo failo
              membero appendo lengtho conco listo
 ;
 
-{ trueo } [ drop t ] voca
+{ trueo } [ drop t ] callback
 
-{ failo } [ drop f ] voca
+{ failo } [ drop f ] callback
 
 
 LOGIC-VARS: A_ B_ C_ X_ Y_ Z_ ;
 
 
-{ asserto X_ } [ X_ of call( -- ) t ] voca
+{ asserto X_ } [ X_ of call( -- ) t ] callback
 
-{ retracto X_ } [ X_ of retract t ] voca
+{ retracto X_ } [ X_ of retract t ] callback
 
-{ retractallo X_ } [ X_ of retract-all t ] voca
+{ retractallo X_ } [ X_ of retract-all t ] callback
 
 
-{ varo X_ } [ X_ of logic-var? ] voca
+{ varo X_ } [ X_ of logic-var? ] callback
 
-{ nonvaro X_ } [ X_ of logic-var? not ] voca
+{ nonvaro X_ } [ X_ of logic-var? not ] callback
 
 
 { (<) X_ Y_ } [
     [ X_ of ] [ Y_ of ] bi 2dup [ number? ] both? [ < ] [ 2drop f ] if
-] voca
+] callback
 
 { (>) X_ Y_ } [
     [ X_ of ] [ Y_ of ] bi 2dup [ number? ] both? [ > ] [ 2drop f ] if
-] voca
+] callback
 
 { (>=) X_ Y_ } [
     [ X_ of ] [ Y_ of ] bi 2dup [ number? ] both? [ >= ] [ 2drop f ] if
-] voca
+] callback
 
 { (=<) X_ Y_ } [
     [ X_ of ] [ Y_ of ] bi 2dup [ number? ] both? [ <= ] [ 2drop f ] if
-] voca
+] callback
 
-{ (==) X_ Y_ } [ [ X_ of ] [ Y_ of ] bi = ] voca
+{ (==) X_ Y_ } [ [ X_ of ] [ Y_ of ] bi = ] callback
 
-{ (\==) X_ Y_ } [ [ X_ of ] [ Y_ of ] bi = not ] voca
+{ (\==) X_ Y_ } [ [ X_ of ] [ Y_ of ] bi = not ] callback
 
-{ (=) X_ Y_ } [ dup [ X_ of ] [ Y_ of ] bi unify ] voca
+{ (=) X_ Y_ } [ dup [ X_ of ] [ Y_ of ] bi unify ] callback
 
 { (\=) X_ Y_ } [
     clone [ clone ] change-env [ clone ] change-trail
     dup [ X_ of ] [ Y_ of ] bi unify not
-] voca
+] callback
 
 
 { writeo X_ } [
@@ -620,7 +620,7 @@ LOGIC-VARS: A_ B_ C_ X_ Y_ Z_ ;
     ] [
         dup string? [ printf ] [ pprint ] if
     ] if t
-] voca
+] callback
 
 { writenlo X_ } [
     X_ of dup sequence? [
@@ -628,37 +628,37 @@ LOGIC-VARS: A_ B_ C_ X_ Y_ Z_ ;
     ] [
         dup string? [ printf ] [ pprint ] if
     ] if nl t
-] voca
+] callback
 
-{ nlo } [ drop nl t ] voca
+{ nlo } [ drop nl t ] callback
 
 
-{ membero X_ L[ X_ | Z_ ] } semper
-{ membero X_ L[ Y_ | Z_ ] } { membero X_ Z_ } si
+{ membero X_ L[ X_ | Z_ ] } fact
+{ membero X_ L[ Y_ | Z_ ] } { membero X_ Z_ } rule
 
-{ appendo L[ ] A_ A_ } semper
+{ appendo L[ ] A_ A_ } fact
 { appendo L[ A_ | X_ ] Y_ L[ A_ | Z_ ] } {
     { appendo X_ Y_ Z_ }
-} si
+} rule
 
 
 LOGIC-VARS: Tail_ N_ N1_ ;
 
-{ lengtho L[ ] 0 } semper
+{ lengtho L[ ] 0 } fact
 { lengtho L[ __ | Tail_ ] N_ } {
     { lengtho Tail_ N1_ }
     [ [ N1_ of 1 + ] N_ is ]
-} si
+} rule
 
 
 LOGIC-VARS: L_ L1_ L2_ L3_ ;
 
-{ conco L[ ] L_ L_ } semper
+{ conco L[ ] L_ L_ } fact
 { conco L[ X_ | L1_ ] L2_ L[ X_ | L3_ ] } {
     { conco L1_ L2_ L3_ }
-} si
+} rule
 
 
-{ listo L[ ] } semper
-{ listo L[ __ | __ ] } semper
+{ listo L[ ] } fact
+{ listo L[ __ | __ ] } fact
 
