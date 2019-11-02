@@ -1,16 +1,13 @@
 ! Copyright (C) 2019 KUSUMOTO Norio.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: accessors arrays assocs classes classes.parser
-classes.tuple combinators compiler.units continuations
-formatting fry hashtables io kernel lexer locals make
-math namespaces parser prettyprint prettyprint.backend
-prettyprint.config prettyprint.custom prettyprint.sections
-quotations sequences sequences.deep sets splitting strings
-words words.symbol ;
-
+USING: accessors arrays assocs classes classes.tuple combinators
+combinators.short-circuit compiler.units continuations
+formatting fry io kernel lexer locals make math namespaces
+parser prettyprint prettyprint.backend prettyprint.config
+prettyprint.custom prettyprint.sections quotations sequences
+sequences.deep sets splitting strings words words.symbol ;
 IN: logica
 
-<<
 SYMBOL: !!    ! cut operator         in prolog: !
 SYMBOL: __    ! anonymous variable   in prolog: _
 SYMBOL: |     ! head-tail separator  in prolog: |
@@ -33,16 +30,8 @@ MIXIN: logica-list
 INSTANCE: cons-pair logica-list
 INSTANCE: NIL logica-list
 
-<PRIVATE
-
-TUPLE: logic-pred name defs ;
-
-: <pred> ( name -- pred )
-    logic-pred new
-        swap >>name
-        { } clone >>defs ;
-
-:: parse-list ( seq -- cons-pair )
+<<
+:: >list ( seq -- cons-pair )
     seq [ | = ] find drop :> d-pos!
     d-pos [
         d-pos 1 + seq nth
@@ -50,81 +39,19 @@ TUPLE: logic-pred name defs ;
         seq length d-pos!
         NIL
     ] if
-    seq d-pos head dup length 1 > [ reverse ] when
-    [ swap cons ] each ;
+    seq d-pos head reverse [ swap cons ] each ;
 
-MIXIN: LOGIC-VAR
-SINGLETON: NORMAL-LOGIC-VAR
-SINGLETON: ANONYMOUSE-LOGIC-VAR
-INSTANCE: NORMAL-LOGIC-VAR LOGIC-VAR
-INSTANCE: ANONYMOUSE-LOGIC-VAR LOGIC-VAR
+SYNTAX: L[ \ ] [ >list ] parse-literal ;
 >>
 
-: logic-var? ( obj -- ? )
-    dup symbol? [ get LOGIC-VAR? ] [ drop f ] if ; inline
-
-SYMBOLS: *trace?* *trace-depth* ;
-
-PRIVATE>
-
-: trace ( -- ) t *trace?* set-global ;
-
-: notrace ( -- ) f *trace?* set-global ;
-
-<<
-SYNTAX: LOGIC-VARS: ";"
-    [ create-class-in dup define-symbol
-      [ NORMAL-LOGIC-VAR swap set-global ]
-      \ call
-      [ suffix! ] tri@
-    ] each-token ;
-
-SYNTAX: LOGIC-PREDS: ";"
-    [ create-class-in dup define-symbol
-      [ dup "%s" sprintf <pred> swap set-global ]
-      \ call
-      [ suffix! ] tri@
-    ] each-token ;
-
-SYNTAX: L[ \ ]
-    [ >array parse-list ] parse-literal ;
->>
-
-<PRIVATE
-
-TUPLE: logic-goal pred args ;
-
-: called-args ( args -- args' )
-    [ dup callable? [ call( -- term ) ] when ] map ;
-
-:: <goal> ( pred args -- goal )
-    pred get args called-args logic-goal boa ; inline
-
-: def>goal ( goal-def -- goal ) unclip swap <goal> ; inline
-
-: normalize ( goal-def/defs -- goal-defs )
-    dup !! = [ 1array ] [
-        dup length 0 > [
-            dup first dup symbol? [
-                get logic-pred? [ 1array ] when
-            ] [ drop ] if
-        ] when
+:: list>array ( list -- array )
+    list NIL? [
+        { } clone
+    ] [
+        list [ car ] [ cdr ] bi :> ( l-car l-cdr )
+        l-car cons-pair? [ l-car list>array ] [ list car ] if 1array
+        l-cdr logica-list? [ l-cdr list>array append ] when
     ] if ;
-
-TUPLE: logic-env table ;
-
-: <env> ( -- env ) logic-env new H{ } clone >>table ; inline
-
-:: env-put ( x pair env -- ) pair x env table>> set-at ; inline
-
-:: env-get ( x env -- pair/f ) x env table>> at ; inline
-
-:: env-delete ( x env -- ) x env table>> delete-at ; inline
-
-: env-clear ( env -- ) table>> clear-assoc ; inline
-
-: dereference ( term env -- term' env' )
-    [ 2dup env-get [ 2nip first2 t ] [ f ] if* ] loop ;
 
 M: logica-list pprint-delims drop \ L[ \ ] ;
 
@@ -150,33 +77,104 @@ M: logica-list pprint*
         ] dip pprint-word block>
     ] check-recursion ;
 
+<PRIVATE
+
+<<
+TUPLE: logic-pred name defs ;
+
+: <pred> ( name -- pred )
+    logic-pred new
+        swap >>name
+        { } clone >>defs ;
+
+MIXIN: LOGIC-VAR
+SINGLETON: NORMAL-LOGIC-VAR
+SINGLETON: ANONYMOUSE-LOGIC-VAR
+INSTANCE: NORMAL-LOGIC-VAR LOGIC-VAR
+INSTANCE: ANONYMOUSE-LOGIC-VAR LOGIC-VAR
+
+: logic-var? ( obj -- ? )
+    dup symbol? [ get LOGIC-VAR? ] [ drop f ] if ; inline
+
+SYMBOLS: *trace?* *trace-depth* ;
+
 PRIVATE>
 
-M:: logic-env at* ( term! env! -- value/f ? )
-    term env dereference env! term!
-    term {
-        { [ dup logic-goal? ] [
-              drop term pred>> term args>> env at <goal> t
-          ] }
-        { [ dup tuple? ] [
-              drop
-              term [ tuple-slots [ env at ] map ]
-              [ class-of slots>tuple ] bi t
-          ] }
-        { [ dup sequence? ] [
-              drop term [ env at ] map t
-          ] }
-        [ drop term t ]
+: trace ( -- ) t *trace?* set-global ;
+
+: notrace ( -- ) f *trace?* set-global ;
+
+SYNTAX: LOGIC-VARS: ";"
+    [
+        create-word-in
+        [ reset-generic ]
+        [ define-symbol ]
+        [ NORMAL-LOGIC-VAR swap set-global ] tri
+    ] each-token ;
+
+SYNTAX: LOGIC-PREDS: ";"
+    [
+        create-word-in
+        [ reset-generic ]
+        [ define-symbol ]
+        [ [ name>> <pred> ] keep set-global ] tri
+    ] each-token ;
+>>
+
+<PRIVATE
+
+TUPLE: logic-goal pred args ;
+
+: called-args ( args -- args' )
+    [ dup callable? [ call( -- term ) ] when ] map ;
+
+:: <goal> ( pred args -- goal )
+    pred get args called-args logic-goal boa ; inline
+
+: def>goal ( goal-def -- goal ) unclip swap <goal> ; inline
+
+: normalize ( goal-def/defs -- goal-defs )
+    dup {
+        [ !! = ]
+        [ ?first dup symbol? [ get logic-pred? ] [ drop f ] if ]
+    } 1|| [ 1array ] when ;
+
+TUPLE: logic-env table ;
+
+: <env> ( -- env ) logic-env new H{ } clone >>table ; inline
+
+:: env-put ( x pair env -- ) pair x env table>> set-at ; inline
+
+:: env-get ( x env -- pair/f ) x env table>> at ; inline
+
+:: env-delete ( x env -- ) x env table>> delete-at ; inline
+
+: env-clear ( env -- ) table>> clear-assoc ; inline
+
+: dereference ( term env -- term' env' )
+    [ 2dup env-get [ 2nip first2 t ] [ f ] if* ] loop ;
+
+PRIVATE>
+
+M: logic-env at*
+    dereference {
+        { [ over logic-goal? ] [
+            [ [ pred>> ] [ args>> ] bi ] dip at <goal> t ] }
+        { [ over tuple? ] [
+            '[ tuple-slots [ _ at ] map ]
+            [ class-of slots>tuple ] bi t ] }
+        { [ over sequence? ] [
+            '[ _ at ] map t ] }
+        [ drop t ]
     } cond ;
 
 <PRIVATE
 
 TUPLE: callback-env env trail ;
 
-: <callback-env> ( env trail -- cb-env ) callback-env boa ;
+C: <callback-env> callback-env
 
-M:: callback-env at* ( term cb-env -- value/f ? )
-    term cb-env env>> at* ;
+M: callback-env at* env>> at* ;
 
 TUPLE: cut-info cut? ;
 
@@ -400,9 +398,8 @@ SYMBOLS: at-the-beginning at-the-end ;
                       ] }
                     { [ dup [ t = ] [ f = ] bi or ] [
                           :> t/f! negation? [ t/f not t/f! ] when
-                          t/f [ "trueo_" ] [ "failo_" ] if <pred> :> t/f-pred
-                          { } clone :> args
-                          t/f-pred args logic-goal boa :> t/f-goal
+                          t/f "trueo_" "failo_" ? <pred> :> t/f-pred
+                          t/f-pred { } clone logic-goal boa :> t/f-goal
                           { { t/f-goal [ drop t/f ] } } t/f-pred defs<<
                           t/f-goal
                           f negation?!
@@ -413,7 +410,7 @@ SYMBOLS: at-the-beginning at-the-end ;
             ] map dummy-item swap remove :> body-goals
             { head-goal body-goals }
             head-goal pred>> [
-                swap 1array pos at-the-beginning = [ swap ] when append
+                swap pos at-the-beginning = [ prefix ] [ suffix ] if
             ] change-defs drop
         ] each
     ] if ;
@@ -505,53 +502,32 @@ PRIVATE>
     } =\=-pred defs<<
     =\=-goal ;
 
-: >list ( seq -- list ) parse-list ; inline
-
-:: list>array ( list -- array )
-    list NIL? [
-        { } clone
-    ] [
-        list [ car ] [ cdr ] bi :> ( l-car l-cdr )
-        l-car cons-pair? [ l-car list>array ] [ list car ] if 1array
-        l-cdr logica-list? [ l-cdr list>array append ] when
-    ] if ;
-
 : resolve ( goal-def/defs quot: ( env -- ) -- ) (resolve) ;
 
 : resolve* ( goal-def/defs -- ) [ drop ] resolve ;
 
 :: query-n ( goal-def/defs n/f -- bindings-array/success? )
     *trace?* get-global :> trace?
-    0 :> count!
+    0 :> n!
     f :> success?!
-    V{ } clone :> bindings-seq
+    V{ } clone :> bindings
     [
-        goal-def/defs normalize
-        [| env |
-            V{ } clone :> bindings
-            env table>>
-            keys [| key |
-                key get NORMAL-LOGIC-VAR? [
-                    key dup env at 2array bindings push
-                    trace? [ key "%u: " printf key env at pprint nl ] when
-                ] when
-            ] each
-            bindings >hashtable bindings-seq push
+        goal-def/defs normalize [| env |
+            env table>> keys [ get NORMAL-LOGIC-VAR? ] filter
+            [ dup env at ] H{ } map>assoc
+            trace? get-global [ dup [ "%u: %u\n" printf ] assoc-each ] when
+            bindings push
             t success?!
             n/f [
-                count 1 + count!
-                count n/f >= [ return ] when
+                n 1 + n!
+                n n/f >= [ return ] when
             ] when
         ] (resolve)
     ] with-return
-    bindings-seq >array
-    {
-        { [ dup empty? ] [ drop success? ] }
-        { [ dup first keys [ get NORMAL-LOGIC-VAR? ] filter empty? ] [
-              drop success?
-          ] }
-        [ ]
-    } cond ;
+    bindings dup {
+        [  empty? ]
+        [ first keys [ get NORMAL-LOGIC-VAR? ] any? not ]
+    } 1|| [ drop success? ] [ >array ] if ;
 
 : query ( goal-def/defs -- bindings-array/success? ) f query-n ;
 
