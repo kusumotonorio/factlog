@@ -65,6 +65,15 @@ The general form of `rule` is:
 Gh { Gb1 Gb2 ... Gbn } rule
 ```
 This means Gh when all goals of Gb1, Gb2, ..., Gbn are met.
+
+This `Gh` is called **head** and the `{Gb 1Gb 2... Gbn}` is called **body**.
+
+In fact, facts are rules where its body is an empty array. So, the general form of `fact` is:
+```
+Gh fact
+```
+
+
 ```
 LOGIC-PREDS: youngo young-mouseo ;
 
@@ -304,6 +313,7 @@ let's have them come back.
 ```
 { { mouseo Jerry } { mouseo Nibbles } } facts
 { creatureo X } query .
+⟹  { H{ { X Tom } } H{ { X Jerry } } H{ { X Nibbles } } }
 ```
 You can **trace** factlog's execution. The word to do this is `trace`.
 ```
