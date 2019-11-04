@@ -295,7 +295,7 @@ While `clear-pred` clears all the definition information for a given logic predi
 { mouseo X } query .
 ⟹ { H{ { X Nibbles } } }
 ```
-On the other hand, `retract-all` removes all definitions that match a given head goal definition. Logic variables, including anonymous logic variables, can be used as goal definition arguments in `retract` and `retract-all`. Logic variables can match any argument. A logic variable match any argument.
+On the other hand, `retract-all` removes all definitions that match a given head goal definition. Logic variables, including anonymous logic variables, can be used as goal definition arguments in `retract` and `retract-all`. A logic variable match any argument.
 ```
 { mouseo Jerry } fact
 { mouseo X } query .
