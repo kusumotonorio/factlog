@@ -81,7 +81,7 @@ LOGIC-PREDS: youngo young-mouseo ;
 ```
 This `Gh` is called **head** and the `{ Gb 1Gb 2... Gbn }` is called **body**.
 
-In fact, facts are rules where its body is an empty array. So, the general form of `fact` is:
+Facts are rules where its body is an empty array. So, the form of `fact` is:
 ```
 Gh fact
 ```
@@ -295,7 +295,7 @@ While `clear-pred` clears all the definition information for a given logic predi
 { mouseo X } query .
 ⟹ { H{ { X Nibbles } } }
 ```
-On the other hand, `retract-all` removes all definitions that match a given head goal definition. You can use logic variable as a goal definition argument to `retract` and `retract-all`.
+On the other hand, `retract-all` removes all definitions that match a given head goal definition. Logic variables, including anonymous logic variables, can be used as goal definition arguments in `retract` and `retract-all`. Logic variables can match any argument. A logic variable match any argument.
 ```
 { mouseo Jerry } fact
 { mouseo X } query .
