@@ -291,7 +291,7 @@ While `clear-pred` clears all the definition information for a given logic predi
 
 `retract` removes the first definition that matches the given head information.
 ```
-{ mouseo Tom } retract
+{ mouseo Jerry } retract
 { mouseo X } query .
 ⟹ { H{ { X Nibbles } } }
 ```
