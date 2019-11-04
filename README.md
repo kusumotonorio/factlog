@@ -258,6 +258,53 @@ SYMBOL: a-cat
 ```
 Jerry, watch out for the other cats.
 
+So far, we've seen how to define a logic predicate with `fact`, `rule`, `facts`, and `rules`. Each time you use those words for a logic predicate, information is added to it.
+
+You can clear these definitions with `clear-pred` for a logic predicate.
+```
+{ creatureo Y } query .
+⟹ { H{ { Y Tom } } H{ { Y Jerry } } H{ { Y Nibbles } } }
+
+mouseo clear-pred
+{mouseo X } query .
+⟹ f
+
+{ creatureo Y } query .
+⟹ { H{ { Y Tom } } }
+```
+`fact` and `rule` add a new definition to the end of a logic predicate, while `fact*` and `rule*` add them first. The order of the information can affect the results of a query.
+```
+{ mouseo Jerry } fact
+{ mouseo Nibbles } fact*
+{ creatureo Y } query .
+⟹ { H{ { Y Tom } } H{ { Y Nibbles } } H{ { Y Jerry } } }
+
+{ creatureo Y } 2 query-n .
+⟹ { H{ { Y Tom } } H{ { Y Nibbles } } }
+```
+While `clear-pred` clears all the definition information for a given logic predicate, `retract` and `retract-all` provide selective clearing.
+
+`retract` removes the first definition that matches the given head information.
+```
+{ mouseo Tom } retract
+{ mouseo X } query .
+⟹ { H{ { X Nibbles } } }
+```
+On the other hand, `retract-all` removes all definitions that match a given head goal definition. You can use logic variable as a goal definition argument to `retract` and `retract-all`.
+```
+{ mouseo Jerry } fact
+{ mouseo X } query .
+⟹ { H{ { X Nibbles } } H{ { X Jerry } } }
+
+{ mouseo __ } retract-all
+{ mouseo X } query .
+⟹ f
+```
+let's have them come back.
+```
+{ { mouseo Jerry } { mouseo Nibbles } } facts
+{ creatureo X } query .
+```
 You can **trace** factlog's execution. The word to do this is `trace`.
 ```
 trace
