@@ -79,7 +79,7 @@ LOGIC-PREDS: youngo young-mouseo ;
 ⟹ { H{ { X Nibbles } } }
 
 ```
-This `Gh` is called **head** and the `{Gb 1Gb 2... Gbn}` is called **body**.
+This `Gh` is called **head** and the `{ Gb 1Gb 2... Gbn }` is called **body**.
 
 In fact, facts are rules where its body is an empty array. So, the general form of `fact` is:
 ```
