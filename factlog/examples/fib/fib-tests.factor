@@ -1,7 +1,7 @@
 ! Copyright (C) 2019 KUSUMOTO Norio.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: tools.test logica logica.examples.fib ;
-IN: logica.examples.fib.tests
+USING: tools.test factlog factlog.examples.fib ;
+IN: factlog.examples.fib.tests
 
 { { H{ { L L[ 0 ] } } } } [ { fib 0 L } query ] unit-test
 

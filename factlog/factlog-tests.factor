@@ -1,17 +1,17 @@
 ! Copyright (C) 2019 KUSUMOTO Norio.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: tools.test logica assocs math kernel
-logica.examples.factorial
-logica.examples.fib
-logica.examples.hanoi
-logica.examples.hanoi2
-logica.examples.money
-logica.examples.zebra
-logica.examples.zebra-short
-logica.examples.zebra2
+USING: tools.test factlog assocs math kernel
+factlog.examples.factorial
+factlog.examples.fib
+factlog.examples.hanoi
+factlog.examples.hanoi2
+factlog.examples.money
+factlog.examples.zebra
+factlog.examples.zebra-short
+factlog.examples.zebra2
 ;
 
-IN: logica.tests
+IN: factlog.tests
 
 LOGIC-PREDS: cato mouseo creatureo ;
 LOGIC-VARS: X Y ;

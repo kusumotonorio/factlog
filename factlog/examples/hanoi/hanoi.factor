@@ -1,7 +1,7 @@
 ! Copyright (C) 2019 KUSUMOTO Norio.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: logica kernel assocs math ;
-IN: logica.examples.hanoi
+USING: factlog kernel assocs math ;
+IN: factlog.examples.hanoi
 
 ! hanoi(N) :- move(N, left, centre, right).
 ! move(0, _, _, _) :- !.

@@ -1,7 +1,7 @@
 ! Copyright (C) 2019 Your name.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: tools.test logica logica.examples.money ;
-IN: logica.examples.money.tests
+USING: tools.test factlog factlog.examples.money ;
+IN: factlog.examples.money.tests
 
 {
     {

@@ -1,7 +1,7 @@
 ! Copyright (C) 2019 Your name.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: tools.test logica logica.examples.factorial ;
-IN: logica.examples.factorial.tests
+USING: tools.test factlog factlog.examples.factorial ;
+IN: factlog.examples.factorial.tests
 
 { { H{ { F 1 } } } } [ { factorial 0 F } query ] unit-test
 

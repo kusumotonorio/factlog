@@ -1,7 +1,7 @@
 ! Copyright (C) 2019 KUSUMOTO Norio.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: logica kernel assocs math ;
-IN: logica.examples.fib
+USING: factlog kernel assocs math ;
+IN: factlog.examples.fib
 
 LOGIC-PREDS: fib ;
 LOGIC-VARS: F F1 F2 N N1 L ;

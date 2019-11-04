@@ -6,7 +6,7 @@ formatting fry io kernel lexer locals make math namespaces
 parser prettyprint prettyprint.backend prettyprint.config
 prettyprint.custom prettyprint.sections quotations sequences
 sequences.deep sets splitting strings words words.symbol ;
-IN: logica
+IN: factlog
 
 SYMBOL: !!    ! cut operator         in prolog: !
 SYMBOL: __    ! anonymous variable   in prolog: _
@@ -26,9 +26,9 @@ C: cons cons-pair
 
 SINGLETON: NIL
 
-MIXIN: logica-list
-INSTANCE: cons-pair logica-list
-INSTANCE: NIL logica-list
+MIXIN: factlog-list
+INSTANCE: cons-pair factlog-list
+INSTANCE: NIL factlog-list
 
 <<
 :: >list ( seq -- cons-pair )
@@ -50,12 +50,12 @@ SYNTAX: L[ \ ] [ >list ] parse-literal ;
     ] [
         list [ car ] [ cdr ] bi :> ( l-car l-cdr )
         l-car cons-pair? [ l-car list>array ] [ list car ] if 1array
-        l-cdr logica-list? [ l-cdr list>array append ] when
+        l-cdr factlog-list? [ l-cdr list>array append ] when
     ] if ;
 
-M: logica-list pprint-delims drop \ L[ \ ] ;
+M: factlog-list pprint-delims drop \ L[ \ ] ;
 
-M: logica-list pprint*
+M: factlog-list pprint*
     [
         <flow
         dup pprint-delims [
@@ -68,7 +68,7 @@ M: logica-list pprint*
                 [ uncons swap , ] while
             ] { } make
             [ pprint* ] each
-            dup logica-list? [
+            dup factlog-list? [
                 NIL? [ "~more~" text ] unless
             ] [
                 "|" text pprint*
@@ -333,7 +333,7 @@ SYMBOL: *anonymouse-var-no*
 : proxy-var-for-'__' ( -- var-symbol )
     [
         *anonymouse-var-no* counter "ANON-%d_" sprintf
-        "logica" create-word dup dup
+        "factlog" create-word dup dup
         define-symbol
         ANONYMOUSE-LOGIC-VAR swap set-global
     ] with-compilation-unit ;
@@ -525,7 +525,7 @@ PRIVATE>
         ] (resolve)
     ] with-return
     bindings dup {
-        [  empty? ]
+        [ empty? ]
         [ first keys [ get NORMAL-LOGIC-VAR? ] any? not ]
     } 1|| [ drop success? ] [ >array ] if ;
 

@@ -3,8 +3,8 @@
 
 ! Zebra Puzzle: https://rosettacode.org/wiki/Zebra_puzzle
 
-USING: logica ;
-IN: logica.examples.zebra
+USING: factlog ;
+IN: factlog.examples.zebra
 
 LOGIC-PREDS: houseso neighboro zebrao watero nexto lefto ;
 LOGIC-VARS: Hs A B Ls X Y ;

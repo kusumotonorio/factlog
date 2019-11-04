@@ -1,28 +1,28 @@
-# logica
+# factlog
 
-logica is an embedded language that runs on [Factor](https://github.com/factor/factor) with the capabilities of a subset of Prolog.
+factlog is an embedded language that runs on [Factor](https://github.com/factor/factor) with the capabilities of a subset of Prolog.
 
 It is an extended port from tiny_prolog and its descendants, [ruby-prolog](https://github.com/preston/ruby-prolog).
 
 ## Usage
 
 ```
-USE: logica
+USE: factlog
 
 LOGIC-PREDS: cato mouseo creatureo ;
 LOGIC-VARS: X Y ;
 SYMBOLS: Tom Jerry Nibbles ;
 ```
-In logica, words that represent relationships are called **logic predicates**. Use `LOGIC-PREDS:` to declare the predicates you want to use. **Logic variables** are used to represent relationships. use `LOGIC-VARS:` to declare the logic variables you want to use.
+In factlog, words that represent relationships are called **logic predicates**. Use `LOGIC-PREDS:` to declare the predicates you want to use. **Logic variables** are used to represent relationships. use `LOGIC-VARS:` to declare the logic variables you want to use.
 
 In the above code, logic predicates end with the character `o`, which is a convention borrowed from miniKanren and so on, and means relation. This is not necessary, but it is useful for reducing conflicts with the words of, the parent language, Factor. We really want to write them as: `cat°`, `mouse°` and `creature°`, but we use `o` because it's easy to type.
 
-**Goals** are questions that logica tries to meet to be true. To represent a goal, write an array with a logic predicate followed by zero or more arguments. logica converts such definitions to internal representations.
+**Goals** are questions that factlog tries to meet to be true. To represent a goal, write an array with a logic predicate followed by zero or more arguments. factlog converts such definitions to internal representations.
 ```
 { LOGIC-PREDICATE ARG1 ARG2 ... }
 { LOGIC-PREDICATE }
 ```
-We will write logica programs using these goals.
+We will write factlog programs using these goals.
 
 ```
 { cato Tom } fact
@@ -131,7 +131,7 @@ Other creatures might also like cheese...
 
 You can also use sequences, lists, and tuples as goal definition arguments.
 
-Note that the list used with logica is logica's own, not the list of `lists`vocabulary bundled with Factor. The list is created by a chain of `cons-pair` tuples, but you can use a special syntax to describe it.
+Note that the list used with factlog is factlog's own, not the list of `lists`vocabulary bundled with Factor. The list is created by a chain of `cons-pair` tuples, but you can use a special syntax to describe it.
 ```
 L[ Tom Jerry Nibbles ] .
 ⟹ L[ Tom Jerry Nibbles ]
@@ -258,7 +258,7 @@ SYMBOL: a-cat
 ```
 Jerry, watch out for the other cats.
 
-You can **trace** logica's execution. The word to do this is `trace`.
+You can **trace** factlog's execution. The word to do this is `trace`.
 ```
 trace
 { creatureo Tom } query .
@@ -314,16 +314,16 @@ notrace
 { creatureo Tom } query .
 ⟹ t
 ```
-Thank you, old friends. I was able to explain most of the functions of logica with fun. Have a good time together with fun fights. See you.
+Thank you, old friends. I was able to explain most of the functions of factlog with fun. Have a good time together with fun fights. See you.
 
 Here is a Prolog definition for the factorial predicate `factorial`.
 ```
 factorial(0, 1).
 factorial(N, F) :- N > 0, N2 is N - 1, factorial(N2, F2), F is F2 * N.
 ```
-Let's think about how to do the same thing with logica. It is mostly the following code, but is surrounded by back quotes where it has not been explained.
+Let's think about how to do the same thing with factlog. It is mostly the following code, but is surrounded by back quotes where it has not been explained.
 ```
-USE: logica
+USE: factlog
 
 LOGIC-PREDS: factorialo ;
 LOGIC-VARS: N N2 F F2 ;
@@ -336,7 +336,7 @@ LOGIC-VARS: N N2 F F2 ;
     `F is F2 * N`
 } rule
 ```
-Within these backquotes are comparisons, calculations, and assignments (to be precise, **unifications**). logica has a mechanism to call Factor code to do these things. Here are some examples.
+Within these backquotes are comparisons, calculations, and assignments (to be precise, **unifications**). factlog has a mechanism to call Factor code to do these things. Here are some examples.
 ```
 LOGIC-PREDS: N_>_0  N2_is_N_-_1  F_is_F2_*_N ;
 
@@ -352,7 +352,7 @@ The word `unify` unifies the two following the environment in that environment.
 
 Now we can rewrite the definition of factorialo to use them.
 ```
-USE: logica
+USE: factlog
 
 LOGIC-PREDS: factorialo N_>_0  N2_is_N_-_1  F_is_F2_*_N ;
 LOGIC-VARS: N N2 F F2 ;
@@ -382,15 +382,15 @@ Let's try `factorialo`.
 { factorialo 10 F } query .
 ⟹ { H{ { F 3628800 } } }
 ```
-logica has features that make it easier to meet the typical requirements shown here.
+factlog has features that make it easier to meet the typical requirements shown here.
 
 There are the built-in logic predicates `(<)`, `(>)`, `(>=)`, and `(=<)` to compare numbers. There are also `(==)` and `(\==)` to test for equality and inequality of two arguments.
 
-The word `is` takes a quotation and a logic variable to be unified. The quotation takes an environment and returns a value.  And `is` returns the internal representation of the goal. `is` is intended to be used in a quotation. If there is a quotation in the definition of `rule`, logica uses the internal definition of the goal obtained by calling it.
+The word `is` takes a quotation and a logic variable to be unified. The quotation takes an environment and returns a value.  And `is` returns the internal representation of the goal. `is` is intended to be used in a quotation. If there is a quotation in the definition of `rule`, factlog uses the internal definition of the goal obtained by calling it.
 
 If you use these features to rewrite the definition of `factorialo`:
 ```
-USE: logica
+USE: factlog
 
 LOGIC-PREDS: factorialo ;
 LOGIC-VARS: N N2 F F2 ;
@@ -407,4 +407,4 @@ Use the built-in logic predicate `(=)` for unification that does not require pro
 
 `varo` takes a argument and is true if it is a logic variable with no value. On the other hand, `nonvaro` is true if its argument is not a logic variable or is a concrete logic variable.
 
-Now almost everything about logica is explained.
+Now almost everything about factlog is explained.

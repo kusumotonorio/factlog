@@ -1,8 +1,8 @@
 ! Copyright (C) 2019 KUSUMOTO Norio.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: tools.test logica logica.examples.hanoi
+USING: tools.test factlog factlog.examples.hanoi
 formatting sequences ;
-IN: logica.examples.hanoi.tests
+IN: factlog.examples.hanoi.tests
 
 { t } [
     {
