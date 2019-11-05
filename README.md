@@ -267,22 +267,22 @@ So far, we've seen how to define a logic predicate with `fact`, `rule`, `facts`,
 
 You can clear these definitions with `clear-pred` for a logic predicate.
 ```
-{ creatureo Y } query .
-⟹ { H{ { Y Tom } } H{ { Y Jerry } } H{ { Y Nibbles } } }
+{ mouseoo X } query .
+⟹ { H{ { X Jerry } } H{ { X Nibbles } } }
 
 mouseo clear-pred
 {mouseo X } query .
 ⟹ f
 
-{ creatureo Y } query .
-⟹ { H{ { Y Tom } } }
+{ creatureo X } query .
+⟹ { H{ { X Tom } } }
 ```
 `fact` and `rule` add a new definition to the end of a logic predicate, while `fact*` and `rule*` add them first. The order of the information can affect the results of a query.
 ```
 { mouseo Jerry } fact
 { mouseo Nibbles } fact*
-{ creatureo Y } query .
-⟹ { H{ { Y Tom } } H{ { Y Nibbles } } H{ { Y Jerry } } }
+{ mouseoo Y } query .
+⟹ { H{ { Y Nibbles } } H{ { Y Jerry } } }
 
 { creatureo Y } 2 query-n .
 ⟹ { H{ { Y Tom } } H{ { Y Nibbles } } }
@@ -374,7 +374,7 @@ Here is a Prolog definition for the factorial predicate `factorial`.
 factorial(0, 1).
 factorial(N, F) :- N > 0, N2 is N - 1, factorial(N2, F2), F is F2 * N.
 ```
-Let's think about how to do the same thing with factlog. It is mostly the following code, but is surrounded by back quotes where it has not been explained.
+Let's think about how to do the same thing with factlog. It is mostly the following code, but is surrounded by backquotes where it has not been explained.
 ```
 USE: factlog
 
