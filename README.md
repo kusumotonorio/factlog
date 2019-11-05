@@ -64,7 +64,7 @@ The general form of `rule` is:
 ```
 Gh { Gb1 Gb2 ... Gbn } rule
 ```
-This means Gh when all goals of Gb1, Gb2, ..., Gbn are met. In other words, this "Gb 1Gb 2..., Gbn" is a **conjunction**.
+This means Gh when all goals of Gb1, Gb2, ..., Gbn are met. In other words, this "Gb1 Gb2 ... Gbn" is a **conjunction**.
 ```
 LOGIC-PREDS: youngo young-mouseo ;
 
