@@ -267,11 +267,11 @@ So far, we've seen how to define a logic predicate with `fact`, `rule`, `facts`,
 
 You can clear these definitions with `clear-pred` for a logic predicate.
 ```
-{ mouseoo X } query .
+{ mouseo X } query .
 ⟹ { H{ { X Jerry } } H{ { X Nibbles } } }
 
 mouseo clear-pred
-{mouseo X } query .
+{ mouseo X } query .
 ⟹ f
 
 { creatureo X } query .
@@ -281,7 +281,7 @@ mouseo clear-pred
 ```
 { mouseo Jerry } fact
 { mouseo Nibbles } fact*
-{ mouseoo Y } query .
+{ mouseo Y } query .
 ⟹ { H{ { Y Nibbles } } H{ { Y Jerry } } }
 
 { creatureo Y } 2 query-n .
