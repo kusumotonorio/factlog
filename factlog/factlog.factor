@@ -5,7 +5,9 @@ combinators.short-circuit compiler.units continuations
 formatting fry io kernel lexer locals make math namespaces
 parser prettyprint prettyprint.backend prettyprint.config
 prettyprint.custom prettyprint.sections quotations sequences
-sequences.deep sets splitting strings words words.symbol ;
+sequences.deep sets splitting strings words words.symbol
+vectors ;
+
 IN: factlog
 
 SYMBOL: !!    ! cut operator         in prolog: !
@@ -85,7 +87,7 @@ TUPLE: logic-pred name defs ;
 : <pred> ( name -- pred )
     logic-pred new
         swap >>name
-        { } clone >>defs ;
+        V{ } clone >>defs ;
 
 MIXIN: LOGIC-VAR
 SINGLETON: NORMAL-LOGIC-VAR
@@ -207,11 +209,9 @@ DEFER: unify*
                 ] [
                     xp first2 x-env! x!
                     x x-env dereference x-env! x!
-                ] if
-            ] }
+                ] if ] }
           { [ y logic-var? ] [
-                x y x! y!  x-env y-env x-env! y-env!
-            ] }
+                x y x! y!  x-env y-env x-env! y-env! ] }
           [ f loop?! ]
         } cond
     ] while
@@ -240,8 +240,7 @@ DEFER: unify*
                               ] unless
                               i 1 + i!
                           ] while
-                      ] [ f ret-value! ] if
-                  ] }
+                      ] [ f ret-value! ] if ] }
                 { [ x y [ sequence? ] both? ] [
                       x y [ class-of ] same? x y [ length ] same? and [
                           0 :> i!  x length 1 - :> stop-i  t :> loop?!
@@ -253,8 +252,7 @@ DEFER: unify*
                               ] unless
                               i 1 + i!
                           ] while
-                      ] [ f ret-value! ] if
-                  ] }
+                      ] [ f ret-value! ] if ] }
                 [  x y = ret-value! ]
             } cond
         ] unless
@@ -301,24 +299,26 @@ DEFER: unify*
             f <cut> :> d-cut!
             first-goal pred>> defs>> [
                 first2 :> ( d-head d-body )
-                d-cut cut? cut cut? or [ t ] [
-                    V{ } clone :> trail
-                    first-goal env d-head d-env trail d-env unify* [
-                        d-body callable? [
-                            d-env trail <callback-env> d-body call( cb-env -- ? ) [
-                                rest-goals env cut [ quot call( -- ) ] resolve-body
-                            ] when
-                        ] [
-                            d-body d-env d-cut [
-                                rest-goals env cut [ quot call( -- ) ] resolve-body
-                                cut cut? d-cut set-info-if-f
-                            ] resolve-body
-                        ] if
-                    ] when
-                    trail [ first2 env-delete ] each
-                    d-env env-clear
-                    f
-                ] if
+                first-goal d-head [ args>> length ] same? [
+                    d-cut cut? cut cut? or [ t ] [
+                        V{ } clone :> trail
+                        first-goal env d-head d-env trail d-env unify* [
+                            d-body callable? [
+                                d-env trail <callback-env> d-body call( cb-env -- ? ) [
+                                    rest-goals env cut [ quot call( -- ) ] resolve-body
+                                ] when
+                            ] [
+                                d-body d-env d-cut [
+                                    rest-goals env cut [ quot call( -- ) ] resolve-body
+                                    cut cut? d-cut set-info-if-f
+                                ] resolve-body
+                            ] if
+                        ] when
+                        trail [ first2 env-delete ] each
+                        d-env env-clear
+                        f
+                    ] if
+                ] [ f ] if
             ] each-until
         ] if
     ] if ;
@@ -361,13 +361,13 @@ SYMBOL: dummy-item
 :: negation-goal ( goal -- negation-goal )
     "failo_" <pred> :> f-pred
     f-pred { } clone logic-goal boa :> f-goal
-    { { f-goal [ drop f ] } } f-pred defs<<
+    V{ { f-goal [ drop f ] } } f-pred defs<<
     "trueo_" <pred> :> t-pred
     t-pred { } clone logic-goal boa :> t-goal
-    { { t-goal [ drop t ] } } t-pred defs<<
+    V{ { t-goal [ drop t ] } } t-pred defs<<
     goal pred>> name>> "\\+%s_" sprintf <pred> :> negation-pred
     negation-pred goal args>> clone logic-goal boa :> negation-goal
-    {
+    V{
         { negation-goal { goal !! f-goal } }
         { negation-goal { t-goal } }
     } negation-pred defs<<  ! \+P_ { P !! { failo_ } ;; { trueo_ } } rule
@@ -378,10 +378,11 @@ SYMBOLS: at-the-beginning at-the-end ;
 :: (rule) ( head body pos -- )
     reset-anonymouse-var-no
     head replace-'__' def>goal :> head-goal
-    body replace-'__' normalize split-body  ! disjunction
+    body replace-'__' normalize
+    split-body pos at-the-beginning = [ reverse ] when  ! disjunction
     dup empty? [
         head-goal swap 2array
-        head-goal pred>> [ swap suffix ] change-defs drop
+        head-goal pred>> [ swap suffix! ] change-defs drop
     ] [
         f :> negation?!
         [
@@ -390,27 +391,24 @@ SYMBOLS: at-the-beginning at-the-end ;
                     { [ dup \+ = ] [ drop dummy-item t negation?! ] }
                     { [ dup array? ] [
                           def>goal negation? [ negation-goal ] when
-                          f negation?!
-                      ] }
+                          f negation?! ] }
                     { [ dup callable? ] [
                           call( -- goal ) negation? [ negation-goal ] when
-                          f negation?!
-                      ] }
+                          f negation?! ] }
                     { [ dup [ t = ] [ f = ] bi or ] [
                           :> t/f! negation? [ t/f not t/f! ] when
                           t/f "trueo_" "failo_" ? <pred> :> t/f-pred
                           t/f-pred { } clone logic-goal boa :> t/f-goal
-                          { { t/f-goal [ drop t/f ] } } t/f-pred defs<<
+                          V{ { t/f-goal [ drop t/f ] } } t/f-pred defs<<
                           t/f-goal
-                          f negation?!
-                      ] }
+                          f negation?! ] }
                     { [ dup !! = ] [ f negation?! ] }  ! as '!!'
                     [ drop dummy-item f negation?! ]
                 } cond
             ] map dummy-item swap remove :> body-goals
             { head-goal body-goals }
             head-goal pred>> [
-                swap pos at-the-beginning = [ prefix ] [ suffix ] if
+                swap pos at-the-beginning = [ prefix ] [ suffix! ] if
             ] change-defs drop
         ] each
     ] if ;
@@ -434,7 +432,7 @@ PRIVATE>
 :: callback ( head quot: ( callback-env -- ? ) -- )
     head def>goal :> head-goal
     head-goal pred>> [
-        { head-goal quot } suffix
+        { head-goal quot } suffix!
     ] change-defs drop ;
 
 : callbacks ( defs -- ) [ first2 callback ] each ; inline
@@ -451,9 +449,9 @@ PRIVATE>
     head-goal pred>> defs>> :> defs
     defs [
         first <env> head-goal <env> V{ } clone <env> (unify*)
-    ] reject head-goal pred>> defs<< ;
+    ] reject >vector head-goal pred>> defs<< ;
 
-: clear-pred ( pred -- ) get { } clone swap defs<< ;
+: clear-pred ( pred -- ) get V{ } clone swap defs<< ;
 
 :: unify ( cb-env x y -- success? )
     cb-env env>> :> env
@@ -464,7 +462,7 @@ PRIVATE>
     dup dist swap member? [ dist suffix ] unless :> args
     quot dist "[ %u %s is ]" sprintf <pred> :> is-pred
     is-pred args logic-goal boa :> is-goal
-    {
+    V{
         {
             is-goal
             [| env | env dist env quot call( env -- value ) unify ]
@@ -476,7 +474,7 @@ PRIVATE>
     quot1 quot2 [ collect-logic-vars ] bi@ union :> args
     quot1 quot2 "[ %u %u =:= ]" sprintf <pred> :> =:=-pred
     =:=-pred args logic-goal boa :> =:=-goal
-    {
+    V{
         {
             =:=-goal
             [| env |
@@ -491,7 +489,7 @@ PRIVATE>
     quot1 quot2 [ collect-logic-vars ] bi@ union :> args
     quot1 quot2 "[ %u %u =\\= ]" sprintf <pred> :> =\=-pred
     =\=-pred args logic-goal boa :> =\=-goal
-    {
+    V{
         {
             =\=-goal
             [| env |

@@ -110,6 +110,7 @@ Gh { Gb1 Gb2 Gb3 } rule
 Gh { Gb4 Gb5 } rule
 Gh { Gb6 } rule
 ```
+factlog actually converts the disjunction in that way.
 
 You can use `query-n` to limit the number of answers to a query. Specify a number greater than or equal to 1.
 ```
@@ -315,50 +316,60 @@ You can **trace** factlog's execution. The word to do this is `trace`.
 ```
 trace
 { creatureo Tom } query .
-in: { creatureo Tom }
-    Unification of T{ logic-goal { args { Tom } } } and T{ logic-goal
-		                                            { pred
-        	    						T{ logic-pred
-            							    { name "creatureo" }
-            							    { defs
-                							{
-                    							    {
-                        							~circularity~
-                        							{
-                            							    T{ logic-goal
-                                							{ pred ~logic-pred~ }
-                                							{ args ~array~ }
-                            							    }
-                        							}
-                    							    }
-                							}
-            							    }
-        							}
-    							    }
-    							    { args { X } }
-							}
-    Unification of Tom and X
+⟹ in: { creatureo Tom }
+        Unification of T{ logic-goal { args { Tom } } } and T{ logic-goal
+                                                                { pred
+                                                                    T{ logic-pred
+                                                                        { name "creatureo" }
+                                                                        { defs
+                                                                            V{
+                                                                                {
+                                                                                    ~circularity~
+                                                                                    {
+                                                                                        T{ logic-goal
+                                                                                            { pred ~logic-pred~ }
+                                                                                            { args ~array~ }
+                                                                                        }
+                                                                                    }
+                                                                                }
+                                                                                {
+                                                                                    T{ logic-goal
+                                                                                        { pred ~logic-pred~ }
+                                                                                        { args ~array~ }
+                                                                                    }
+                                                                                    {
+                                                                                        T{ logic-goal
+                                                                                            { pred ~logic-pred~ }
+                                                                                            { args ~array~ }
+                                                                                        }
+                                                                                    }
+                                                                                }
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                }
+                                                                { args { X } }
+                                                            }
+        Unification of Tom and X
         ==> Success
 
     ==> Success
 
-in: { cato X }
-    Unification of T{ logic-goal { args { Tom } } } and T{ logic-goal
-     		                                            { pred
-        						        T{ logic-pred
-            							    { name "cato" }
-            							    { defs { { ~circularity~ { } } } }
-        							}
-    							    }
-    							    { args { Tom } }
-							}
-        Unification of Tom and Tom
-	==> Success
+   in: { cato X }
+	Unification of T{ logic-goal { args { Tom } } } and T{ logic-goal
+                                                                { pred
+                                                                    T{ logic-pred
+                                                                        { name "cato" }
+                                                                        { defs V{ { ~circularity~ { } } } }
+                                                                    }
+                                                                }
+                                                                { args { Tom } }
+                                                            }
+	    Unification of Tom and Tom
+	    ==> Success
 
-    ==> Success
-
+        ==> Success
 ...
-
 ⟹ t
 ```
 The word to stop tracing is `notrace`.
