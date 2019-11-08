@@ -110,7 +110,7 @@ Gh { Gb1 Gb2 Gb3 } rule
 Gh { Gb4 Gb5 } rule
 Gh { Gb6 } rule
 ```
-factlog actually converts the disjunction in that way.
+factlog actually converts the disjunction in that way. You may need to be careful when deleting definitions that you registered using `rule`, etc.
 
 You can use `query-n` to limit the number of answers to a query. Specify a number greater than or equal to 1.
 ```
@@ -312,6 +312,38 @@ let's have them come back.
 { creatureo X } query .
 ⟹  { H{ { X Tom } } H{ { X Jerry } } H{ { X Nibbles } } }
 ```
+Logic predicates that take different numbers of arguments are treated separately. For example, the previously used `cato` took one argument.
+
+Let's define `cato` that takes two arguments.
+```
+SYMBOLS: black white a-black-cat a-white-cat ;
+
+{ cato black a-black-cat } fact
+{ cato white a-white-cat } fact
+
+{ cato X } query .
+⟹ { H{ { X Tom } } }
+
+{ cato X Y } query .
+⟹ {
+       H{ { X black } { Y a-black-cat } }
+       H{ { X white } { Y a-white-cat } }
+    }
+
+{ creatureo X } query .
+⟹ { H{ { X Tom } } H{ { X Jerry } } H{ { X Nibbles } } }
+```
+If you need to identify a logic predicate that has a different **arity**, that is numbers of arguments, say it with a slash and an arity number. For example, `cato` of arity 1 is `cato/1`, `cato` of arity 2 is `cato/2`.
+
+`clear-pred` will clear all definitions of any arity. If you only want to remove the definition of a certain arity, you should use `retract-all` with logic variables.
+```
+{ cato __ __ } retract-all
+{ cato X Y } query .
+⟹ f
+
+{ cato X } query .
+⟹ { H{ { X Tom } } }
+```
 You can **trace** factlog's execution. The word to do this is `trace`.
 ```
 trace
@@ -356,7 +388,7 @@ trace
     ==> Success
 
    in: { cato X }
-	Unification of T{ logic-goal { args { Tom } } } and T{ logic-goal
+        Unification of T{ logic-goal { args { Tom } } } and T{ logic-goal
                                                                 { pred
                                                                     T{ logic-pred
                                                                         { name "cato" }
@@ -365,12 +397,12 @@ trace
                                                                 }
                                                                 { args { Tom } }
                                                             }
-	    Unification of Tom and Tom
-	    ==> Success
+            Unification of Tom and Tom
+            ==> Success
 
         ==> Success
-...
-⟹ t
+   ...
+   t
 ```
 The word to stop tracing is `notrace`.
 ```
