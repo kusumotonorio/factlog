@@ -64,7 +64,7 @@ The general form of `rule` is:
 ```
 Gh { Gb1 Gb2 ... Gbn } rule
 ```
-This means Gh when all goals of Gb1, Gb2, ..., Gbn are met. In other words, this "Gb1 Gb2 ... Gbn" is a **conjunction**.
+This means Gh when all goals of Gb1, Gb2, ..., Gbn are met. This `Gb1 Gb2 ... Gbn` is a **conjunction**.
 ```
 LOGIC-PREDS: youngo young-mouseo ;
 
@@ -312,22 +312,20 @@ let's have them come back.
 { creatureo X } query .
 ⟹  { H{ { X Tom } } H{ { X Jerry } } H{ { X Nibbles } } }
 ```
-Logic predicates that take different numbers of arguments are treated separately. For example, the previously used `cato` took one argument.
-
-Let's define `cato` that takes two arguments.
+Logic predicates that take different numbers of arguments are treated separately. The previously used `cato` took one argument. Let's define `cato` that takes two arguments.
 ```
-SYMBOLS: black white a-black-cat a-white-cat ;
+SYMBOLS: big small a-big-cat a-small-cat ;
 
-{ cato black a-black-cat } fact
-{ cato white a-white-cat } fact
+{ cato big a-big-cat } fact
+{ cato small a-small-cat } fact
 
 { cato X } query .
 ⟹ { H{ { X Tom } } }
 
 { cato X Y } query .
 ⟹ {
-       H{ { X black } { Y a-black-cat } }
-       H{ { X white } { Y a-white-cat } }
+       H{ { X big } { Y a-big-cat } }
+       H{ { X small } { Y a-small-cat } }
     }
 
 { creatureo X } query .
