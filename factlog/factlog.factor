@@ -380,8 +380,10 @@ SYMBOLS: at-the-beginning at-the-end ;
     body replace-'__' normalize
     split-body pos at-the-beginning = [ reverse ] when  ! disjunction
     dup empty? [
-        head-goal swap 2array
-        head-goal pred>> [ swap suffix! ] change-defs drop
+        head-goal swap 2array 1vector
+        head-goal pred>> [
+            pos at-the-end = [ swap ] when append!
+        ] change-defs drop
     ] [
         f :> negation?!
         [
