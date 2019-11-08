@@ -323,8 +323,7 @@ DEFER: unify*
         ] if
     ] if ;
 
-: split-body ( body -- bodies )
-    { ;; } split [ >array ] map ;
+: split-body ( body -- bodies ) { ;; } split [ >array ] map ;
 
 SYMBOL: *anonymouse-var-no*
 
@@ -406,9 +405,9 @@ SYMBOLS: at-the-beginning at-the-end ;
                     [ drop dummy-item f negation?! ]
                 } cond
             ] map dummy-item swap remove :> body-goals
-            { head-goal body-goals }
+            V{ { head-goal body-goals } }
             head-goal pred>> [
-                swap pos at-the-beginning = [ prefix ] [ suffix! ] if
+                pos at-the-end = [ swap ] when append!
             ] change-defs drop
         ] each
     ] if ;
@@ -441,7 +440,7 @@ PRIVATE>
     head-def replace-'__' def>goal :> head-goal
     head-goal pred>> defs>> :> defs
     defs [ first <env> head-goal <env> V{ } clone <env> (unify*) ] find [
-        head-goal pred>> [ remove-nth ] change-defs drop
+        head-goal pred>> [ remove-nth! ] change-defs drop
     ] [ drop ] if ;
 
 :: retract-all ( head-def -- )
@@ -449,7 +448,7 @@ PRIVATE>
     head-goal pred>> defs>> :> defs
     defs [
         first <env> head-goal <env> V{ } clone <env> (unify*)
-    ] reject >vector head-goal pred>> defs<< ;
+    ] reject! head-goal pred>> defs<< ;
 
 : clear-pred ( pred -- ) get V{ } clone swap defs<< ;
 
