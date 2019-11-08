@@ -64,7 +64,7 @@ The general form of `rule` is:
 ```
 Gh { Gb1 Gb2 ... Gbn } rule
 ```
-This means Gh when all goals of Gb1, Gb2, ..., Gbn are met. This `Gb1 Gb2 ... Gbn` is a **conjunction**.
+This means `Gh` when all goals of `Gb1`, `Gb2`, ..., `Gbn` are met. This `Gb1 Gb2 ... Gbn` is a **conjunction**.
 ```
 LOGIC-PREDS: youngo young-mouseo ;
 
@@ -142,7 +142,7 @@ Note that the list used with factlog is factlog's own, not the list of `lists`vo
 L[ Tom Jerry Nibbles ] .
 ⟹ L[ Tom Jerry Nibbles ]
 ```
-The syntax of list descriptions allows you to describe "head" and "tail".
+The syntax of list descriptions allows you to describe "head" and "tail" of a list.
 ```
 L[ HEAD | TAIL ]
 L[ ITEM1 ITEM2 ITEM3 | OTHERS ]
@@ -331,7 +331,7 @@ SYMBOLS: big small a-big-cat a-small-cat ;
 { creatureo X } query .
 ⟹ { H{ { X Tom } } H{ { X Jerry } } H{ { X Nibbles } } }
 ```
-If you need to identify a logic predicate that has a different **arity**, that is numbers of arguments, say it with a slash and an arity number. For example, `cato` of arity 1 is `cato/1`, `cato` of arity 2 is `cato/2`.
+If you need to identify a logic predicate that has a different **arity**, that is numbers of arguments, say it with a slash and an arity number. For example, `cato` of arity 1 is `cato/1`, `cato` of arity 2 is `cato/2`. However, factlog does not recognize these names.
 
 `clear-pred` will clear all definitions of any arity. If you only want to remove the definition of a certain arity, you should use `retract-all` with logic variables.
 ```
