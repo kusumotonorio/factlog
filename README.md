@@ -110,7 +110,7 @@ Gh { Gb1 Gb2 Gb3 } rule
 Gh { Gb4 Gb5 } rule
 Gh { Gb6 } rule
 ```
-factlog actually converts the disjunction in that way. You may need to be careful when deleting definitions that you registered using `rule`, etc.
+factlog actually converts the disjunction in that way. You may need to be careful about that when deleting definitions that you registered using `rule`, etc.
 
 You can use `query-n` to limit the number of answers to a query. Specify a number greater than or equal to 1.
 ```
