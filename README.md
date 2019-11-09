@@ -268,18 +268,14 @@ So far, we've seen how to define a logic predicate with `fact`, `rule`, `facts`,
 
 You can clear these definitions with `clear-pred` for a logic predicate.
 ```
-{ mouseo X } query .
-⟹ { H{ { X Jerry } } H{ { X Nibbles } } }
-
-mouseo clear-pred
-{ mouseo X } query .
-⟹ f
-
+{ cato X } clear-pred
+{ mouseo X } clear-pred
 { creatureo X } query .
-⟹ { H{ { X Tom } } }
+⟹ f
 ```
 `fact` and `rule` add a new definition to the end of a logic predicate, while `fact*` and `rule*` add them first. The order of the information can affect the results of a query.
 ```
+{ cato Tom } fact
 { mouseo Jerry } fact
 { mouseo Nibbles } fact*
 { mouseo Y } query .
@@ -331,7 +327,7 @@ SYMBOLS: big small a-big-cat a-small-cat ;
 { creatureo X } query .
 ⟹ { H{ { X Tom } } H{ { X Jerry } } H{ { X Nibbles } } }
 ```
-If you need to identify a logic predicate that has a different **arity**, that is numbers of arguments, say it with a slash and an arity number. For example, `cato` of arity 1 is `cato/1`, `cato` of arity 2 is `cato/2`. However, factlog does not recognize these names.
+If you need to identify a logic predicate that has a different **arity**, that is numbers of arguments, express it with a slash and an arity number. For example, `cato` of arity 1 is `cato/1`, `cato` of arity 2 is `cato/2`. However, factlog does not recognize these names.
 
 `clear-pred` will clear all definitions of any arity. If you only want to remove the definition of a certain arity, you should use `retract-all` with logic variables.
 ```
