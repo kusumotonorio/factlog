@@ -268,8 +268,8 @@ So far, we've seen how to define a logic predicate with `fact`, `rule`, `facts`,
 
 You can clear these definitions with `clear-pred` for a logic predicate.
 ```
-{ cato X } clear-pred
-{ mouseo X } clear-pred
+cato clear-pred
+mouseo clear-pred
 { creatureo X } query .
 ⟹ f
 ```
