@@ -328,7 +328,7 @@ SYMBOLS: big small a-big-cat a-small-cat ;
 { creatureo X } query .
 ⟹ { H{ { X Tom } } H{ { X Jerry } } H{ { X Nibbles } } }
 ```
-If you need to identify a logic predicate that has a different **arity**, that is numbers of arguments, express it with a slash and an arity number. For example, `cato` with arity 1 is `cato/1`, `cato` with arity 2 is `cato/2`. However, factlog does not recognize these names.
+If you need to identify a logic predicate that has a different **arity**, that is numbers of arguments, express it with a slash and an arity number. For example, `cato` with arity 1 is `cato/1`, `cato` with arity 2 is `cato/2`. But, note that factlog does not recognize these names.
 
 `clear-pred` will clear all definitions of any arity. If you only want to remove the definition of a certain arity, you should use `retract-all` with logic variables.
 ```
