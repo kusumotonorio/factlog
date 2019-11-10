@@ -1,6 +1,7 @@
 ! Copyright (C) 2019 KUSUMOTO Norio.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: tools.test factlog assocs math kernel
+USING: tools.test factlog assocs math kernel namespaces
+accessors sequences
 factlog.examples.factorial
 factlog.examples.fib
 factlog.examples.hanoi
@@ -8,8 +9,7 @@ factlog.examples.hanoi2
 factlog.examples.money
 factlog.examples.zebra
 factlog.examples.zebra-short
-factlog.examples.zebra2
-;
+factlog.examples.zebra2 ;
 
 IN: factlog.tests
 
@@ -49,6 +49,23 @@ creatureo clear-pred
 { creatureo Y } {
     { cato Y } ;; { mouseo Y }
 } rule
+{ "cato" } [
+    creatureo get defs>> first second first pred>> name>>
+] unit-test
+{ "mouseo" } [
+    creatureo get defs>> second second first pred>> name>>
+] unit-test
+
+creatureo clear-pred
+{ creatureo Y } {
+    { cato Y } ;; { mouseo Y }
+} rule*
+{ "cato" } [
+    creatureo get defs>> first second first pred>> name>>
+] unit-test
+{ "mouseo" } [
+    creatureo get defs>> second second first pred>> name>>
+] unit-test
 
 { { H{ { X Tom } } H{ { X Jerry } } H{ { X Nibbles } } } } [
     { creatureo X } query
@@ -129,6 +146,59 @@ SYMBOLS: mouse cat milk cheese fresh-milk Emmentaler ;
 { { H{ { X milk } { Y fresh-milk } } } } [
     { { consumeso Tom X } { is-ao Y X } } query
 ] unit-test
+
+SYMBOL: a-cat
+{ is-ao a-cat cat } fact
+{ {
+        H{ { X milk } { Y fresh-milk } }
+        H{ { X mouse } { Y Jerry } }
+        H{ { X mouse } { Y Nibbles } }
+    }
+} [
+    { { consumeso a-cat X } { is-ao Y X } } query
+] unit-test
+
+cato clear-pred
+mouseo clear-pred
+{ f } [ { creatureo X } query ] unit-test
+
+{ cato Tom } fact
+{ mouseo Jerry } fact
+{ mouseo Nibbles } fact*
+{ { H{ { Y Nibbles } } H{ { Y Jerry } } } } [
+    { mouseo Y } query
+] unit-test
+
+{ mouseo Jerry } retract
+{ { H{ { X Nibbles } } } } [
+    { mouseo X } query
+] unit-test
+
+{ mouseo Jerry } fact
+{ { H{ { X Nibbles } } H{ { X Jerry } } } } [
+    { mouseo X } query
+] unit-test
+{ mouseo __ } retract-all
+{ f } [ { mouseo X } query ] unit-test
+
+{ { mouseo Jerry } { mouseo Nibbles } } facts
+SYMBOLS: big small a-big-cat a-small-cat ;
+{ cato big a-big-cat } fact
+{ cato small a-small-cat } fact
+{ { H{ { X Tom } } } } [ { cato X } query ] unit-test
+{
+    {
+       H{ { X big } { Y a-big-cat } }
+       H{ { X small } { Y a-small-cat } }
+    }
+} [ { cato X Y } query ] unit-test
+{
+    { H{ { X Tom } } H{ { X Jerry } } H{ { X Nibbles } } }
+} [ { creatureo X } query ] unit-test
+
+{ cato __ __ } retract-all
+{ f } [ { cato X Y } query ] unit-test
+{ { H{ { X Tom } } } } [ { cato X } query ] unit-test
 
 LOGIC-PREDS: factorialo N_>_0  N2_is_N_-_1  F_is_F2_*_N ;
 LOGIC-VARS: N N2 F F2 ;
