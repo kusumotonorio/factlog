@@ -75,6 +75,44 @@ creatureo clear-pred
     { creatureo Y } 2 query-n
 ] unit-test
 
+SYMBOL: Spike
+LOGIC-PREDS: dogo ;
+{ dogo Spike } fact
+creatureo clear-pred
+{ creatureo X } { dogo X } rule
+{ creatureo Y } {
+    { cato Y } ;; { mouseo Y }
+} rule
+{ "dogo" } [
+    creatureo get defs>> first second first pred>> name>>
+] unit-test
+{ "cato" } [
+    creatureo get defs>> second second first pred>> name>>
+] unit-test
+{ "mouseo" } [
+    creatureo get defs>> third second first pred>> name>>
+] unit-test
+
+creatureo clear-pred
+{ creatureo X } { dogo X } rule
+{ creatureo Y } {
+    { cato Y } ;; { mouseo Y }
+} rule*
+{ "cato" } [
+    creatureo get defs>> first second first pred>> name>>
+] unit-test
+{ "mouseo" } [
+    creatureo get defs>> second second first pred>> name>>
+] unit-test
+{ "dogo" } [
+    creatureo get defs>> third second first pred>> name>>
+] unit-test
+
+creatureo clear-pred
+{ creatureo Y } {
+    { cato Y } ;; { mouseo Y }
+} rule
+
 LOGIC-PREDS: likes-cheeseo dislikes-cheeseo ;
 { likes-cheeseo X } { mouseo X } rule
 { dislikes-cheeseo Y } {
@@ -87,8 +125,6 @@ LOGIC-PREDS: likes-cheeseo dislikes-cheeseo ;
 
 { L[ Tom Jerry Nibbles ] } [ L[ Tom Jerry Nibbles ] ] unit-test
 { t } [ { membero Jerry L[ Tom Jerry Nibbles ] } query ] unit-test
-
-SYMBOL: Spike
 
 { f } [
     { membero Spike [ Tom Jerry Nibbles L[ ] cons cons cons ] } query
