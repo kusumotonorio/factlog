@@ -137,7 +137,7 @@ Other creatures might also like cheese...
 
 You can also use sequences, lists, and tuples as goal definition arguments.
 
-Note that the list used with factlog is factlog's own, not the list of `lists`vocabulary bundled with Factor. The list is created by a chain of `cons-pair` tuples, but you can use a special syntax to describe it.
+Note that the list used by factlog is specific to factlog and not `lists` vocabulary list bundled with Factor. A list is created by a chain of `cons-pair` tuples, but it can be written using the special syntax `L{`.
 ```
 L[ Tom Jerry Nibbles ] .
 ⟹ L[ Tom Jerry Nibbles ]
@@ -216,7 +216,7 @@ Let's ask what Jerry consumes.
 { { consumeso Jerry X } { is-ao Y X } } query .
 ⟹ {
         H{ { X milk } { Y fresh-milk } }
-        H{ { X cheese } { Y Emmentaler }
+        H{ { X cheese } { Y Emmentaler } }
     }
 ```
 Well, what about Tom?
