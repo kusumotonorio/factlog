@@ -137,7 +137,7 @@ Other creatures might also like cheese...
 
 You can also use sequences, lists, and tuples as goal definition arguments.
 
-Note that the list used by factlog is specific to factlog and not `lists` vocabulary list bundled with Factor. A list is created by a chain of `cons-pair` tuples, but it can be written using the special syntax `L{`.
+Note that the list used by factlog is specific to factlog and not `lists` vocabulary list bundled with Factor. A list is created by a chain of `cons-pair` tuples, but it can be written using the special syntax `L[`.
 ```
 L[ Tom Jerry Nibbles ] .
 ⟹ L[ Tom Jerry Nibbles ]

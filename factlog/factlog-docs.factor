@@ -1,81 +1,136 @@
 ! Copyright (C) 2019 Your name.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays help.markup help.syntax kernel quotations sequences
-    prettyprint assocs math lists ;
+    prettyprint assocs math lists urls factlog.private ;
 IN: factlog
 
 HELP: !!
-{ $var-description "" } ;
+{ $var-description "The cut operator.\nUse the cut operator to suppress backtracking." } ;
 
 HELP: (<)
-{ $var-description "" } ;
+{ $var-description "A logic predicate. It takes two arguments. It is true if both arguments are evaluated numerically and the first argument is less than the second, otherwise, it is false." } ;
 
 HELP: (=)
-{ $var-description "" } ;
+{ $var-description "A logic predicate. It unifies two arguments." } ;
 
 HELP: (=<)
-{ $var-description "" } ;
+{ $var-description "A logic predicate. It takes two arguments. It is true if both arguments are evaluated numerically and the first argument equals or is less than the second, otherwise, it is false." } ;
 
 HELP: (==)
-{ $var-description "" } ;
+{ $var-description "A logic predicate. It tests for equality of two arguments. Evaluating two arguments, true if they are the same, false if they are different." } ;
 
 HELP: (>)
-{ $var-description "" } ;
+{ $var-description "A logic predicate. It is true if both arguments are evaluated numerically and the first argument is greater than the second, otherwise, it is false." } ;
 
 HELP: (>=)
-{ $var-description "" } ;
+{ $var-description "A logic predicate. It is true if both arguments are evaluated numerically and the first argument equals or is greater than the second, otherwise, it is false." } ;
 
 HELP: (\=)
-{ $var-description "" } ;
+{ $var-description "A logic predicate.  It will be true when such a unification fails. Note that " { $snippet "(\\=)" } " does not actually do the unification." } ;
 
 HELP: (\==)
-{ $var-description "" } ;
+{ $var-description "A logic predicate. It tests for inequality of two arguments. Evaluating two arguments, true if they are different, false if they are the same." } ;
 
 HELP: ;;
-{ $var-description "" } ;
+{ $var-description "Is used to represent disjunction. The code below it has the same meaning as the code below it.
+"
+{ $code
+  "Gh { Gb1 Gb2 Gb3 ;; Gb4 Gb5 ;; Gb6 } rule" }
+""
+{ $code
+  "Gh { Gb1 Gb2 Gb3 } rule"
+  "Gh { Gb4 Gb5 } rule:
+Gh { Gb6 } rule" }
+} ;
 
 HELP: =:=
 { $values
     { "quot1" quotation } { "quot2" quotation }
-    { "goal" null }
+    { "goal" logic-goal }
 }
-{ $description "" } ;
+{ $description "Each of the two quotations takes an environment and returns a value. " { $snippet "=:=" } " returns the internal representation of the goal which returns t if values returned by these quotations are same.\n" { $snippet "=:=" } " is intended to be used in a quotation. If there is a quotation in the definition of rule, factlog uses the internal definition of the goal obtained by calling it." } ;
 
 HELP: =\=
 { $values
     { "quot1" quotation } { "quot2" quotation }
-    { "goal" null }
+    { "goal" logic-goal }
 }
-{ $description "" } ;
+{ $description "Each of the two quotations takes an environment and returns a value. " { $snippet "=:=" } " returns the internal representation of the goal which returns t if values returned by these quotations are not same.\n" { $snippet "=:=" } " is intended to be used in a quotation. If there is a quotation in the definition of rule, factlog uses the internal definition of the goal obtained by calling it." } ;
 
 HELP: >list
 { $values
     { "seq" sequence }
-    { "cons-pair" null }
+    { "factlog-list" cons-pair }
 }
 { $description "" } ;
 
 
 HELP: LOGIC-PREDS:
-{ $description "" } ;
+{ $description "Creates a new logic predicate for every token until the ;." }
+{ $examples
+  { $code
+    "USE: factlog"
+    "LOGIC-PREDS: cato mouseo ;"
+    ""
+    "{ cato Tom } fact"
+    "{ mouseo Jerry } fact"
+  }
+} ;
 
 HELP: LOGIC-VARS:
-{ $description "" } ;
+{ $description "Creates a new logic variable for every token until the ;." }
+{ $examples
+  { $example
+    "USE: factlog"
+    "LOGIC-PREDS: mouseo ;"
+    "LOGIC-VARS: X Y ;"
+    ""
+    "{ mouseo Jerry } fact"
+    "{ mouseo X } query"
+    "{ H{ { X Jerry } } }"
+  }
+} ;
 
 HELP: L[
 { $description "" } ;
 
 HELP: \+
-{ $var-description "" } ;
+{ $var-description "Express negation. \\+ acts on the goal immediately following it.\n" }
+{ $examples
+  { $example
+    "USE: factlog"
+    "LOGIC-PREDS: cato mouseo creatureo ;"
+    "LOGIC-VARS: X Y ;"
+    "SYMBOLS: Tom Jerry Nibbles ;"
+    ""
+    "{ cato Tom } fact"
+    "{ mouseo Jerry } fact"
+    "{ mouseo Nibbles } fact"
+    "{ creatureo Y } {
+    { cato Y } ;; { mouseo Y }
+} rule"
+    ""
+    "LOGIC-PREDS: likes-cheeseo dislikes-cheeseo ;"
+    ""
+    "{ likes-cheeseo X } { mouseo X } rule"
+    "{ dislikes-cheeseo Y } {
+    { creatureo Y }
+    \\+ { likes-cheeseo Y }
+    } rule"
+    "{ dislikes-cheeseo Jerry } query"
+    "{ dislikes-cheeseo Tom } query"
+    "f\nt"
+  }
+} ;
 
 HELP: __
-{ $var-description "" } ;
+{ $var-description "An anonymous logic variable.\nUse in place of a regular logic variable when you do not need its name and value." } ;
 
 HELP: appendo
-{ $var-description "" } ;
+{ $var-description "A logic predicate." } ;
 
 HELP: asserto
-{ $var-description "" } ;
+{ $var-description "A logic predicate." } ;
 
 HELP: callback
 { $values
@@ -91,70 +146,105 @@ HELP: callbacks
 
 HELP: car
 { $values
-    { "cons-pair" null }
-    { "car" null }
+    { "cons-pair" cons-pair }
+    { "car" "the first item in the " { $link factlog-list } }
 }
-{ $description "" } ;
+{ $description "Returns car of the " { $link cons-pair } "." } ;
 
 HELP: cdr
 { $values
-    { "cons-pair" null }
-    { "cdr" null }
+    { "cons-pair" cons-pair }
+    { "cdr" "the rest items in the factlog-list" }
 }
-{ $description "" } ;
+{ $description "Returns cdr of the " { $link cons-pair } "." } ;
 
 HELP: clear-pred
 { $values
     { "pred" null }
 }
-{ $description "" } ;
+{ $description "Clears all the definition information for the given logic predicate" }
+{ $examples
+  { $example
+    "USE: factlog"
+    "LOGIC-PREDS: mouseo ;"
+    "SYMBOLS: Jerry Nibbles ;"
+    "LOGIC-VARS: X ;"
+    ""
+    "{ mouseo Jerry } fact"
+    "{ mouseo Nibbles } fact"
+    ""
+    "{ mouseo X } query"
+    ""
+    "mouseo clear-pred"
+    "{ mouseo X } query"
+    "{ H{ { X Jerry } } H{ { X Nibbles } } }\nf"
+  }
+} ;
 
 HELP: conco
-{ $var-description "" } ;
+{ $var-description "A logic predicate." } ;
 
 HELP: cons
 { $values
-    { "cons-car" null } { "cons-cdr" null }
-    { "cons-pair" null }
+    { "cons-car" object } { "cons-cdr" object }
+    { "cons-pair" cons-pair }
 }
-{ $description "" } ;
+{ $description "Constructs a "{ $link cons-pair } "." } ;
 
 HELP: cons-pair
 { $class-description "" } ;
 
 HELP: fact
 { $values
-    { "head" null }
+    { "head" "an array representing a goal" }
 }
-{ $description "" } ;
+{ $description "Registers the fact to the end of the logic predicate that is in the head." }
+{ $examples
+  { $code
+    "USE: factlog"
+    "LOGIC-PREDS: cato mouseo ;"
+    "SYMBOLS: Tom Jerry ;"
+    ""
+    "{ cato Tom } fact"
+    "{ mouseo Jerry } fact"
+  }
+} ;
 
 HELP: fact*
 { $values
-    { "head" null }
+    { "head" "an array representing a goal" }
 }
-{ $description "" } ;
+{ $description "Registers the fact to the beginning of the logic predicate that is in the head." } ;
 
 HELP: factlog-list
 { $class-description "" } ;
 
 HELP: facts
 { $values
-    { "defs" null }
+    { "defs" array }
 }
-{ $description "" } ;
+{ $description "Registers these facts to the end of the logic predicate that is in the head." }
+{ $examples
+  { $code
+    "USE: factlog"
+    "LOGIC-PREDS: cato mouseo ;"
+    ""
+    "{ { cato Tom } { mouseo Jerry } } facts"
+  }
+} ;
 
 HELP: failo
-{ $var-description "" } ;
+{ $var-description "A built-in logic predicate. { " { $snippet "failo" } " } is a goal that is always " { $link f } "." } ;
 
 HELP: is
 { $values
-    { "quot" quotation } { "dist" null }
-    { "goal" null }
+    { "quot" quotation } { "dist" "a logic predicate" }
+    { "goal" logic-goal }
 }
-{ $description "" } ;
+{ $description "Takes a quotation and a logic variable to be unified. Each of the two quotations takes an environment and returns a value. " { $snippet "is" } " returns the internal representation of the goal.\n" { $snippet "is" } " is intended to be used in a quotation. If there is a quotation in the definition of rule, factlog uses the internal definition of the goal obtained by calling it." } ;
 
 HELP: lengtho
-{ $var-description "" } ;
+{ $var-description "A logic predicate." } ;
 
 HELP: list>array
 { $values
@@ -164,16 +254,16 @@ HELP: list>array
 { $description "" } ;
 
 HELP: listo
-{ $var-description "" } ;
+{ $var-description "A logic predicate." } ;
 
 HELP: membero
-{ $var-description "" } ;
+{ $var-description "A logic predicate." } ;
 
 HELP: nlo
-{ $var-description "" } ;
+{ $var-description "A logic predicate." } ;
 
 HELP: nonvaro
-{ $var-description "" } ;
+{ $var-description "A logic predicate. { " { $snippet "nonvaro" } " } takes a argument and is true if its argument is not a logic variable or is a concrete logic variable." } ;
 
 HELP: notrace
 { $description "" } ;
@@ -206,68 +296,68 @@ HELP: resolve*
 
 HELP: retract
 { $values
-    { "head-def" null }
+    { "head-def" "a logic predicate" }
 }
-{ $description "" } ;
+{ $description "Removes the first definition that matches the given head information." } ;
 
 HELP: retract-all
 { $values
     { "head-def" null }
 }
-{ $description "" } ;
+{ $description "Removes all definitions that match a given head goal definition." } ;
 
 HELP: retractallo
-{ $var-description "" } ;
+{ $var-description "A built-in logic predicate." } ;
 
 HELP: retracto
-{ $var-description "" } ;
+{ $var-description "A built-in logic predicate." } ;
 
 HELP: rule
 { $values
-    { "head" null } { "body" null }
+    { "head" "an array representing a goal" } { "body" "an array of goals or a goal" }
 }
-{ $description "" } ;
+{ $description "Registers the rule to the end of the logic predicate that is in the head." } ;
 
 HELP: rule*
 { $values
-    { "head" null } { "body" null }
+    { "head" "an array representing a goal" } { "body" "an array of goals or a goal" }
 }
-{ $description "" } ;
+{ $description "Registers the rule to the beginnung of the logic predicate that is in the head." } ;
 
 HELP: rules
 { $values
-    { "defs" null }
+  { "defs" "an array of rules" }
 }
-{ $description "" } ;
+{ $description "Registers these rules to the end of the logic predicate that is in these heads." } ;
 
 HELP: trace
 { $description "" } ;
 
 HELP: trueo
-{ $var-description "" } ;
+{ $var-description "A logic predicate. { " { $snippet "trueo" } " } is a goal that is always " { $link t } "." } ;
 
 HELP: uncons
 { $values
-    { "cons-pair" null }
-    { "car" null } { "cdr" null }
+    { "cons-pair" cons-pair }
+    { "car" object } { "cdr" object }
 }
 { $description "" } ;
 
 HELP: unify
 { $values
-    { "cb-env" null } { "x" null } { "y" null }
-    { "success?" null }
+    { "cb-env" callback-env } { "x" object } { "y" object }
+    { "success?" boolean }
 }
-{ $description "" } ;
+{ $description "Unifies the two following the environment in that environment." } ;
 
 HELP: varo
-{ $var-description "" } ;
+{ $var-description "A logic predicate. " { $snippet "varo" } "takes a argument and is true if it is a logic variable with no value." } ;
 
 HELP: writenlo
-{ $var-description "" } ;
+{ $var-description "A logic predicate. " } ;
 
 HELP: writeo
-{ $var-description "" } ;
+{ $var-description "A logic predicate. " } ;
 
 HELP: |
 { $var-description "" } ;
@@ -387,7 +477,8 @@ To tell the truth, we were able to describe at once that cats and mice were crea
     { cato Y } ;; { mouseo Y }
 } rule"
 }
-"" { $link ;; } " is used to represent " { $strong "disjunction" } ". The code below it has the same meaning as the code below it.
+"
+" { $link ;; } " is used to represent " { $strong "disjunction" } ". The code below it has the same meaning as the code below it.
 
     Gh { Gb1 Gb2 Gb3 ;; Gb4 Gb5 ;; Gb6 } rule
 
@@ -406,7 +497,7 @@ You can use " { $link query-n } " to limit the number of answers to a query. Spe
 "
 Use " { $link \+ } " to express " { $strong "negation" } ". " { $link \+ } " acts on the goal immediately following it.
 "
-{ $code
+{ $example
 "LOGIC-PREDS: likes-cheeseo dislikes-cheeseo ;
 
 { likes-cheeseo X } { mouseo X } rule
@@ -415,23 +506,16 @@ Use " { $link \+ } " to express " { $strong "negation" } ". " { $link \+ } " act
     { creatureo Y }
     \\+ { likes-cheeseo Y }
 } rule"
-}
-{ $example
 "{ dislikes-cheeseo Jerry } query"
-"f"
-}
-{ $example
 "{ dislikes-cheeseo Tom } query"
-"t"
+"f\nt"
 }
 "
 Other creatures might also like cheese...
 
 You can also use sequences, lists, and tuples as goal definition arguments.
 
-Note that the list used with factlog is factlog's own, not the list of " { $vocab-link "lists" } " vocabulary bundled with Factor. The list is created by a chain of " { $link cons-pair } " tuples, but you can use a special syntax to describe it.
-
-Note that the list used by factlog is specific to factlog and not the `lists` vocabulary list bundled with Factor. A list is created by a chain of " { $link cons-pair } " tuples, but it can also be written using the special syntax " { $link L{ } ".
+Note that the list used by factlog is specific to factlog and not " { $vocab-link "lists" } " vocabulary list bundled with Factor. A list is created by a chain of " { $link cons-pair } " tuples, but it can be written using the special syntax " { $link \ L[ } ".
 
 "
 { $example
@@ -452,20 +536,17 @@ When written as an argument to a goal definition, the following lines have the s
 
     L[ Tom Jerry Nibbles ]
     L[ Tom Jerry Nibbles | L[ ] ]
-    [ { Tom Jerry Nibbles } >list ]
+    [ { Tom Jerry Nibbles } " { $link >list } " ]
 
 Such quotations are called only once when converting the goal definitions to internal representations.
 
 "{ $link membero } " is a built-in logic predicate for the relationship an element is in a list.
 "
 { $example
-"{ membero Jerry L[ Tom Jerry Nibbles ] } query"
-"t"
-}
-{ $example
-"SYMBOL: Spike
+  "SYMBOL: Spike
+{ membero Jerry L[ Tom Jerry Nibbles ] } query
 { membero Spike [ Tom Jerry Nibbles L[ ] cons cons cons ] } query"
-"f"
+"t\nf"
 }
 "
 Recently, they moved into a small house. The house has a living room, a dining room and a kitchen. Well, humans feel that way. Each of them seems to be in their favorite room.
@@ -554,7 +635,7 @@ This is a problematical answer. We have to redefine " { $snippet "consumeso" } "
 "
 We wrote about Tom before about common cats. What two consecutive exclamation marks represent is called a " { $strong "cut" } " operator. Use the cut operator to suppress " { $strong "backtracking" } ".
 
-The next letter " { $link f } " is an abbreviation for goal { " { $link failo } " } using the built-in logic predicate " { $snippet "failo" } ". { " { $link failo } " } is a goal that is always " { $link f } ". Similarly, there is a goal { " { $link trueo } " } that is always " { $link t } ", and its abbreviation is " { $link t } ".
+The next letter " { $link f } " is an abbreviation for goal { " { $link failo } " } using the built-in logic predicate " { $link failo } ". { " { $link failo } " } is a goal that is always " { $link f } ". Similarly, there is a goal { " { $link trueo } " } that is always " { $link t } ", and its abbreviation is " { $link t } ".
 
 By these actions, \"Tom consumes mice.\" becomes false and suppresses the examination of general eating habits of cats.
 "
@@ -597,12 +678,10 @@ mouseo clear-pred
 { mouseo Jerry } fact
 { mouseo Nibbles } fact*
 
-{ mouseo Y } query"
-"{ H{ { Y Nibbles } } H{ { Y Jerry } } }"
-}
-{ $example
-"{ creatureo Y } 2 query-n"
-"{ H{ { Y Tom } } H{ { Y Nibbles } } }"
+{ mouseo Y } query
+
+{ creatureo Y } 2 query-n"
+"{ H{ { Y Nibbles } } H{ { Y Jerry } } }\n{ H{ { Y Tom } } H{ { Y Nibbles } } }"
 }
 "
 While " { $link clear-pred } " clears all the definition information for a given logic predicate, " { $link retract } " and " { $link retract-all } " provide selective clearing.
@@ -619,13 +698,11 @@ On the other hand, " { $link retract-all } " removes all definitions that match 
 "
 { $example
 "{ mouseo Jerry } fact
+{ mouseo X } query
+
+{ mouseo __ } retract-all
 { mouseo X } query"
-"{ H{ { X Nibbles } } H{ { X Jerry } } }"
-}
-{ $example
-"{ mouseo __ } retract-all
-{ mouseo X } query"
-"f"
+"{ H{ { X Nibbles } } H{ { X Jerry } } }\nf"
 }
 "
 let's have them come back.
@@ -644,20 +721,10 @@ Logic predicates that take different numbers of arguments are treated separately
 { cato big a-big-cat } fact
 { cato small a-small-cat } fact
 
-{ cato X } query"
-"{ H{ { X Tom } } }"
-}
-{ $example
-"{ cato X Y } query"
-"{
-    H{ { X big } { Y a-big-cat } }
-    H{ { X small } { Y a-small-cat } }
-}"
-}
-{ $example
-"{ creatureo X } query"
-"{ H{ { X Tom } } H{ { X Jerry } } H{ { X Nibbles } } }"
-}
+{ cato X } query
+{ cato X Y } query
+{ creatureo X } query"
+"{ H{ { X Tom } } }\n{ H{ { X big } { Y a-big-cat } } H{ { X small } { Y a-small-cat } } }\n{ H{ { X Tom } } H{ { X Jerry } } H{ { X Nibbles } }" }
 "
 If you need to identify a logic predicate that has a different " { $strong "arity" } ", that is numbers of arguments, express it with a slash and an arity number. For example, " { $snippet "cato" } " with arity 1 is " { $snippet "cato/1" } ", " { $snippet "cato" } " with arity 2 is " { $snippet "cato/2" } ". But, note that factlog does not recognize these names.
 
@@ -666,11 +733,8 @@ If you need to identify a logic predicate that has a different " { $strong "arit
 { $example
 "{ cato __ __ } retract-all
 { cato X Y } query"
-"f"
-}
-{ $example
 "{ cato X } query"
-"{ H{ { X Tom } } }"
+"f\n{ H{ { X Tom } } }"
 }
 "
 You can " { $strong "trace" } " factlog's execution. The word to do this is " { $link trace } ".
