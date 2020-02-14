@@ -38,24 +38,16 @@ INSTANCE: NIL factlog-list
         reverse unclip swap [ swap cons ] each
     ] if ;
 
-: scan-list ( -- object )
-    scan-token {
-        { "\"" [ scan-token but-last ] }
-        { "." [ "." ] }
-        { ")" [ ")" ] }
-        [ parse-datum ]
-    } case ;
-
 :: (parse-list-literal) ( accum right-of-dot? -- accum )
-    accum scan-list {
-        { [ dup ")" = ] [ drop NIL , ] }
-        { [ dup "." = ] [ drop t (parse-list-literal) ] }
-        { [ dup parsing-word? ] [
-              V{ } clone swap execute-parsing first ,
-              right-of-dot? [ ")" expect ] [ f (parse-list-literal) ] if
-          ] }
-        [ , right-of-dot? [ ")" expect ] [ f (parse-list-literal) ] if ]
-    } cond ;
+    accum scan-token {
+        { ")" [ NIL , ] }
+        { "." [ t (parse-list-literal) ] }
+        [
+            parse-datum dup parsing-word? [
+                V{ } clone swap execute-parsing first
+            ] when
+            , right-of-dot? [ ")" expect ] [ f (parse-list-literal) ] if ]
+    } case ;
 
 : parse-list-literal ( accum -- accum object )
     [ f (parse-list-literal) ] { } make items>list ;
