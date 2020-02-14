@@ -137,35 +137,35 @@ Other creatures might also like cheese...
 
 You can also use sequences, lists, and tuples as goal definition arguments.
 
-Note that the list used by factlog is specific to factlog and not `lists` vocabulary list bundled with Factor. A list is created by a chain of `cons-pair` tuples, but it can be written using the special syntax `L[`.
+Note that the list used by factlog is specific to factlog and not `lists` vocabulary list bundled with Factor. A list is created by a chain of `cons-pair` tuples, but it can be written using the special syntax `L(`.
 ```
-L[ Tom Jerry Nibbles ] .
-⟹ L[ Tom Jerry Nibbles ]
+L( Tom Jerry Nibbles ) .
+⟹ L( Tom Jerry Nibbles )
 ```
 The syntax of list descriptions allows you to describe "head" and "tail" of a list.
 ```
-L[ HEAD | TAIL ]
-L[ ITEM1 ITEM2 ITEM3 | OTHERS ]
+L( HEAD . TAIL )
+L( ITEM1 ITEM2 ITEM3 . OTHERS )
 ```
 You can also write a quotation that returns an argument as a goal definition argument.
 ```
-[ Tom Jerry Nibbles L[ ] cons cons cons ]
+[ Tom Jerry Nibbles L( ) cons cons cons ]
 ```
 When written as an argument to a goal definition, the following lines have the same meaning as above:
 ```
-L[ Tom Jerry Nibbles ]
-L[ Tom Jerry Nibbles | L[ ] ]
-[ { Tom Jerry Nibbles } >list ]
+L( Tom Jerry Nibbles )
+L( Tom Jerry Nibbles . L( ) )
+[ { Tom Jerry Nibbles NIL } items>list ]
 ```
 Such quotations are called only once when converting the goal definitions to internal representations.
 
 `membero` is a built-in logic predicate for the relationship an element is in a list.
 ```
-{ membero Jerry L[ Tom Jerry Nibbles ] } query .
+{ membero Jerry L( Tom Jerry Nibbles ) } query .
 ⟹ t
 
 SYMBOL: Spike
-{ membero Spike [ Tom Jerry Nibbles L[ ] cons cons cons ] } query .
+{ membero Spike [ Tom Jerry Nibbles L( ) cons cons cons ] } query .
 ⟹ f
 ```
 Recently, they moved into a small house. The house has a living room, a dining room and a kitchen. Well, humans feel that way. Each of them seems to be in their favorite room.

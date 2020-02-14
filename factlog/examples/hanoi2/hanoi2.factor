@@ -8,9 +8,9 @@ LOGIC-VARS: A B C X Y Z ;
 
 { write-move X } [ X of [ printf ] each t ] callback
 
-{ hanoi L[ ] A B C } fact
+{ hanoi L( ) A B C } fact
 
-{ hanoi L[ X | Y ] A B C } {
+{ hanoi L( X . Y ) A B C } {
     { hanoi Y A C B }
     { write-move { "move " X " from " A " to " B "\n" } }
     { hanoi Y C B A }

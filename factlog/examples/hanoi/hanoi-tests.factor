@@ -14,7 +14,7 @@ IN: factlog.examples.hanoi.tests
         "move disk from right to left"
         "move disk from right to center"
         "move disk from left to center"
-        ""
+        " "
     } [ "%s\n" printf ] each
     { hanoi 3 } query
 ] unit-test

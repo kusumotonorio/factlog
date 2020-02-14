@@ -8,7 +8,7 @@ IN: factlog.examples.zebra.tests
         H{
             {
                 Hs
-                L[
+                L(
                     T{ house
                        { color yellow }
                        { nationality norwegian }
@@ -44,7 +44,7 @@ IN: factlog.examples.zebra.tests
                        { smoke blue-master }
                        { pet dog }
                      }
-                ]
+                )
             }
             { X norwegian }
             { Y german }

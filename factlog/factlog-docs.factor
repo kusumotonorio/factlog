@@ -1,4 +1,4 @@
-! Copyright (C) 2019 Your name.
+! Copyright (C) 2019 KUSUMOTO Norio.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: arrays help.markup help.syntax kernel quotations sequences
     prettyprint assocs math lists urls factlog.private ;
@@ -57,7 +57,7 @@ HELP: =\=
 }
 { $description "Each of the two quotations takes an environment and returns a value. " { $snippet "=:=" } " returns the internal representation of the goal which returns t if values returned by these quotations are not same.\n" { $snippet "=:=" } " is intended to be used in a quotation. If there is a quotation in the definition of rule, factlog uses the internal definition of the goal obtained by calling it." } ;
 
-HELP: >list
+HELP: items>list
 { $values
     { "seq" sequence }
     { "factlog-list" cons-pair }
@@ -91,7 +91,7 @@ HELP: LOGIC-VARS:
   }
 } ;
 
-HELP: L[
+HELP: L(
 { $description "" } ;
 
 HELP: \+
@@ -515,28 +515,28 @@ Other creatures might also like cheese...
 
 You can also use sequences, lists, and tuples as goal definition arguments.
 
-Note that the list used by factlog is specific to factlog and not " { $vocab-link "lists" } " vocabulary list bundled with Factor. A list is created by a chain of " { $link cons-pair } " tuples, but it can be written using the special syntax " { $link \ L[ } ".
+Note that the list used by factlog is specific to factlog and not " { $vocab-link "lists" } " vocabulary list bundled with Factor. A list is created by a chain of " { $link cons-pair } " tuples, but it can be written using the special syntax " { $link \ L( } ".
 
 "
 { $example
-  "L[ Tom Jerry Nibbles ]"
-  "L[ Tom Jerry Nibbles ]"
+  "L( Tom Jerry Nibbles )"
+  "L( Tom Jerry Nibbles )"
 }
 "
 The syntax of list descriptions allows you to describe \"head\" and \"tail\" of a list.
 
-    L[ HEAD | TAIL ]
-    L[ ITEM1 ITEM2 ITEM3 | OTHERS ]
+    L( HEAD . TAIL )
+    L( ITEM1 ITEM2 ITEM3 . OTHERS )
 
 You can also write a quotation that returns an argument as a goal definition argument.
 
-    [ Tom Jerry Nibbles L[ ] cons cons cons ]
+    [ Tom Jerry Nibbles L( ) cons cons cons ]
 
 When written as an argument to a goal definition, the following lines have the same meaning as above:
 
-    L[ Tom Jerry Nibbles ]
-    L[ Tom Jerry Nibbles | L[ ] ]
-    [ { Tom Jerry Nibbles } " { $link >list } " ]
+    L( Tom Jerry Nibbles )
+    L( Tom Jerry Nibbles . L( ) ]
+    [ { Tom Jerry Nibbles NIL } " { $link items>list } " ]
 
 Such quotations are called only once when converting the goal definitions to internal representations.
 
@@ -544,8 +544,8 @@ Such quotations are called only once when converting the goal definitions to int
 "
 { $example
   "SYMBOL: Spike
-{ membero Jerry L[ Tom Jerry Nibbles ] } query
-{ membero Spike [ Tom Jerry Nibbles L[ ] cons cons cons ] } query"
+{ membero Jerry L( Tom Jerry Nibbles ) } query
+{ membero Spike [ Tom Jerry Nibbles L( ) cons cons cons ] } query"
 "t\nf"
 }
 "

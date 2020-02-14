@@ -123,11 +123,11 @@ LOGIC-PREDS: likes-cheeseo dislikes-cheeseo ;
 { f } [ { dislikes-cheeseo Jerry } query ] unit-test
 { t } [ { dislikes-cheeseo Tom } query ] unit-test
 
-{ L[ Tom Jerry Nibbles ] } [ L[ Tom Jerry Nibbles ] ] unit-test
-{ t } [ { membero Jerry L[ Tom Jerry Nibbles ] } query ] unit-test
+{ L( Tom Jerry Nibbles ) } [ L( Tom Jerry Nibbles ) ] unit-test
+{ t } [ { membero Jerry L( Tom Jerry Nibbles ) } query ] unit-test
 
 { f } [
-    { membero Spike [ Tom Jerry Nibbles L[ ] cons cons cons ] } query
+    { membero Spike [ Tom Jerry Nibbles L( ) cons cons cons ] } query
 ] unit-test
 
 TUPLE: house living dining kitchen in-the-wall ;

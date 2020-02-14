@@ -1,4 +1,4 @@
-! Copyright (C) 2019 KUSUMOTO Norio.
+! Copyright (C) 2019,2020 KUSUMOTO Norio.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs classes classes.tuple combinators
 combinators.short-circuit compiler.units continuations
@@ -33,17 +33,34 @@ INSTANCE: cons-pair factlog-list
 INSTANCE: NIL factlog-list
 
 <<
-:: >list ( seq -- cons-pair )
-    seq [ | = ] find drop :> d-pos!
-    d-pos [
-        d-pos 1 + seq nth
-    ] [
-        seq length d-pos!
-        NIL
-    ] if
-    seq d-pos head reverse [ swap cons ] each ;
+: items>list ( seq -- cons-pair )
+    dup empty? [ drop NIL ] [
+        reverse unclip swap [ swap cons ] each
+    ] if ;
 
-SYNTAX: L[ \ ] [ >list ] parse-literal ;
+: scan-list ( -- object )
+    scan-token {
+        { "\"" [ scan-token but-last ] }
+        { "." [ "." ] }
+        { ")" [ ")" ] }
+        [ parse-datum ]
+    } case ;
+
+:: (parse-list-literal) ( accum right-of-dot? -- accum )
+    accum scan-list {
+        { [ dup ")" = ] [ drop NIL , ] }
+        { [ dup "." = ] [ drop t (parse-list-literal) ] }
+        { [ dup parsing-word? ] [
+              V{ } clone swap execute-parsing first ,
+              right-of-dot? [ ")" expect ] [ f (parse-list-literal) ] if
+          ] }
+        [ , right-of-dot? [ ")" expect ] [ f (parse-list-literal) ] if ]
+    } cond ;
+
+: parse-list-literal ( accum -- accum object )
+    [ f (parse-list-literal) ] { } make items>list ;
+
+SYNTAX: L( parse-list-literal suffix! ;
 >>
 
 :: list>array ( list -- array )
@@ -55,7 +72,9 @@ SYNTAX: L[ \ ] [ >list ] parse-literal ;
         l-cdr factlog-list? [ l-cdr list>array append ] when
     ] if ;
 
-M: factlog-list pprint-delims drop \ L[ \ ] ;
+SYMBOL: ) delimiter
+
+M: factlog-list pprint-delims drop \ L( \ ) ;
 
 M: factlog-list pprint*
     [
@@ -73,7 +92,7 @@ M: factlog-list pprint*
             dup factlog-list? [
                 NIL? [ "~more~" text ] unless
             ] [
-                "|" text pprint*
+                "." text pprint*
             ] if
             block>
         ] dip pprint-word block>
@@ -147,9 +166,9 @@ TUPLE: logic-env table ;
 
 :: env-put ( x pair env -- ) pair x env table>> set-at ; inline
 
-:: env-get ( x env -- pair/f ) x env table>> at ; inline
+: env-get ( x env -- pair/f ) table>> at ; inline
 
-:: env-delete ( x env -- ) x env table>> delete-at ; inline
+: env-delete ( x env -- ) table>> delete-at ; inline
 
 : env-clear ( env -- ) table>> clear-assoc ; inline
 
@@ -166,7 +185,7 @@ M: logic-env at*
             '[ tuple-slots [ _ at ] map ]
             [ class-of slots>tuple ] bi t ] }
         { [ over sequence? ] [
-            '[ _ at ] map t ] }
+              '[ _ at ] map t ] }
         [ drop t ]
     } cond ;
 
@@ -192,7 +211,7 @@ C: <cut> cut-info
 DEFER: unify*
 
 :: (unify*) ( x! x-env! y! y-env! trail tmp-env -- success? )
-    f :> ret-value!  f :> ret?! f :> ret2?!
+    f :> ret-value!  f :> ret?!  f :> ret2?!
     t :> loop?!
     [ loop? ] [
         { { [ x logic-var? ] [
@@ -608,19 +627,19 @@ LOGIC-VARS: A_ B_ C_ X_ Y_ Z_ ;
 { nlo } [ drop nl t ] callback
 
 
-{ membero X_ L[ X_ | Z_ ] } fact
-{ membero X_ L[ Y_ | Z_ ] } { membero X_ Z_ } rule
+{ membero X_ L( X_ . Z_ ) } fact
+{ membero X_ L( Y_ . Z_ ) } { membero X_ Z_ } rule
 
-{ appendo L[ ] A_ A_ } fact
-{ appendo L[ A_ | X_ ] Y_ L[ A_ | Z_ ] } {
+{ appendo L( ) A_ A_ } fact
+{ appendo L( A_ . X_ ) Y_ L( A_ . Z_ ) } {
     { appendo X_ Y_ Z_ }
 } rule
 
 
 LOGIC-VARS: Tail_ N_ N1_ ;
 
-{ lengtho L[ ] 0 } fact
-{ lengtho L[ __ | Tail_ ] N_ } {
+{ lengtho L( ) 0 } fact
+{ lengtho L( __ . Tail_ ) N_ } {
     { lengtho Tail_ N1_ }
     [ [ N1_ of 1 + ] N_ is ]
 } rule
@@ -628,12 +647,12 @@ LOGIC-VARS: Tail_ N_ N1_ ;
 
 LOGIC-VARS: L_ L1_ L2_ L3_ ;
 
-{ conco L[ ] L_ L_ } fact
-{ conco L[ X_ | L1_ ] L2_ L[ X_ | L3_ ] } {
+{ conco L( ) L_ L_ } fact
+{ conco L( X_ . L1_ ) L2_ L( X_ . L3_ ) } {
     { conco L1_ L2_ L3_ }
 } rule
 
 
-{ listo L[ ] } fact
-{ listo L[ __ | __ ] } fact
+{ listo L( ) } fact
+{ listo L( __ . __ ) } fact
 

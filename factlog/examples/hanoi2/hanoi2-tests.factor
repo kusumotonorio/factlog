@@ -14,7 +14,7 @@ IN: factlog.examples.hanoi2.tests
         "move Top from Right to Left"
         "move 2nd from Right to Center"
         "move Top from Left to Center"
-        ""
+        " "
     } [ "%s\n" printf ] each
-    { hanoi L[ "Base" "2nd" "Top" ] "Left" "Center" "Right" } query
+    { hanoi L( "Base" "2nd" "Top" ) "Left" "Center" "Right" } query
 ] unit-test
