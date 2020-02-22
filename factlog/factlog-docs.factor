@@ -347,7 +347,7 @@ HELP: query-n
     { "goal-def/defs" "a goal def or an array of goal defs" } { "n/f" "the highest number of responses" }
     { "bindings-array/success?" "anser" }
 }
-{ $description "The version of " { $link query } " that limits the number of responses.
+{ $description "The version of " { $link query } " that limits the number of responses. Specify a number greater than or equal to 1.
 If " { $link f } " is given instead of a number as " { $snippet "n/f" } ", there is no limit to the number of answers. That is, the behavior is the same as " { $link query } "." }
 { $see-also query } ;
 

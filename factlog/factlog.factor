@@ -6,7 +6,7 @@ formatting fry io kernel lexer locals make math namespaces
 parser prettyprint prettyprint.backend prettyprint.config
 prettyprint.custom prettyprint.sections quotations sequences
 sequences.deep sets splitting strings words words.symbol
-vectors vocabs.parser ;
+vectors ;
 
 IN: factlog
 
