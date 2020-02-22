@@ -8,7 +8,6 @@ factlog.examples.hanoi
 factlog.examples.hanoi2
 factlog.examples.money
 factlog.examples.zebra
-factlog.examples.zebra-short
 factlog.examples.zebra2 ;
 
 IN: factlog.tests
