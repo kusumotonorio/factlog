@@ -6,13 +6,12 @@ formatting fry io kernel lexer locals make math namespaces
 parser prettyprint prettyprint.backend prettyprint.config
 prettyprint.custom prettyprint.sections quotations sequences
 sequences.deep sets splitting strings words words.symbol
-vectors ;
+vectors vocabs.parser ;
 
 IN: factlog
 
 SYMBOL: !!    ! cut operator         in prolog: !
 SYMBOL: __    ! anonymous variable   in prolog: _
-SYMBOL: |     ! head-tail separator  in prolog: |
 SYMBOL: ;;    ! disjunction, or      in prolog: ;
 SYMBOL: \+    ! negation             in prolog: not, \+
 
@@ -38,6 +37,7 @@ INSTANCE: NIL factlog-list
         reverse unclip swap [ swap cons ] each
     ] if ;
 
+<PRIVATE
 :: (parse-list-literal) ( accum right-of-dot? -- accum )
     accum scan-token {
         { ")" [ NIL , ] }
@@ -51,6 +51,7 @@ INSTANCE: NIL factlog-list
 
 : parse-list-literal ( accum -- accum object )
     [ f (parse-list-literal) ] { } make items>list ;
+PRIVATE>
 
 SYNTAX: L( parse-list-literal suffix! ;
 >>
@@ -64,7 +65,7 @@ SYNTAX: L( parse-list-literal suffix! ;
         l-cdr factlog-list? [ l-cdr list>array append ] when
     ] if ;
 
-SYMBOL: ) delimiter
+SYMBOLS: ) ; delimiter
 
 M: factlog-list pprint-delims drop \ L( \ ) ;
 
@@ -343,7 +344,7 @@ SYMBOL: *anonymouse-var-no*
 : proxy-var-for-'__' ( -- var-symbol )
     [
         *anonymouse-var-no* counter "ANON-%d_" sprintf
-        "factlog" create-word dup dup
+        "factlog.private" create-word dup dup
         define-symbol
         ANONYMOUSE-LOGIC-VAR swap set-global
     ] with-compilation-unit ;
@@ -365,6 +366,10 @@ SYMBOL: *anonymouse-var-no*
     goal-def/defs replace-'__' normalize [ def>goal ] map :> goals
     <env> :> env
     goals env f <cut> [ env quot call( env -- ) ] resolve-body ;
+
+: resolve ( goal-def/defs quot: ( env -- ) -- ) (resolve) ;
+
+: resolve* ( goal-def/defs -- ) [ drop ] resolve ;
 
 SYMBOL: dummy-item
 
@@ -512,10 +517,6 @@ PRIVATE>
     } =\=-pred defs<<
     =\=-goal ;
 
-: resolve ( goal-def/defs quot: ( env -- ) -- ) (resolve) ;
-
-: resolve* ( goal-def/defs -- ) [ drop ] resolve ;
-
 :: query-n ( goal-def/defs n/f -- bindings-array/success? )
     *trace?* get-global :> trace?
     0 :> n!
@@ -557,59 +558,58 @@ LOGIC-PREDS: trueo failo
 { failo } [ drop f ] callback
 
 
-LOGIC-VARS: A_ B_ C_ X_ Y_ Z_ ;
+<PRIVATE LOGIC-VARS: A B C X Y Z ; PRIVATE>
+
+{ asserto X } [ X of call( -- ) t ] callback
+
+{ retracto X } [ X of retract t ] callback
+
+{ retractallo X } [ X of retract-all t ] callback
 
 
-{ asserto X_ } [ X_ of call( -- ) t ] callback
+{ varo X } [ X of logic-var? ] callback
 
-{ retracto X_ } [ X_ of retract t ] callback
-
-{ retractallo X_ } [ X_ of retract-all t ] callback
+{ nonvaro X } [ X of logic-var? not ] callback
 
 
-{ varo X_ } [ X_ of logic-var? ] callback
-
-{ nonvaro X_ } [ X_ of logic-var? not ] callback
-
-
-{ (<) X_ Y_ } [
-    [ X_ of ] [ Y_ of ] bi 2dup [ number? ] both? [ < ] [ 2drop f ] if
+{ (<) X Y } [
+    [ X of ] [ Y of ] bi 2dup [ number? ] both? [ < ] [ 2drop f ] if
 ] callback
 
-{ (>) X_ Y_ } [
-    [ X_ of ] [ Y_ of ] bi 2dup [ number? ] both? [ > ] [ 2drop f ] if
+{ (>) X Y } [
+    [ X of ] [ Y of ] bi 2dup [ number? ] both? [ > ] [ 2drop f ] if
 ] callback
 
-{ (>=) X_ Y_ } [
-    [ X_ of ] [ Y_ of ] bi 2dup [ number? ] both? [ >= ] [ 2drop f ] if
+{ (>=) X Y } [
+    [ X of ] [ Y of ] bi 2dup [ number? ] both? [ >= ] [ 2drop f ] if
 ] callback
 
-{ (=<) X_ Y_ } [
-    [ X_ of ] [ Y_ of ] bi 2dup [ number? ] both? [ <= ] [ 2drop f ] if
+{ (=<) X Y } [
+    [ X of ] [ Y of ] bi 2dup [ number? ] both? [ <= ] [ 2drop f ] if
 ] callback
 
-{ (==) X_ Y_ } [ [ X_ of ] [ Y_ of ] bi = ] callback
+{ (==) X Y } [ [ X of ] [ Y of ] bi = ] callback
 
-{ (\==) X_ Y_ } [ [ X_ of ] [ Y_ of ] bi = not ] callback
+{ (\==) X Y } [ [ X of ] [ Y of ] bi = not ] callback
 
-{ (=) X_ Y_ } [ dup [ X_ of ] [ Y_ of ] bi unify ] callback
+{ (=) X Y } [ dup [ X of ] [ Y of ] bi unify ] callback
 
-{ (\=) X_ Y_ } [
+{ (\=) X Y } [
     clone [ clone ] change-env [ clone ] change-trail
-    dup [ X_ of ] [ Y_ of ] bi unify not
+    dup [ X of ] [ Y of ] bi unify not
 ] callback
 
 
-{ writeo X_ } [
-    X_ of dup sequence? [
+{ writeo X } [
+    X of dup sequence? [
         [ dup string? [ printf ] [ pprint ] if ] each
     ] [
         dup string? [ printf ] [ pprint ] if
     ] if t
 ] callback
 
-{ writenlo X_ } [
-    X_ of dup sequence? [
+{ writenlo X } [
+    X of dup sequence? [
         [ dup string? [ printf ] [ pprint ] if ] each
     ] [
         dup string? [ printf ] [ pprint ] if
@@ -619,29 +619,29 @@ LOGIC-VARS: A_ B_ C_ X_ Y_ Z_ ;
 { nlo } [ drop nl t ] callback
 
 
-{ membero X_ L( X_ . Z_ ) } fact
-{ membero X_ L( Y_ . Z_ ) } { membero X_ Z_ } rule
+{ membero X L( X . Z ) } fact
+{ membero X L( Y . Z ) } { membero X Z } rule
 
-{ appendo L( ) A_ A_ } fact
-{ appendo L( A_ . X_ ) Y_ L( A_ . Z_ ) } {
-    { appendo X_ Y_ Z_ }
+{ appendo L( ) A A } fact
+{ appendo L( A . X ) Y L( A . Z ) } {
+    { appendo X Y Z }
 } rule
 
 
-LOGIC-VARS: Tail_ N_ N1_ ;
+<PRIVATE LOGIC-VARS: Tail N N1 ; PRIVATE>
 
 { lengtho L( ) 0 } fact
-{ lengtho L( __ . Tail_ ) N_ } {
-    { lengtho Tail_ N1_ }
-    [ [ N1_ of 1 + ] N_ is ]
+{ lengtho L( __ . Tail ) N } {
+    { lengtho Tail N1 }
+    [ [ N1 of 1 + ] N is ]
 } rule
 
 
-LOGIC-VARS: L_ L1_ L2_ L3_ ;
+<PRIVATE LOGIC-VARS: L L1 L2 L3 ; PRIVATE>
 
-{ conco L( ) L_ L_ } fact
-{ conco L( X_ . L1_ ) L2_ L( X_ . L3_ ) } {
-    { conco L1_ L2_ L3_ }
+{ conco L( ) L L } fact
+{ conco L( X . L1 ) L2 L( X . L3 ) } {
+    { conco L1 L2 L3 }
 } rule
 
 
