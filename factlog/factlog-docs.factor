@@ -309,7 +309,33 @@ HELP: rule
 { $values
     { "head" "an array representing a goal" } { "body" "an array of goals or a goal" }
 }
-{ $description "Registers the rule to the end of the logic predicate that is in the head." }
+{ $description "Registers the rule to the end of the logic predicate that is in the head.
+The general form of rule is:
+
+    Gh { Gb1 Gb2 ... Gbn } rule
+
+This means Gh when all goals of Gb1, Gb2, ..., Gbn are met. This Gb1 Gb2 ... Gbn is a conjunction.
+If the body array contains only one goal definition, you can write it instead of the body array. That is, they are equivalent.
+
+    Gh { Gb } rule
+    Gh Gb rule" }
+{ $examples
+  { $example
+    "LOGIC-PREDS: mouseo youngo young-mouseo ;"
+    "SYMBOLS: Jerry Nibbles ;"
+    ""
+    "{ mouseo Jerry } fact"
+    "{ mouseo Nibbles } fact"
+    ""
+    "{ young-mouseo X } {"
+    "    { mouseo X }"
+    "    { youngo X }"
+    "} rule"
+    ""
+    "{ young-mouseo X } query"
+    "{ H{ { X Nibbles } } }"
+  }
+}
 { $see-also rule* rules } ;
 
 HELP: rule*
@@ -324,6 +350,32 @@ HELP: rules
   { "defs" "an array of rules" }
 }
 { $description "Registers these rules to the end of the logic predicate that is in these heads." }
+{ $examples
+  { $code
+    "LOGIC-PREDS: is-ao consumeso ;"
+    "SYMBOLS: Tom Jerry Nibbles ;"
+    "SYMBOLS: mouse cat milk cheese fresh-milk Emmentaler ;"
+    ""
+    "{"
+    "    { is-ao Tom cat }"
+    "    { is-ao Jerry mouse }"
+    "    { is-ao Nibbles mouse }"
+    "    { is-ao fresh-milk milk }"
+    "    { is-ao Emmentaler cheese }"
+    "} facts"
+    ""
+    "{"
+    "    {"
+    "        { consumeso X milk } {"
+    "            { is-ao X mouse } ;;"
+    "            { is-ao X cat }"
+    "        }"
+    "    }"
+    "    { { consumeso X cheese } { is-ao X mouse } }"
+    "    { { consumeso X mouse } { is-ao X cat } }"
+    "} rules"
+  }
+}
 { $see-also rule rule* } ;
 
 HELP: trace
