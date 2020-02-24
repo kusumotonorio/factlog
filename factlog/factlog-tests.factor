@@ -1,6 +1,6 @@
 ! Copyright (C) 2019 KUSUMOTO Norio.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: tools.test factlog assocs math kernel namespaces
+USING: tools.test factlog lists assocs math kernel namespaces
 accessors sequences
 factlog.examples.factorial
 factlog.examples.fib
@@ -122,11 +122,11 @@ LOGIC-PREDS: likes-cheeseo dislikes-cheeseo ;
 { f } [ { dislikes-cheeseo Jerry } query ] unit-test
 { t } [ { dislikes-cheeseo Tom } query ] unit-test
 
-{ L( Tom Jerry Nibbles ) } [ L( Tom Jerry Nibbles ) ] unit-test
-{ t } [ { membero Jerry L( Tom Jerry Nibbles ) } query ] unit-test
+{ L{ Tom Jerry Nibbles } } [ L{ Tom Jerry Nibbles } ] unit-test
+{ t } [ { membero Jerry L{ Tom Jerry Nibbles } } query ] unit-test
 
 { f } [
-    { membero Spike [ Tom Jerry Nibbles L( ) cons cons cons ] } query
+    { membero Spike [ Tom Jerry Nibbles L{ } cons cons cons ] } query
 ] unit-test
 
 TUPLE: house living dining kitchen in-the-wall ;

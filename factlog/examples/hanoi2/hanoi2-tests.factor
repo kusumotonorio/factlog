@@ -1,6 +1,6 @@
 ! Copyright (C) 2019 KUSUMOTO Norio.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: tools.test factlog factlog.examples.hanoi2
+USING: tools.test factlog lists factlog.examples.hanoi2
 formatting sequences ;
 IN: factlog.examples.hanoi2.tests
 
@@ -16,5 +16,5 @@ IN: factlog.examples.hanoi2.tests
         "move Top from Left to Center"
         " "
     } [ "%s\n" printf ] each
-    { hanoi L( "Base" "2nd" "Top" ) "Left" "Center" "Right" } query
+    { hanoi L{ "Base" "2nd" "Top" } "Left" "Center" "Right" } query
 ] unit-test

@@ -57,14 +57,6 @@ HELP: =\=
 }
 { $description "Each of the two quotations takes an environment and returns a value. " { $snippet "=\\=" } " returns the internal representation of the goal which returns t if values returned by these quotations are not same.\n" { $snippet "=\\=" } " is intended to be used in a quotation. If there is a quotation in the definition of rule, factlog uses the internal definition of the goal obtained by calling it." } ;
 
-HELP: items>list
-{ $values
-    { "seq" sequence }
-    { "factlog-list" cons-pair }
-}
-{ $description "Create a factlog list using sequence elements. The last element is the " { $snippet "cdr" } " of the last " { $link cons-pair } " that makes up the factlog list." } ;
-
-
 HELP: LOGIC-PREDS:
 { $description "Creates a new logic predicate for every token until the ;." }
 { $syntax "LOGIC-PREDS: preds... ;" }
@@ -91,15 +83,6 @@ HELP: LOGIC-VARS:
     "{ mouseo X } query"
     "{ H{ { X Jerry } } }"
   }
-} ;
-
-HELP: L(
-{ $description "Marks the beginning of a literal list of factlog. Literal factlog lists are terminated by ). Permits dotted pair notation." }
-{ $syntax "L( elements... )
-L( elements... . element )" }
-{ $examples
-  { $example "L( 1 2 3 )" }
-  { $example "L( 4 5 6 . 7 )" }
 } ;
 
 HELP: \+
@@ -163,23 +146,6 @@ HELP: callbacks
 { $description "To collectively register a plurality of " { $link callback } "s." }
 { $see-also callback } ;
 
-
-HELP: car
-{ $values
-    { "cons-pair" cons-pair }
-    { "car" "the first item in the " { $link factlog-list } }
-}
-{ $description "Returns car of the " { $link cons-pair } "." }
-{ $see-also cdr cons-pair } ;
-
-HELP: cdr
-{ $values
-    { "cons-pair" cons-pair }
-    { "cdr" "the rest items in the factlog-list" }
-}
-{ $description "Returns cdr of the " { $link cons-pair } "." }
-{ $see-also car cons-pair } ;
-
 HELP: clear-pred
 { $values
     { "pred" "a logic predicate" }
@@ -207,18 +173,6 @@ HELP: clear-pred
 HELP: conco
 { $var-description "A logic predicate. Concatenate two lists." } ;
 
-HELP: cons
-{ $values
-    { "cons-car" object } { "cons-cdr" object }
-    { "cons-pair" cons-pair }
-}
-{ $description "Constructs a "{ $link cons-pair } "." }
-{ $see-also uncons cons-pair } ;
-
-HELP: cons-pair
-{ $class-description "Cons cells that make up the list of factlog." }
-{ $see-also cons uncons POSTPONE: L( } ;
-
 HELP: fact
 { $values
     { "head" "an array representing a goal" }
@@ -241,9 +195,6 @@ HELP: fact*
 }
 { $description "Registers the fact to the beginning of the logic predicate that is in the head." }
 { $see-also fact facts } ;
-
-HELP: factlog-list
-{ $class-description { $link cons-pair } " or " { $link NIL } } ;
 
 HELP: facts
 { $values
@@ -274,22 +225,11 @@ HELP: is
 HELP: lengtho
 { $var-description "A logic predicate. Instantiate the length of the list." } ;
 
-HELP: list>array
-{ $values
-    { "list" cons-pair }
-    { "array" array }
-}
-{ $description "Convert a factlog list recursively into an array. If the cdr of the " { $link cons-pair } " is not " { $link cons-pair } " or " { $link NIL } ", the value is not included in the generated array." } ;
-
 HELP: listo
 { $var-description "A logic predicate. Takes a single argument and checks to see if it is a list." } ;
 
 HELP: membero
 { $var-description "A logic predicate for the relationship an element is in a list." } ;
-
-HELP: NIL
-{ $description "This represents an empty list " { $snippet "L( )" } "." }
-{ $see-also POSTPONE: L( } ;
 
 HELP: nlo
 { $var-description "A logic predicate. Print line breaks." }
@@ -393,15 +333,6 @@ HELP: trace
 HELP: trueo
 { $var-description "A logic predicate. { " { $snippet "trueo" } " } is a goal that is always " { $link t } "." }
 { $see-also failo } ;
-
-HELP: uncons
-{ $values
-    { "cons-pair" cons-pair }
-    { "car" object } { "cdr" object }
-}
-{ $description "Explode pairs of the cons cell." }
-{ $see-also cons cons-pair } ;
-
 
 HELP: unify
 { $values
@@ -575,28 +506,20 @@ Other creatures might also like cheese...
 
 You can also use sequences, lists, and tuples as goal definition arguments.
 
-Note that the list used by factlog is specific to factlog and not " { $vocab-link "lists" } " vocabulary list bundled with Factor. A list is created by a chain of " { $link cons-pair } " tuples, but it can be written using the special syntax " { $link \ L( } ".
-
-"
-{ $example
-  "L( Tom Jerry Nibbles )"
-  "L( Tom Jerry Nibbles )"
-}
-"
 The syntax of list descriptions allows you to describe \"head\" and \"tail\" of a list.
 
-    L( HEAD . TAIL )
-    L( ITEM1 ITEM2 ITEM3 . OTHERS )
+    L{ HEAD . TAIL }
+    L{ ITEM1 ITEM2 ITEM3 . OTHERS }
 
 You can also write a quotation that returns an argument as a goal definition argument.
 
-    [ Tom Jerry Nibbles L( ) cons cons cons ]
+    [ Tom Jerry Nibbles L{ } cons cons cons ]
 
 When written as an argument to a goal definition, the following lines have the same meaning as above:
 
-    L( Tom Jerry Nibbles )
-    L( Tom Jerry Nibbles . L( ) ]
-    [ { Tom Jerry Nibbles NIL } " { $link items>list } " ]
+    L{ Tom Jerry Nibbles }
+    L{ Tom Jerry Nibbles . L{ } }
+    [ { Tom Jerry Nibbles } " { $link >list } " ]
 
 Such quotations are called only once when converting the goal definitions to internal representations.
 
@@ -604,8 +527,8 @@ Such quotations are called only once when converting the goal definitions to int
 "
 { $example
   "SYMBOL: Spike
-{ membero Jerry L( Tom Jerry Nibbles ) } query
-{ membero Spike [ Tom Jerry Nibbles L( ) cons cons cons ] } query"
+{ membero Jerry L{ Tom Jerry Nibbles } } query
+{ membero Spike [ Tom Jerry Nibbles L{ } cons cons cons ] } query"
 "t\nf"
 }
 "

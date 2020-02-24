@@ -3,7 +3,7 @@
 
 ! Zebra Puzzle: https://rosettacode.org/wiki/Zebra_puzzle
 
-USING: factlog ;
+USING: factlog lists ;
 IN: factlog.examples.zebra
 
 LOGIC-PREDS: houseso neighboro zebrao watero nexto lefto ;
@@ -17,11 +17,11 @@ TUPLE: house color nationality drink smoke pet ;
 
 { houseso Hs X Y } {
     { (=) Hs                                                                      ! #1
-          L( T{ house f __ norwegian __ __ __ }                                   ! #10
-              T{ house f blue __ __ __ __ }                                       ! #15
-              T{ house f __ __ milk __ __ }                                       ! #9
+          L{ T{ house f __ norwegian __ __ __ }                                   ! #10
+             T{ house f blue __ __ __ __ }                                        ! #15
+             T{ house f __ __ milk __ __ }                                        ! #9
               __
-              __ ) }
+              __ } }
     { membero T{ house f red english __ __ __ } Hs }                              ! #2
     { membero T{ house f __ swede __ __ dog } Hs }                                ! #3
     { membero T{ house f __ dane tea __ __ } Hs }                                 ! #4
@@ -39,9 +39,9 @@ TUPLE: house color nationality drink smoke pet ;
 } rule
 
 { nexto A B Ls } {
-    { appendo __ L( A B . __ ) Ls } ;;
-    { appendo __ L( B A . __ ) Ls }
+    { appendo __ L{ A B . __ } Ls } ;;
+    { appendo __ L{ B A . __ } Ls }
 } rule
 
-{ lefto A B Ls } { appendo __ L( A B . __ ) Ls } rule
+{ lefto A B Ls } { appendo __ L{ A B . __ } Ls } rule
 

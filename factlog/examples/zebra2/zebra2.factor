@@ -1,6 +1,6 @@
 ! Copyright (C) 2019 KUSUMOTO Norio.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: factlog ;
+USING: factlog lists ;
 IN: factlog.examples.zebra2
 
 LOGIC-PREDS: existso righto middleo firsto nexto
@@ -14,29 +14,29 @@ SYMBOLS: prince dunhill pall-mall blend blue-master ;
 
 TUPLE: house color nationality drink smoke pet ;
 {
-    { existso A L( A  __  __  __  __ ) }
-    { existso A L( __  A  __  __  __ ) }
-    { existso A L( __  __  A  __  __ ) }
-    { existso A L( __  __  __  A  __ ) }
-    { existso A L( __  __  __  __  A ) }
+    { existso A L{ A  __  __  __  __ } }
+    { existso A L{ __  A  __  __  __ } }
+    { existso A L{ __  __  A  __  __ } }
+    { existso A L{ __  __  __  A  __ } }
+    { existso A L{ __  __  __  __  A } }
 
-    { righto R L L( L R __ __ __ ) }
-    { righto R L L( __ L R __ __ ) }
-    { righto R L L( __ __ L R __ ) }
-    { righto R L L( __ __ __ L R ) }
+    { righto R L L{ L R __ __ __ } }
+    { righto R L L{ __ L R __ __ } }
+    { righto R L L{ __ __ L R __ } }
+    { righto R L L{ __ __ __ L R } }
 
-    { middleo A L( __ __ A __ __ ) }
+    { middleo A L{ __ __ A __ __ } }
 
-    { firsto A L( A __ __ __ __ ) }
+    { firsto A L{ A __ __ __ __ } }
 
-    { nexto A B L( B A __ __ __ ) }
-    { nexto A B L( __ B A __ __ ) }
-    { nexto A B L( __ __ B A __ ) }
-    { nexto A B L( __ __ __ B A ) }
-    { nexto A B L( A B __ __ __ ) }
-    { nexto A B L( __ A B __ __ ) }
-    { nexto A B L( __ __ A B __ ) }
-    { nexto A B L( __ __ __ A B ) }
+    { nexto A B L{ B A __ __ __ } }
+    { nexto A B L{ __ B A __ __ } }
+    { nexto A B L{ __ __ B A __ } }
+    { nexto A B L{ __ __ __ B A } }
+    { nexto A B L{ A B __ __ __ } }
+    { nexto A B L{ __ A B __ __ } }
+    { nexto A B L{ __ __ A B __ } }
+    { nexto A B L{ __ __ __ A B } }
 } facts
 
 { houseso Hs X Y } {

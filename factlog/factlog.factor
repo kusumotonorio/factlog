@@ -2,7 +2,7 @@
 ! See http://factorcode.org/license.txt for BSD license.
 USING: accessors arrays assocs classes classes.tuple combinators
 combinators.short-circuit compiler.units continuations
-formatting fry io kernel lexer locals make math namespaces
+formatting fry io kernel lexer lists locals make math namespaces
 parser prettyprint prettyprint.backend prettyprint.config
 prettyprint.custom prettyprint.sections quotations sequences
 sequences.deep sets splitting strings words words.symbol
@@ -15,81 +15,87 @@ SYMBOL: __    ! anonymous variable   in prolog: _
 SYMBOL: ;;    ! disjunction, or      in prolog: ;
 SYMBOL: \+    ! negation             in prolog: not, \+
 
-TUPLE: cons-pair cons-car cons-cdr ;
+! TUPLE: cons-pair cons-car cons-cdr ;
 
-C: cons cons-pair
+! C: cons cons-pair
 
-: car ( cons-pair -- car ) cons-car>> ; inline
+! : car ( cons-pair -- car ) cons-car>> ; inline
 
-: cdr ( cons-pair -- cdr ) cons-cdr>> ; inline
+! : cdr ( cons-pair -- cdr ) cons-cdr>> ; inline
 
-: uncons ( cons-pair -- car cdr ) [ car ] [ cdr ] bi ; inline
+! : uncons ( cons-pair -- car cdr ) [ car ] [ cdr ] bi ; inline
 
-SINGLETON: NIL
+! SINGLETON: NIL
 
-MIXIN: factlog-list
-INSTANCE: cons-pair factlog-list
-INSTANCE: NIL factlog-list
+! MIXIN: factlog-list
+! INSTANCE: cons-pair factlog-list
+! INSTANCE: NIL factlog-list
 
-<<
-: items>list ( seq -- cons-pair )
-    dup empty? [ drop NIL ] [
-        reverse unclip swap [ swap cons ] each
-    ] if ;
+! <<
+! : items>list ( seq -- cons-pair )
+!     dup empty? [ drop NIL ] [
+!         reverse unclip swap [ swap cons ] each
+!     ] if ;
 
-<PRIVATE
-:: (parse-list-literal) ( accum right-of-dot? -- accum )
-    accum scan-token {
-        { ")" [ NIL , ] }
-        { "." [ t (parse-list-literal) ] }
-        [
-            parse-datum dup parsing-word? [
-                V{ } clone swap execute-parsing first
-            ] when
-            , right-of-dot? [ ")" expect ] [ f (parse-list-literal) ] if ]
-    } case ;
+! ERROR: list-syntax-error ;
 
-: parse-list-literal ( accum -- accum object )
-    [ f (parse-list-literal) ] { } make items>list ;
-PRIVATE>
+! <PRIVATE
+! :: (parse-list-literal) ( accum right-of-dot? -- accum )
+!     accum scan-token {
+!         { ")" [ NIL , ] }
+!         { "." [ right-of-dot? [
+!                     list-syntax-error
+!                 ] [
+!                     t (parse-list-literal)
+!                 ] if ] }
+!         [
+!             parse-datum dup parsing-word? [
+!                 V{ } clone swap execute-parsing first
+!             ] when
+!             , right-of-dot? [ ")" expect ] [ f (parse-list-literal) ] if ]
+!     } case ;
 
-SYNTAX: L( parse-list-literal suffix! ;
->>
+! : parse-list-literal ( accum -- accum object )
+!     [ f (parse-list-literal) ] { } make items>list ;
+! PRIVATE>
 
-:: list>array ( list -- array )
-    list NIL? [
-        { } clone
-    ] [
-        list [ car ] [ cdr ] bi :> ( l-car l-cdr )
-        l-car cons-pair? [ l-car list>array ] [ list car ] if 1array
-        l-cdr factlog-list? [ l-cdr list>array append ] when
-    ] if ;
+! SYNTAX: L( parse-list-literal suffix! ;
+! >>
 
-SYMBOLS: ) ; delimiter
+! :: list>array ( list -- array )
+!     list NIL? [
+!         { } clone
+!     ] [
+!         list [ car ] [ cdr ] bi :> ( l-car l-cdr )
+!         l-car cons-pair? [ l-car list>array ] [ list car ] if 1array
+!         l-cdr factlog-list? [ l-cdr list>array append ] when
+!     ] if ;
 
-M: factlog-list pprint-delims drop \ L( \ ) ;
+! SYMBOLS: ) ; delimiter
 
-M: factlog-list pprint*
-    [
-        <flow
-        dup pprint-delims [
-            pprint-word
-            dup pprint-narrow? <inset
-            [
-                building get
-                length-limit get
-                '[ dup cons-pair? _ length _ < and ]
-                [ uncons swap , ] while
-            ] { } make
-            [ pprint* ] each
-            dup factlog-list? [
-                NIL? [ "~more~" text ] unless
-            ] [
-                "." text pprint*
-            ] if
-            block>
-        ] dip pprint-word block>
-    ] check-recursion ;
+! M: factlog-list pprint-delims drop \ L( \ ) ;
+
+! M: factlog-list pprint*
+!     [
+!         <flow
+!         dup pprint-delims [
+!             pprint-word
+!             dup pprint-narrow? <inset
+!             [
+!                 building get
+!                 length-limit get
+!                 '[ dup cons-pair? _ length _ < and ]
+!                 [ uncons swap , ] while
+!             ] { } make
+!             [ pprint* ] each
+!             dup factlog-list? [
+!                 NIL? [ "~more~" text ] unless
+!             ] [
+!                 "." text pprint*
+!             ] if
+!             block>
+!         ] dip pprint-word block>
+!     ] check-recursion ;
 
 <PRIVATE
 
@@ -545,12 +551,13 @@ PRIVATE>
 
 ! Built-in predicate definitions -----------------------------------------------------
 
-LOGIC-PREDS: trueo failo
-             varo nonvaro
-             asserto retracto retractallo
-             (<) (>) (>=) (=<) (==) (\==) (=) (\=)
-             writeo writenlo nlo
-             membero appendo lengtho conco listo
+LOGIC-PREDS:
+    trueo failo
+    varo nonvaro
+    asserto retracto retractallo
+    (<) (>) (>=) (=<) (==) (\==) (=) (\=)
+    writeo writenlo nlo
+    membero appendo lengtho conco listo
 ;
 
 { trueo } [ drop t ] callback
@@ -619,19 +626,19 @@ LOGIC-PREDS: trueo failo
 { nlo } [ drop nl t ] callback
 
 
-{ membero X L( X . Z ) } fact
-{ membero X L( Y . Z ) } { membero X Z } rule
+{ membero X L{ X . Z } } fact
+{ membero X L{ Y . Z } } { membero X Z } rule
 
-{ appendo L( ) A A } fact
-{ appendo L( A . X ) Y L( A . Z ) } {
+{ appendo L{ } A A } fact
+{ appendo L{ A . X } Y L{ A . Z } } {
     { appendo X Y Z }
 } rule
 
 
 <PRIVATE LOGIC-VARS: Tail N N1 ; PRIVATE>
 
-{ lengtho L( ) 0 } fact
-{ lengtho L( __ . Tail ) N } {
+{ lengtho L{ } 0 } fact
+{ lengtho L{ __ . Tail } N } {
     { lengtho Tail N1 }
     [ [ N1 of 1 + ] N is ]
 } rule
@@ -639,12 +646,12 @@ LOGIC-PREDS: trueo failo
 
 <PRIVATE LOGIC-VARS: L L1 L2 L3 ; PRIVATE>
 
-{ conco L( ) L L } fact
-{ conco L( X . L1 ) L2 L( X . L3 ) } {
+{ conco L{ } L L } fact
+{ conco L{ X . L1 } L2 L{ X . L3 } } {
     { conco L1 L2 L3 }
 } rule
 
 
-{ listo L( ) } fact
-{ listo L( __ . __ ) } fact
+{ listo L{ } } fact
+{ listo L{ __ . __ } } fact
 

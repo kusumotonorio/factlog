@@ -1,6 +1,6 @@
 ! Copyright (C) 2019 KUSUMOTO Norio.
 ! See http://factorcode.org/license.txt for BSD license.
-USING: tools.test factlog factlog.examples.zebra2 ;
+USING: tools.test factlog lists factlog.examples.zebra2 ;
 IN: factlog.examples.zebra2.tests
 
 {
@@ -8,7 +8,7 @@ IN: factlog.examples.zebra2.tests
         H{
             {
                 Hs
-                L(
+                L{
                     T{ house
                        { color yellow }
                        { nationality norwegian }
@@ -44,7 +44,7 @@ IN: factlog.examples.zebra2.tests
                        { smoke blue-master }
                        { pet dog }
                      }
-                )
+                }
             }
             { X norwegian }
             { Y german }
