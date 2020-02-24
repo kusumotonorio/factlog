@@ -151,7 +151,7 @@ When written as an argument to a goal definition, the following lines have the s
 ```
 L{ Tom Jerry Nibbles }
 L{ Tom Jerry Nibbles . L{ } )
-[ { Tom Jerry Nibbles NIL } >list ]
+[ { Tom Jerry Nibbles } >list ]
 ```
 Such quotations are called only once when converting the goal definitions to internal representations.
 
