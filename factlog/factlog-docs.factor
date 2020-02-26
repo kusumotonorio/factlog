@@ -135,7 +135,7 @@ HELP: callback
 { $examples
   { $code
     "LOGIC-PREDS: N_>_0 ;"
-    "N_>_0 N } [ N of 0 > ] callback"
+    "{ N_>_0 N } [ N of 0 > ] callback"
   }
 }
 { $see-also callbacks } ;
@@ -160,7 +160,7 @@ HELP: clear-pred
 { $values
     { "pred" "a logic predicate" }
 }
-{ $description "Clears all the definition information for the given logic predicate" }
+{ $description "Clears all the definition information for the given logic predicate." }
 { $examples
   { $example
     "USING: factlog prettyprint ;"
