@@ -475,7 +475,7 @@ LOGIC-PREDS:
     asserto retracto retractallo
     (<) (>) (>=) (=<) (==) (\==) (=) (\=)
     writeo writenlo nlo
-    membero appendo lengtho conco listo
+    membero appendo lengtho listo
 ;
 
 { trueo } [ drop t ] callback
@@ -562,13 +562,7 @@ LOGIC-PREDS:
 } rule
 
 
-<PRIVATE LOGIC-VARS: L L1 L2 L3 ; PRIVATE>
-
-{ conco L{ } L L } fact
-{ conco L{ X . L1 } L2 L{ X . L3 } } {
-    { conco L1 L2 L3 }
-} rule
-
+<PRIVATE LOGIC-VARS: L ; PRIVATE>
 
 { listo L{ } } fact
 { listo L{ __ . __ } } fact

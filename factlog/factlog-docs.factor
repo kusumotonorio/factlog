@@ -8,28 +8,44 @@ HELP: !!
 { $var-description "The cut operator.\nUse the cut operator to suppress backtracking." } ;
 
 HELP: (<)
-{ $var-description "A logic predicate. It takes two arguments. It is true if both arguments are evaluated numerically and the first argument is less than the second, otherwise, it is false." } ;
+{ $var-description "A logic predicate. It takes two arguments. It is true if both arguments are evaluated numerically and the first argument is less than the second, otherwise, it is false." }
+{ $syntax "{ (<) X Y }" }
+{ $see-also (>) (>=) (==) (=<) } ;
 
 HELP: (=)
-{ $var-description "A logic predicate. It unifies two arguments." } ;
+{ $var-description "A logic predicate. It unifies two arguments." }
+{ $syntax "{ (=) X Y }" }
+{ $see-also (\=) is } ;
 
 HELP: (=<)
-{ $var-description "A logic predicate. It takes two arguments. It is true if both arguments are evaluated numerically and the first argument equals or is less than the second, otherwise, it is false." } ;
+{ $var-description "A logic predicate. It takes two arguments. It is true if both arguments are evaluated numerically and the first argument equals or is less than the second, otherwise, it is false." }
+{ $syntax "{ (=<) X Y }" }
+{ $see-also (>) (>=) (==) (<) } ;
 
 HELP: (==)
-{ $var-description "A logic predicate. It tests for equality of two arguments. Evaluating two arguments, true if they are the same, false if they are different." } ;
+{ $var-description "A logic predicate. It tests for equality of two arguments. Evaluating two arguments, true if they are the same, false if they are different." }
+{ $syntax "{ (==) X Y }" }
+{ $see-also (>) (>=) (=<) (<) =:= =\= } ;
 
 HELP: (>)
-{ $var-description "A logic predicate. It is true if both arguments are evaluated numerically and the first argument is greater than the second, otherwise, it is false." } ;
+{ $var-description "A logic predicate. It is true if both arguments are evaluated numerically and the first argument is greater than the second, otherwise, it is false." }
+{ $syntax "{ (>) X Y }" }
+{ $see-also (>=) (==) (=<) (<) } ;
 
 HELP: (>=)
-{ $var-description "A logic predicate. It is true if both arguments are evaluated numerically and the first argument equals or is greater than the second, otherwise, it is false." } ;
+{ $var-description "A logic predicate. It is true if both arguments are evaluated numerically and the first argument equals or is greater than the second, otherwise, it is false." }
+{ $syntax "{ (>=) X Y }" }
+{ $see-also (>) (==) (=<) (<) } ;
 
 HELP: (\=)
-{ $var-description "A logic predicate.  It will be true when such a unification fails. Note that " { $snippet "(\\=)" } " does not actually do the unification." } ;
+{ $var-description "A logic predicate. It will be true when such a unification fails. Note that " { $snippet "(\\=)" } " does not actually do the unification." }
+{ $syntax "{ (\\=) X Y }" }
+{ $see-also (=) } ;
 
 HELP: (\==)
-{ $var-description "A logic predicate. It tests for inequality of two arguments. Evaluating two arguments, true if they are different, false if they are the same." } ;
+{ $var-description "A logic predicate. It tests for inequality of two arguments. Evaluating two arguments, true if they are different, false if they are the same." }
+{ $syntax "{ (\\==) X Y }" }
+;
 
 HELP: ;;
 { $var-description "Is used to represent disjunction. The code below it has the same meaning as the code below it.
@@ -48,14 +64,16 @@ HELP: =:=
     { "quot1" quotation } { "quot2" quotation }
     { "goal" logic-goal }
 }
-{ $description "Each of the two quotations takes an environment and returns a value. " { $snippet "=:=" } " returns the internal representation of the goal which returns t if values returned by these quotations are same.\n" { $snippet "=:=" } " is intended to be used in a quotation. If there is a quotation in the definition of rule, factlog uses the internal definition of the goal obtained by calling it." } ;
+{ $description "Each of the two quotations takes an environment and returns a value. " { $snippet "=:=" } " returns the internal representation of the goal which returns t if values returned by these quotations are same.\n" { $snippet "=:=" } " is intended to be used in a quotation. If there is a quotation in the definition of rule, factlog uses the internal definition of the goal obtained by calling it." }
+{ $see-also (==) =\= } ;
 
 HELP: =\=
 { $values
     { "quot1" quotation } { "quot2" quotation }
     { "goal" logic-goal }
 }
-{ $description "Each of the two quotations takes an environment and returns a value. " { $snippet "=\\=" } " returns the internal representation of the goal which returns t if values returned by these quotations are not same.\n" { $snippet "=\\=" } " is intended to be used in a quotation. If there is a quotation in the definition of rule, factlog uses the internal definition of the goal obtained by calling it." } ;
+{ $description "Each of the two quotations takes an environment and returns a value. " { $snippet "=\\=" } " returns the internal representation of the goal which returns t if values returned by these quotations are not same.\n" { $snippet "=\\=" } " is intended to be used in a quotation. If there is a quotation in the definition of rule, factlog uses the internal definition of the goal obtained by calling it." }
+{ $see-also (==) =:= } ;
 
 HELP: LOGIC-PREDS:
 { $description "Creates a new logic predicate for every token until the ;." }
@@ -125,7 +143,22 @@ HELP: __
 { $var-description "An anonymous logic variable.\nUse in place of a regular logic variable when you do not need its name and value." } ;
 
 HELP: appendo
-{ $var-description "A logic predicate. Add a new element to the beginning of the list." } ;
+{ $var-description "A logic predicate. Concatenate two lists." }
+{ $syntax "{ appendo List1 List1+List2 }" }
+{ $examples
+  { $example
+    "USING: factlog lists prettyprint ;"
+    "IN: scratchpad"
+    ""
+    "SYMBOLS: Tom Jerry Nibbles ;"
+    "LOGIC-VARS: X Y ;"
+    ""
+    "{ appendo L{ Tom } L{ Jerry Nibbles } L{ Jerry Nibbles Tom } } query ."
+    "{ appendo L{ Tom } L{ Jerry Nibbles } X } query ."
+    "{ appendo X Y L{ Tom Jerry Nibbles } } query ."
+    "f\n{ H{ { X L{ Tom Jerry Nibbles } } } }\n{\n    H{ { X +nil+ } { Y L{ Tom Jerry Nibbles } } }\n    H{ { X L{ Tom } } { Y L{ Jerry Nibbles } } }\n    H{ { X L{ Tom Jerry } } { Y L{ Nibbles } } }\n    H{ { X L{ Tom Jerry Nibbles } } { Y +nil+ } }\n}"
+  }
+} ;
 
 HELP: callback
 { $values
@@ -153,7 +186,6 @@ HELP: callbacks
     { F_is_F2_*_N F F2 N } [ dup [ F2 of ] [ N of ] bi * F unify ] }
 } callbacks" }
 }
-
 { $see-also callback } ;
 
 HELP: clear-pred
@@ -180,9 +212,6 @@ HELP: clear-pred
   }
 }
 { $see-also retract retract-all } ;
-
-HELP: conco
-{ $var-description "A logic predicate. Concatenate two lists." } ;
 
 HELP: fact
 { $values
@@ -228,6 +257,7 @@ HELP: facts
 
 HELP: failo
 { $var-description "A built-in logic predicate. { " { $snippet "failo" } " } is a goal that is always " { $link f } "." }
+{ $syntax "{ failo }" }
 { $see-also trueo } ;
 
 HELP: is
@@ -238,20 +268,62 @@ HELP: is
 { $description "Takes a quotation and a logic variable to be unified. Each of the two quotations takes an environment and returns a value. " { $snippet "is" } " returns the internal representation of the goal.\n" { $snippet "is" } " is intended to be used in a quotation. If there is a quotation in the definition of rule, factlog uses the internal definition of the goal obtained by calling it." } ;
 
 HELP: lengtho
-{ $var-description "A logic predicate. Instantiate the length of the list." } ;
+{ $var-description "A logic predicate. Instantiate the length of the list." }
+{ $syntax "{ lengtho List X }" }
+{ $examples
+  { $example
+    "USING: factlog lists prettyprint ;"
+    "IN: scratchpad"
+    ""
+    "SYMBOLS: Tom Jerry Nibbles ;"
+    "LOGIC-VARS: X ;"
+    ""
+    "{ lengtho L{ Tom Jerry Nibbles } 3 } query ."
+    "{ lengtho L{ Tom Jerry Nibbles } X } query ."
+    "t\n{ H{ { X 3 } } }"
+  }
+} ;
 
 HELP: listo
-{ $var-description "A logic predicate. Takes a single argument and checks to see if it is a list." } ;
+{ $var-description "A logic predicate. Takes a single argument and checks to see if it is a list." }
+{ $syntax "{ listo X }" }
+{ $examples
+  { $example
+    "USING: factlog lists prettyprint ;"
+    "IN: scratchpad"
+    ""
+    "SYMBOLS: Tom Jerry Nibbles ;"
+    ""
+    "{ listo L{ Jerry Nibbles } } query ."
+    "{ listo Tom } query ."
+    "t\nf"
+  }
+} ;
 
 HELP: membero
-{ $var-description "A logic predicate for the relationship an element is in a list." } ;
+{ $var-description "A logic predicate for the relationship an element is in a list." }
+{ $syntax "{ membero X List }" }
+{ $examples
+  { $example
+    "USING: factlog lists prettyprint ;"
+    "IN: scratchpad"
+    ""
+    "SYMBOLS: Tom Jerry Nibbles Spike ;"
+    ""
+    "{ membero Jerry L{ Tom Jerry Nibbles } } query ."
+    "{ membero Spike L{ Tom Jerry Nibbles } } query ."
+    "t\nf"
+  }
+} ;
 
 HELP: nlo
 { $var-description "A logic predicate. Print line breaks." }
+{ $syntax "{ nlo }" }
 { $see-also writeo writenlo } ;
 
 HELP: nonvaro
 { $var-description "A logic predicate. { " { $snippet "nonvaro" } " } takes a single argument and is true if its argument is not a logic variable or is a concrete logic variable." }
+{ $syntax "{ nonvaro X }" }
 { $see-also varo } ;
 
 HELP: notrace
@@ -438,6 +510,7 @@ HELP: trace
 
 HELP: trueo
 { $var-description "A logic predicate. { " { $snippet "trueo" } " } is a goal that is always " { $link t } "." }
+{ $syntax "{ trueo }" }
 { $see-also failo } ;
 
 HELP: unify
@@ -449,14 +522,17 @@ HELP: unify
 
 HELP: varo
 { $var-description "A logic predicate. " { $snippet "varo" } " takes a argument and is true if it is a logic variable with no value." }
+{ $syntax "{ varo X }" }
 { $see-also nonvaro } ;
 
 HELP: writenlo
 { $var-description "A logic predicate. print a single sequence or string and return a new line." }
+{ $syntax "{ writenlo X }" }
 { $see-also writeo nlo } ;
 
 HELP: writeo
 { $var-description "A logic predicate. print a single sequence or string of characters." }
+{ $syntax "{ writeo X }" }
 { $see-also writenlo nlo } ;
 
 ARTICLE: "factlog" "How to use factlog"
