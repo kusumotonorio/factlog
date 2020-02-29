@@ -15,8 +15,6 @@ SYMBOL: __    ! anonymous variable   in prolog: _
 SYMBOL: ;;    ! disjunction, or      in prolog: ;
 SYMBOL: \+    ! negation             in prolog: not, \+
 
-M: +nil+ pprint* drop "L{ }" text ;
-
 <PRIVATE
 
 <<
