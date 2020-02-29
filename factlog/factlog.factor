@@ -15,6 +15,8 @@ SYMBOL: __    ! anonymous variable   in prolog: _
 SYMBOL: ;;    ! disjunction, or      in prolog: ;
 SYMBOL: \+    ! negation             in prolog: not, \+
 
+M: +nil+ pprint* drop "L{ }" text ;
+
 <PRIVATE
 
 <<
@@ -441,6 +443,45 @@ PRIVATE>
     } =\=-pred defs<<
     =\=-goal ;
 
+:: assert-rule ( quot: ( env -- ) -- goal )
+    quot collect-logic-vars :> args
+    quot "[ %u assert-rule ]" sprintf <pred> :> assert-pred
+    assert-pred args logic-goal boa :> assert-goal
+    V{
+        { assert-goal [| env | env quot call( env -- ) t ] }
+    } assert-pred defs<<
+    assert-goal ;
+
+:: retract-rule ( quot: ( env -- ) -- goal )
+    quot collect-logic-vars :> args
+    quot "[ %u retract-rule ]" sprintf <pred> :> retract-pred
+    retract-pred args logic-goal boa :> retract-goal
+    V{
+        {
+            retract-goal
+            [| env |
+                env quot call( env -- head-goal ) retract
+                t
+            ]
+        }
+    } retract-pred defs<<
+    retract-goal ;
+
+:: retract-all-rule ( quot: ( env -- ) -- goal )
+    quot collect-logic-vars :> args
+    quot "[ %u retract-all-rule ]" sprintf <pred> :> retract-all-pred
+    retract-all-pred args logic-goal boa :> retract-all-goal
+    V{
+        {
+            retract-all-goal
+            [| env |
+                env quot call( env -- head-goal ) retract-all
+                t
+            ]
+        }
+    } retract-all-pred defs<<
+    retract-all-goal ;
+
 :: query-n ( goal-def/defs n/f -- bindings-array/success? )
     *trace?* get-global :> trace?
     0 :> n!
@@ -472,7 +513,6 @@ PRIVATE>
 LOGIC-PREDS:
     trueo failo
     varo nonvaro
-    asserto retracto retractallo
     (<) (>) (>=) (=<) (==) (\==) (=) (\=)
     writeo writenlo nlo
     membero appendo lengtho listo
@@ -484,13 +524,6 @@ LOGIC-PREDS:
 
 
 <PRIVATE LOGIC-VARS: A B C X Y Z ; PRIVATE>
-
-{ asserto X } [ X of call( -- ) t ] callback
-
-{ retracto X } [ X of retract t ] callback
-
-{ retractallo X } [ X of retract-all t ] callback
-
 
 { varo X } [ X of logic-var? ] callback
 

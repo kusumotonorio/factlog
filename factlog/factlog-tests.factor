@@ -4,6 +4,7 @@ USING: tools.test factlog lists assocs math kernel namespaces
 accessors sequences
 factlog.examples.factorial
 factlog.examples.fib
+factlog.examples.fib2
 factlog.examples.hanoi
 factlog.examples.hanoi2
 factlog.examples.money

@@ -144,7 +144,7 @@ HELP: __
 
 HELP: appendo
 { $var-description "A logic predicate. Concatenate two lists." }
-{ $syntax "{ appendo List1 List1+List2 }" }
+{ $syntax "{ appendo List1 List2 List1+List2 }" }
 { $examples
   { $example
     "USING: factlog lists prettyprint ;"
@@ -156,7 +156,7 @@ HELP: appendo
     "{ appendo L{ Tom } L{ Jerry Nibbles } L{ Jerry Nibbles Tom } } query ."
     "{ appendo L{ Tom } L{ Jerry Nibbles } X } query ."
     "{ appendo X Y L{ Tom Jerry Nibbles } } query ."
-    "f\n{ H{ { X L{ Tom Jerry Nibbles } } } }\n{\n    H{ { X +nil+ } { Y L{ Tom Jerry Nibbles } } }\n    H{ { X L{ Tom } } { Y L{ Jerry Nibbles } } }\n    H{ { X L{ Tom Jerry } } { Y L{ Nibbles } } }\n    H{ { X L{ Tom Jerry Nibbles } } { Y +nil+ } }\n}"
+    "f\n{ H{ { X L{ Tom Jerry Nibbles } } } }\n{\n    H{ { X L{ } } { Y L{ Tom Jerry Nibbles } } }\n    H{ { X L{ Tom } } { Y L{ Jerry Nibbles } } }\n    H{ { X L{ Tom Jerry } } { Y L{ Nibbles } } }\n    H{ { X L{ Tom Jerry Nibbles } } { Y L{ } } }\n}"
   }
 } ;
 
@@ -267,6 +267,40 @@ HELP: is
 }
 { $description "Takes a quotation and a logic variable to be unified. Each of the two quotations takes an environment and returns a value. " { $snippet "is" } " returns the internal representation of the goal.\n" { $snippet "is" } " is intended to be used in a quotation. If there is a quotation in the definition of rule, factlog uses the internal definition of the goal obtained by calling it." } ;
 
+HELP: assert-rule
+{ $values
+    { "quot" quotation }
+    { "goal" logic-goal }
+}
+{ $description "Used to add facts and rules to the database from a rule description." }
+{ $examples
+  "In this example, the calculated values are memorized to reduce unnecessary calculation work."
+  { $example
+    "USING: factlog kernel lists assocs locals math prettyprint ;"
+    "IN: scratchpad"
+    ""
+    "LOGIC-PREDS: fibo ;"
+    "LOGIC-VARS: F F1 F2 N N1 N2 ;"
+    ""
+    "{ fibo 1 1 } fact"
+    "{ fibo 2 1 } fact"
+    "{ fibo N F } {"
+    "    { (>) N 2 }"
+    "    [ [ N of 1 - ] N1 is ] { fibo N1 F1 }"
+    "    [ [ N of 2 - ] N2 is ] { fibo N2 F2 }"
+    "    [ [ [ F1 of ] [ F2 of ] bi + ] F is ]"
+    "    ["
+    "        ["
+    "            [ N of ] [ F of ] bi"
+    "            [let :> ( nv fv ) { fibo nv fv } !! rule* ]"
+    "        ] assert-rule ]"
+    "} rule"
+    ""
+    "{ fibo 10 F } query ."
+    "{ H{ { F 55 } } }"
+  }
+} ;
+
 HELP: lengtho
 { $var-description "A logic predicate. Instantiate the length of the list." }
 { $syntax "{ lengtho List X }" }
@@ -322,7 +356,7 @@ HELP: nlo
 { $see-also writeo writenlo } ;
 
 HELP: nonvaro
-{ $var-description "A logic predicate. { " { $snippet "nonvaro" } " } takes a single argument and is true if its argument is not a logic variable or is a concrete logic variable." }
+{ $var-description "A logic predicate. "{ $snippet "nonvaro" } " takes a single argument and is true if its argument is not a logic variable or is a concrete logic variable." }
 { $syntax "{ nonvaro X }" }
 { $see-also varo } ;
 
@@ -401,7 +435,7 @@ HELP: retract
     "{ H{ { X Jerry } } H{ { X Nibbles } } }\n{ H{ { X Nibbles } } }"
   }
 }
-{ $see-also retract-all clear-pred } ;
+{ $see-also retract-all clear-pred retract-rule } ;
 
 HELP: retract-all
 { $values
@@ -425,7 +459,23 @@ HELP: retract-all
     "{ H{ { X Jerry } } H{ { X Nibbles } } }\nf"
   }
 }
-{ $see-also retract clear-pred } ;
+{ $see-also retract clear-pred retract-all-rule } ;
+
+HELP: retract-all-rule
+{ $values
+    { "quot" quotation }
+    { "goal" logic-goal }
+}
+{ $description "Execute " { $link retract-all } " to the database in a rule description." }
+{ $see-also retract-rule retract-all } ;
+
+HELP: retract-rule
+{ $values
+    { "quot" quotation }
+    { "goal" logic-goal }
+}
+{ $description "Execute " { $link retract } " to the database in a rule description." }
+{ $see-also retract-all-rule retract } ;
 
 HELP: rule
 { $values
