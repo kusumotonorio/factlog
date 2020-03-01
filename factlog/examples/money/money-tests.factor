@@ -1,4 +1,4 @@
-! Copyright (C) 2019 Your name.
+! Copyright (C) 2019-2020 KUSUMOTO Norio.
 ! See http://factorcode.org/license.txt for BSD license.
 USING: tools.test factlog lists factlog.examples.money ;
 IN: factlog.examples.money.tests
