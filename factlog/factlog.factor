@@ -411,31 +411,27 @@ PRIVATE>
     } is-pred defs<<
     is-goal ;
 
-:: =:= ( quot1: ( env -- value ) quot2: ( env -- value ) -- goal )
-    quot1 quot2 [ collect-logic-vars ] bi@ union :> args
-    quot1 quot2 "[ %u %u =:= ]" sprintf <pred> :> =:=-pred
+:: =:= ( quot: ( env -- n m ) -- goal )
+    quot collect-logic-vars :> args
+    quot "[ %u =:= ]" sprintf <pred> :> =:=-pred
     =:=-pred args logic-goal boa :> =:=-goal
     V{
         {
             =:=-goal
-            [| env |
-                env quot1 call( env -- value )
-                env quot2 call( env -- value )
+            [| env | env quot call( env -- n m )
                 2dup [ number? ] both? [ = ] [ 2drop f ] if ]
         }
     } =:=-pred defs<<
     =:=-goal ;
 
-:: =\= ( quot1: ( env -- value ) quot2: ( env -- value ) -- goal )
-    quot1 quot2 [ collect-logic-vars ] bi@ union :> args
-    quot1 quot2 "[ %u %u =\\= ]" sprintf <pred> :> =\=-pred
+:: =\= ( quot: ( env -- n m ) -- goal )
+    quot collect-logic-vars :> args
+    quot "[ %u =\\= ]" sprintf <pred> :> =\=-pred
     =\=-pred args logic-goal boa :> =\=-goal
     V{
         {
             =\=-goal
-            [| env |
-                env quot1 call( env -- value )
-                env quot2 call( env -- value )
+            [| env | env quot call( env -- n m )
                 2dup [ number? ] both? [ = not ] [ 2drop f ] if ]
         }
     } =\=-pred defs<<

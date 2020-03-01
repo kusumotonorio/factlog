@@ -61,18 +61,18 @@ Gh { Gb6 } rule" }
 
 HELP: =:=
 { $values
-    { "quot1" quotation } { "quot2" quotation }
+    { "quot" quotation }
     { "goal" logic-goal }
 }
-{ $description "Each of the two quotations takes an environment and returns a value. " { $snippet "=:=" } " returns the internal representation of the goal which returns t if values returned by these quotations are same.\n" { $snippet "=:=" } " is intended to be used in a quotation. If there is a quotation in the definition of rule, factlog uses the internal definition of the goal obtained by calling it." }
+{ $description "The quotations takes an environment and returns two values. " { $snippet "=:=" } " returns the internal representation of the goal which returns t if values returned by the quotation are same numbers.\n" { $snippet "=:=" } " is intended to be used in a quotation. If there is a quotation in the definition of rule, factlog uses the internal definition of the goal obtained by calling it." }
 { $see-also (==) =\= } ;
 
 HELP: =\=
 { $values
-    { "quot1" quotation } { "quot2" quotation }
+    { "quot" quotation }
     { "goal" logic-goal }
 }
-{ $description "Each of the two quotations takes an environment and returns a value. " { $snippet "=\\=" } " returns the internal representation of the goal which returns t if values returned by these quotations are not same.\n" { $snippet "=\\=" } " is intended to be used in a quotation. If there is a quotation in the definition of rule, factlog uses the internal definition of the goal obtained by calling it." }
+{ $description "The quotations takes an environment and returns two values. " { $snippet "=\\=" } " returns the internal representation of the goal which returns t if values returned by the quotation are numbers and are not same.\n" { $snippet "=\\=" } " is intended to be used in a quotation. If there is a quotation in the definition of rule, factlog uses the internal definition of the goal obtained by calling it." }
 { $see-also (==) =:= } ;
 
 HELP: LOGIC-PREDS:
@@ -272,7 +272,7 @@ HELP: invoke
     { "quot" quotation }
     { "goal" logic-goal }
 }
-{ $description "Creates a goal which uses the values of obtained logic variables. It can be used to add new rules to or drop rules from the database while a " { $link query } " is running.\nThe argument " { $snippet "quot" } " must not return any values, the created goal always return " { $link t } "." }
+{ $description "Creates a goal which uses the values of obtained logic variables. It can be used to add new rules to or drop rules from the database while a " { $link query } " is running.\nThe argument " { $snippet "quot" } " must not return any values, the created goal always return " { $link t } ".\n" { $snippet "invoke" } " is intended to be used in a quotation. If there is a quotation in the definition of rule, factlog uses the internal definition of the goal obtained by calling it." }
 { $examples
   "In this example, the calculated values are memorized to eliminate recalculation."
   { $example
@@ -307,7 +307,7 @@ HELP: invoke*
     { "quot" quotation }
     { "goal" logic-goal }
 }
-{ $description "Creates a goal which uses the values of obtained logic variables. The difference with " { $link invoke } " is that " { $snippet "quot" } " returns " { $link t } " or " { $link f } ", and the created goal returns it." }
+{ $description "Creates a goal which uses the values of obtained logic variables. The difference with " { $link invoke } " is that " { $snippet "quot" } " returns " { $link t } " or " { $link f } ", and the created goal returns it.\n" { $snippet "invoke*" } " is intended to be used in a quotation. If there is a quotation in the definition of rule, factlog uses the internal definition of the goal obtained by calling it." }
 { $see-also invoke } ;
 
 HELP: lengtho
