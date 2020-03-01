@@ -272,7 +272,7 @@ HELP: invoke
     { "quot" quotation }
     { "goal" logic-goal }
 }
-{ $description "Creates a goal using the values of obtained logic variables. It can be used to add new rules to or drop rules from the database while a " { $link query } " is running.\nThe argument " { $snippet "quot" } " must not return any values, the created goal always return " { $link t } "." }
+{ $description "Creates a goal which uses the values of obtained logic variables. It can be used to add new rules to or drop rules from the database while a " { $link query } " is running.\nThe argument " { $snippet "quot" } " must not return any values, the created goal always return " { $link t } "." }
 { $examples
   "In this example, the calculated values are memorized to eliminate recalculation."
   { $example
@@ -307,7 +307,7 @@ HELP: invoke*
     { "quot" quotation }
     { "goal" logic-goal }
 }
-{ $description "Creates a goal using the values of obtained logic variables. The difference with " { $link invoke } " is that " { $snippet "quot" } " returns " { $link t } " or " { $link f } ", and the created goal returns it." }
+{ $description "Creates a goal which uses the values of obtained logic variables. The difference with " { $link invoke } " is that " { $snippet "quot" } " returns " { $link t } " or " { $link f } ", and the created goal returns it." }
 { $see-also invoke } ;
 
 HELP: lengtho
