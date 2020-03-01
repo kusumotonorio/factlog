@@ -921,7 +921,6 @@ mouseo clear-pred
 } $nl
 "You can " { $strong "trace" } " factlog's execution. The word to do this is " { $link trace } "." $nl
 "The word to stop tracing is " { $link notrace } "." $nl
-"Thank you, old friends. I was able to explain most of the functions of factlog with fun. Have a good time together with fun fights. See you." $nl
 "Here is a Prolog definition for the factorial predicate " { $snippet "factorial" } "." $nl
 "factorial(0, 1)." $nl
 "factorial(N, F) :- N > 0, N2 is N - 1, factorial(N2, F2), F is F2 * N." $nl
