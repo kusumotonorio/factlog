@@ -441,44 +441,23 @@ PRIVATE>
     } =\=-pred defs<<
     =\=-goal ;
 
-:: assert-rule ( quot: ( env -- ) -- goal )
+:: invoke ( quot: ( env -- ) -- goal )
     quot collect-logic-vars :> args
-    quot "[ %u assert-rule ]" sprintf <pred> :> assert-pred
-    assert-pred args logic-goal boa :> assert-goal
+    quot "[ %u invoke ]" sprintf <pred> :> invoke-pred
+    invoke-pred args logic-goal boa :> invoke-goal
     V{
-        { assert-goal [| env | env quot call( env -- ) t ] }
-    } assert-pred defs<<
-    assert-goal ;
+        { invoke-goal [| env | env quot call( env -- ) t ] }
+    } invoke-pred defs<<
+    invoke-goal ;
 
-:: retract-rule ( quot: ( env -- ) -- goal )
+:: invoke* ( quot: ( env -- ? ) -- goal )
     quot collect-logic-vars :> args
-    quot "[ %u retract-rule ]" sprintf <pred> :> retract-pred
-    retract-pred args logic-goal boa :> retract-goal
+    quot "[ %u invoke* ]" sprintf <pred> :> invoke*-pred
+    invoke*-pred args logic-goal boa :> invoke*-goal
     V{
-        {
-            retract-goal
-            [| env |
-                env quot call( env -- head-goal ) retract
-                t
-            ]
-        }
-    } retract-pred defs<<
-    retract-goal ;
-
-:: retract-all-rule ( quot: ( env -- ) -- goal )
-    quot collect-logic-vars :> args
-    quot "[ %u retract-all-rule ]" sprintf <pred> :> retract-all-pred
-    retract-all-pred args logic-goal boa :> retract-all-goal
-    V{
-        {
-            retract-all-goal
-            [| env |
-                env quot call( env -- head-goal ) retract-all
-                t
-            ]
-        }
-    } retract-all-pred defs<<
-    retract-all-goal ;
+        { invoke*-goal [| env | env quot call( env -- ? ) ] }
+    } invoke*-pred defs<<
+    invoke*-goal ;
 
 :: query-n ( goal-def/defs n/f -- bindings-array/success? )
     *trace?* get-global :> trace?

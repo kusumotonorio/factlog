@@ -267,14 +267,14 @@ HELP: is
 }
 { $description "Takes a quotation and a logic variable to be unified. Each of the two quotations takes an environment and returns a value. " { $snippet "is" } " returns the internal representation of the goal.\n" { $snippet "is" } " is intended to be used in a quotation. If there is a quotation in the definition of rule, factlog uses the internal definition of the goal obtained by calling it." } ;
 
-HELP: assert-rule
+HELP: invoke
 { $values
     { "quot" quotation }
     { "goal" logic-goal }
 }
-{ $description "Used to add facts and rules to the database from a rule description." }
+{ $description "Creates a goal using the values of obtained logic variables. It can be used to add new rules to or drop rules from the database while a " { $link query } " is running.\nThe argument " { $snippet "quot" } " must not return any values, the created goal always return " { $link t } "." }
 { $examples
-  "In this example, the calculated values are memorized to reduce unnecessary calculation work."
+  "In this example, the calculated values are memorized to eliminate recalculation."
   { $example
     "USING: factlog kernel lists assocs locals math prettyprint ;"
     "IN: scratchpad"
@@ -293,13 +293,22 @@ HELP: assert-rule
     "        ["
     "            [ N of ] [ F of ] bi"
     "            [let :> ( nv fv ) { fibo nv fv } !! rule* ]"
-    "        ] assert-rule ]"
+    "        ] invoke ]"
     "} rule"
     ""
     "{ fibo 10 F } query ."
     "{ H{ { F 55 } } }"
   }
-} ;
+}
+{ $see-also invoke* } ;
+
+HELP: invoke*
+{ $values
+    { "quot" quotation }
+    { "goal" logic-goal }
+}
+{ $description "Creates a goal using the values of obtained logic variables. The difference with " { $link invoke } " is that " { $snippet "quot" } " returns " { $link t } " or " { $link f } ", and the created goal returns it." }
+{ $see-also invoke } ;
 
 HELP: lengtho
 { $var-description "A logic predicate. Instantiate the length of the list." }
@@ -435,7 +444,7 @@ HELP: retract
     "{ H{ { X Jerry } } H{ { X Nibbles } } }\n{ H{ { X Nibbles } } }"
   }
 }
-{ $see-also retract-all clear-pred retract-rule } ;
+{ $see-also retract-all clear-pred } ;
 
 HELP: retract-all
 { $values
@@ -459,23 +468,7 @@ HELP: retract-all
     "{ H{ { X Jerry } } H{ { X Nibbles } } }\nf"
   }
 }
-{ $see-also retract clear-pred retract-all-rule } ;
-
-HELP: retract-all-rule
-{ $values
-    { "quot" quotation }
-    { "goal" logic-goal }
-}
-{ $description "Execute " { $link retract-all } " to the database in a rule description." }
-{ $see-also retract-rule retract-all } ;
-
-HELP: retract-rule
-{ $values
-    { "quot" quotation }
-    { "goal" logic-goal }
-}
-{ $description "Execute " { $link retract } " to the database in a rule description." }
-{ $see-also retract-all-rule retract } ;
+{ $see-also retract clear-pred } ;
 
 HELP: rule
 { $values
