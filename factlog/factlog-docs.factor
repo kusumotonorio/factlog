@@ -5,7 +5,39 @@ USING: arrays help.markup help.syntax kernel quotations sequences
 IN: factlog
 
 HELP: !!
-{ $var-description "The cut operator.\nUse the cut operator to suppress backtracking." } ;
+{ $var-description "The cut operator.\nUse the cut operator to suppress backtracking." }
+{ $examples
+  "In the following example, it is used to define that cats generally eat mice, but Tom does not."
+  { $example
+    "USING: factlog prettyprint ;"
+    "IN: scratchpad"
+    ""
+    "LOGIC-PREDS: is-ao consumeso ;"
+    "LOGIC-VARS: X Y ;"
+    "SYMBOLS: Tom Jerry Nibbles"
+    "         mouse cat milk cheese fresh-milk Emmentaler ;"
+    ""
+    "{"
+    "    { is-ao Tom cat }"
+    "    { is-ao Jerry mouse }"
+    "    { is-ao Nibbles mouse }"
+    "    { is-ao fresh-milk milk }"
+    "    { is-ao Emmentaler cheese }"
+    "} facts"
+    ""
+    "{ consumeso X milk } {"
+    "    { is-ao X mouse } ;;"
+    "    { is-ao X cat }"
+    "} rule"
+    ""
+    "{ consumeso X cheese } { is-ao X mouse } rule"
+    "{ consumeso Tom mouse } { !! f } rule"
+    "{ consumeso X mouse } { is-ao X cat } rule"
+    ""
+    "{ { consumeso Tom X } { is-ao Y X } } query ."
+    "{ H{ { X milk } { Y fresh-milk } } }"
+  }
+} ;
 
 HELP: (<)
 { $var-description "A logic predicate. It takes two arguments. It is true if both arguments are evaluated numerically and the first argument is less than the second, otherwise, it is false." }
@@ -140,7 +172,36 @@ HELP: \+
 } ;
 
 HELP: __
-{ $var-description "An anonymous logic variable.\nUse in place of a regular logic variable when you do not need its name and value." } ;
+{ $var-description "An anonymous logic variable.\nUse in place of a regular logic variable when you do not need its name and value." }
+{ $examples
+  { $example
+    "USING: factlog prettyprint ;"
+    "IN: scratchpad"
+    ""
+    "SYMBOLS: Tom Jerry Nibbles ;"
+    "TUPLE: house living dining kitchen in-the-wall ;"
+    "LOGIC-PREDS: houseo ;"
+    "LOGIC-VARS: X ;"
+
+    ""
+    "{ houseo T{ house"
+    "             { living Tom }"
+    "             { dining f }"
+    "             { kitchen Nibbles }"
+    "             { in-the-wall Jerry }"
+    "         }"
+    "} fact"
+    ""
+    "{ houseo T{ house"
+    "             { living __ }"
+    "             { dining __ }"
+    "             { kitchen X }"
+    "             { in-the-wall __ }"
+    "         }"
+    "} query ."
+    "{ H{ { X Nibbles } } }"
+  }
+} ;
 
 HELP: appendo
 { $var-description "A logic predicate. Concatenate two lists." }
@@ -153,10 +214,10 @@ HELP: appendo
     "SYMBOLS: Tom Jerry Nibbles ;"
     "LOGIC-VARS: X Y ;"
     ""
-    "{ appendo L{ Tom } L{ Jerry Nibbles } L{ Jerry Nibbles Tom } } query ."
     "{ appendo L{ Tom } L{ Jerry Nibbles } X } query ."
+    "{ appendo L{ Tom } L{ Jerry Nibbles } L{ Jerry Nibbles Tom } } query ."
     "{ appendo X Y L{ Tom Jerry Nibbles } } query ."
-    "f\n{ H{ { X L{ Tom Jerry Nibbles } } } }\n{\n    H{ { X L{ } } { Y L{ Tom Jerry Nibbles } } }\n    H{ { X L{ Tom } } { Y L{ Jerry Nibbles } } }\n    H{ { X L{ Tom Jerry } } { Y L{ Nibbles } } }\n    H{ { X L{ Tom Jerry Nibbles } } { Y L{ } } }\n}"
+    "{ H{ { X L{ Tom Jerry Nibbles } } } }\nf\n{\n    H{ { X L{ } } { Y L{ Tom Jerry Nibbles } } }\n    H{ { X L{ Tom } } { Y L{ Jerry Nibbles } } }\n    H{ { X L{ Tom Jerry } } { Y L{ Nibbles } } }\n    H{ { X L{ Tom Jerry Nibbles } } { Y L{ } } }\n}"
   }
 } ;
 

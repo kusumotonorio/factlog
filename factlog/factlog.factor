@@ -151,7 +151,6 @@ DEFER: unify*
           [ f loop?! ]
         } cond
     ] while
-
     ret? [
         t ret-value!
         x y [ logic-goal? ] both? [
@@ -418,7 +417,8 @@ PRIVATE>
     V{
         {
             =:=-goal
-            [| env | env quot call( env -- n m )
+            [| env |
+                env quot call( env -- n m )
                 2dup [ number? ] both? [ = ] [ 2drop f ] if ]
         }
     } =:=-pred defs<<
@@ -431,7 +431,8 @@ PRIVATE>
     V{
         {
             =\=-goal
-            [| env | env quot call( env -- n m )
+            [| env |
+                env quot call( env -- n m )
                 2dup [ number? ] both? [ = not ] [ 2drop f ] if ]
         }
     } =\=-pred defs<<
