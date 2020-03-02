@@ -101,7 +101,7 @@ LOGIC-PREDS: creatureo ;
     { cato Y } ;; { mouseo Y }
 } rule
 ```
-`;;` is used to represent **disjunction**. The code below it has the same meaning as the code below it.
+`;;` is used to represent **disjunction**. The following two forms are equivalent:
 ```
 Gh { Gb1 Gb2 Gb3 ;; Gb4 Gb5 ;; Gb6 } rule
 ```
