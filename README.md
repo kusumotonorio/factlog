@@ -7,7 +7,7 @@ It is an extended port from tiny_prolog and its descendants, [ruby-prolog](https
 ## Usage
 
 ```
-USE: factlog
+USE: logic
 
 LOGIC-PREDS: cato mouseo creatureo ;
 LOGIC-VARS: X Y ;
@@ -17,7 +17,7 @@ In factlog, words that represent relationships are called **logic predicates**. 
 
 In the above code, logic predicates end with the character `o`, which is a convention borrowed from miniKanren and so on, and means relation. This is not necessary, but it is useful for reducing conflicts with the words of, the parent language, Factor. We really want to write them as: `cat°`, `mouse°` and `creature°`, but we use `o` because it's easy to type.
 
-**Goals** are questions that factlog tries to meet to be true. To represent a goal, write an array with a logic predicate followed by zero or more arguments. factlog converts such definitions to internal representations.
+**Goals** are questions tried to meet to be true. To represent a goal, write an array with a logic predicate followed by zero or more arguments. Such definitions are coverted to internal representations.
 ```
 { LOGIC-PREDICATE ARG1 ARG2 ... }
 { LOGIC-PREDICATE }
@@ -110,7 +110,7 @@ Gh { Gb1 Gb2 Gb3 } rule
 Gh { Gb4 Gb5 } rule
 Gh { Gb6 } rule
 ```
-factlog actually converts the disjunction in that way. You may need to be careful about that when deleting definitions that you registered using `rule`, etc.
+The disjunction is actually converted in that way. You may need to be careful about that when deleting definitions that you registered using `rule`, etc.
 
 You can use `query-n` to limit the number of answers to a query. Specify a number greater than or equal to 1.
 ```
@@ -324,7 +324,7 @@ SYMBOLS: big small a-big-cat a-small-cat ;
 { creatureo X } query .
 ⟹ { H{ { X Tom } } H{ { X Jerry } } H{ { X Nibbles } } }
 ```
-If you need to identify a logic predicate that has a different **arity**, that is numbers of arguments, express it with a slash and an arity number. For example, `cato` with arity 1 is `cato/1`, `cato` with arity 2 is `cato/2`. But, note that factlog does not recognize these names.
+If you need to identify a logic predicate that has a different **arity**, that is numbers of arguments, express it with a slash and an arity number. For example, `cato` with arity 1 is `cato/1`, `cato` with arity 2 is `cato/2`. But, note that `logic` vocab does not recognize these names.
 
 `clear-pred` will clear all definitions of any arity. If you only want to remove the definition of a certain arity, you should use `retract-all` with logic variables.
 ```
@@ -335,7 +335,7 @@ If you need to identify a logic predicate that has a different **arity**, that i
 { cato X } query .
 ⟹ { H{ { X Tom } } }
 ```
-You can **trace** factlog's execution. The word to do this is `trace`.
+You can **trace** `logic` vocab's execution. The word to do this is `trace`.
 ```
 trace
 { creatureo Tom } query .
@@ -401,7 +401,7 @@ notrace
 { creatureo Tom } query .
 ⟹ t
 ```
-Thank you, old friends. I was able to explain most of the functions of factlog with fun. Have a good time together with fun fights. See you.
+Thank you, old friends. I was able to explain most of factlog with fun. Have a good time together with fun fights. See you.
 
 Here is a Prolog definition for the factorial predicate `factorial`.
 ```
@@ -410,7 +410,7 @@ factorial(N, F) :- N > 0, N2 is N - 1, factorial(N2, F2), F is F2 * N.
 ```
 Let's think about how to do the same thing with factlog. It is mostly the following code, but is surrounded by backquotes where it has not been explained.
 ```
-USE: factlog
+USE: logic
 
 LOGIC-PREDS: factorialo ;
 LOGIC-VARS: N N2 F F2 ;
@@ -423,7 +423,7 @@ LOGIC-VARS: N N2 F F2 ;
     `F is F2 * N`
 } rule
 ```
-Within these backquotes are comparisons, calculations, and assignments (to be precise, **unifications**). factlog has a mechanism to call Factor code to do these things. Here are some examples.
+Within these backquotes are comparisons, calculations, and assignments (to be precise, **unifications**). `logic` vocab has a mechanism to call Factor code to do these things. Here are some examples.
 ```
 LOGIC-PREDS: N_>_0  N2_is_N_-_1  F_is_F2_*_N ;
 
@@ -439,7 +439,7 @@ The word `unify` unifies the two following the environment in that environment.
 
 Now we can rewrite the definition of factorialo to use them.
 ```
-USE: factlog
+USE: logic
 
 LOGIC-PREDS: factorialo N_>_0  N2_is_N_-_1  F_is_F2_*_N ;
 LOGIC-VARS: N N2 F F2 ;
@@ -473,11 +473,11 @@ factlog has features that make it easier to meet the typical requirements shown 
 
 There are the built-in logic predicates `(<)`, `(>)`, `(>=)`, and `(=<)` to compare numbers. There are also `(==)` and `(\==)` to test for equality and inequality of two arguments.
 
-The word `is` takes a quotation and a logic variable to be unified. The quotation takes an environment and returns a value.  And `is` returns the internal representation of the goal. `is` is intended to be used in a quotation. If there is a quotation in the definition of `rule`, factlog uses the internal definition of the goal obtained by calling it.
+The word `is` takes a quotation and a logic variable to be unified. The quotation takes an environment and returns a value.  And `is` returns the internal representation of the goal. `is` is intended to be used in a quotation. If there is a quotation in the definition of `rule`, `logic` vocab uses the internal definition of the goal obtained by calling it.
 
 If you use these features to rewrite the definition of `factorialo`:
 ```
-USE: factlog
+USE: logic
 
 LOGIC-PREDS: factorialo ;
 LOGIC-VARS: N N2 F F2 ;
