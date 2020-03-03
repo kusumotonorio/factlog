@@ -2,7 +2,7 @@
 
 factlog is an embedded language that runs on [Factor](https://github.com/factor/factor) with the capabilities of a subset of Prolog.
 
-It is an extended port from tiny_prolog and its descendants, [ruby-prolog](https://github.com/preston/ruby-prolog).
+The library that does this is an extended port from tiny_prolog and its descendants, [ruby-prolog](https://github.com/preston/ruby-prolog).
 
 ## Usage
 
