@@ -144,7 +144,6 @@ L{ ITEM1 ITEM2 ITEM3 . OTHERS }
 ```
 You can also write a quotation that returns an argument as a goal definition argument.
 ```
-USE: lists
 [ Tom Jerry Nibbles L{ } cons cons cons ]
 ```
 When written as an argument to a goal definition, the following lines have the same meaning as above:
@@ -157,6 +156,8 @@ Such quotations are called only once when converting the goal definitions to int
 
 `membero` is a built-in logic predicate for the relationship an element is in a list.
 ```
+USE: lists
+
 { membero Jerry L{ Tom Jerry Nibbles } } query .
 ⟹ t
 
