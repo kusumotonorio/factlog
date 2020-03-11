@@ -214,112 +214,6 @@ DEFER: unify*
     ] when
     success? ;
 
-: each-until ( seq quot -- ) find 2drop ; inline
-
-:: resolve-body ( body env cut quot: ( -- ) -- )
-    body empty? [
-        quot call( -- )
-    ] [
-        body unclip :> ( rest-goals! first-goal! )
-        first-goal !! = [  ! cut
-            rest-goals env cut quot resolve-body
-            t cut set-info
-        ] [
-            first-goal callable? [
-                first-goal call( -- goal ) first-goal!
-            ] when
-            *trace?* get-global [
-                first-goal
-                [ pred>> name>> "in: { %s " printf ]
-                [ args>> [ "%u " printf ] each "}\n" printf ] bi
-            ] when
-            <env> :> d-env!
-            f <cut> :> d-cut!
-            first-goal pred>> defs>> [
-                first2 :> ( d-head d-body )
-                first-goal d-head [ args>> length ] same? [
-                    d-cut cut? cut cut? or [ t ] [
-                        V{ } clone :> trail
-                        first-goal env d-head d-env trail d-env unify* [
-                            d-body callable? [
-                                d-env trail <callback-env> d-body call( cb-env -- ? ) [
-                                    rest-goals env cut quot resolve-body
-                                ] when
-                            ] [
-                                d-body d-env d-cut [
-                                    rest-goals env cut quot resolve-body
-                                    cut cut? d-cut set-info-if-f
-                                ] resolve-body
-                            ] if
-                        ] when
-                        trail [ first2 env-delete ] each
-                        d-env env-clear
-                        f
-                    ] if
-               ] [ f ] if
-            ] each-until
-        ] if
-    ] if ;
-
-USE: coroutines
-
-:: resolver-co ( body' env' cut' -- co )
-    { body' env' cut' } [
-        first3 :> ( body env cut )
-        body empty? [
-            t coyield*
-        ] [
-            body unclip :> ( rest-goals! first-goal! )
-            first-goal !! = [  ! cut
-                rest-goals env cut resolver-co [
-                    dup *coresume
-                ] [ t coyield* ] while drop
-                t cut set-info
-            ] [
-                first-goal callable? [
-                    first-goal call( -- goal ) first-goal!
-                ] when
-                *trace?* get-global [
-                    first-goal
-                    [ pred>> name>> "in: { %s " printf ]
-                    [ args>> [ "%u " printf ] each "}\n" printf ] bi
-                ] when
-                <env> :> d-env!
-                f <cut> :> d-cut!
-                first-goal pred>> defs>> [
-                    first2 :> ( d-head d-body )
-                    first-goal d-head [ args>> length ] same? [
-                        d-cut cut? cut cut? or [ t ] [
-                            V{ } clone :> trail
-                            first-goal env d-head d-env trail d-env unify* [
-                                d-body callable? [
-                                    d-env trail <callback-env> d-body call( cb-env -- ? ) [
-                                        rest-goals env cut resolver-co [
-                                            dup *coresume
-                                        ] [ t coyield* ] while drop
-                                    ] when
-                                ] [
-                                    d-body d-env d-cut resolver-co [
-                                        dup *coresume
-                                    ] [
-                                        rest-goals env cut resolver-co [
-                                            dup *coresume
-                                        ] [ t coyield* ] while drop
-                                        cut cut? d-cut set-info-if-f
-                                    ] while drop
-                                ] if
-                            ] when
-                            trail [ first2 env-delete ] each
-                            d-env env-clear
-                            f
-                        ] if
-                    ] [ f ] if
-                ] each-until
-            ] if
-        ] if
-        f coterminate
-    ] curry cocreate ;
-
 SYMBOLS:
     s-start:
     s-not-empty:
@@ -511,15 +405,6 @@ SYMBOL: *anonymouse-var-no*
 : collect-logic-vars ( seq -- vars-array )
     [ logic-var? ] deep-filter members ;
 
-:: (resolve) ( goal-def/defs quot: ( env -- ) -- )
-    goal-def/defs replace-'__' normalize [ def>goal ] map :> goals
-    <env> :> env
-    goals env f <cut> [ env quot call( env -- ) ] resolve-body ;
-
-: resolve ( goal-def/defs quot: ( env -- ) -- ) (resolve) ;
-
-: resolve* ( goal-def/defs -- ) [ drop ] resolve ;
-
 SYMBOL: dummy-item
 
 :: negation-goal ( goal -- negation-goal )
@@ -679,62 +564,6 @@ PRIVATE>
     } invoke*-pred defs<<
     invoke*-goal ;
 
-:: nquery/rec ( goal-def/defs n/f -- bindings-array/success? )
-    *trace?* get-global :> trace?
-    0 :> n!
-    f :> success?!
-    V{ } clone :> bindings
-    [
-        goal-def/defs normalize [| env |
-            env table>> keys [ get NORMAL-LOGIC-VAR? ] filter
-            [ dup env at ] H{ } map>assoc
-            trace? get-global [ dup [ "%u: %u\n" printf ] assoc-each ] when
-            bindings push
-            t success?!
-            n/f [
-                n 1 + n!
-                n n/f >= [ return ] when
-            ] when
-        ] (resolve)
-    ] with-return
-    bindings dup {
-        [ empty? ]
-        [ first keys empty? ]
-    } 1|| [ drop success? ] [ >array ] if ;
-
-: query/rec ( goal-def/defs -- bindings-array/success? ) f nquery/rec ; inline
-
-:: nquery/co ( goal-def/defs n/f -- bindings-array/success? )
-    *trace?* get-global :> trace?
-    0 :> n!
-    f :> success?!
-    V{ } clone :> bindings
-    <env> :> env
-    goal-def/defs replace-'__' normalize [ def>goal ] map
-    env f <cut>
-    resolver-co :> resolver
-    [
-        resolver [
-            dup *coresume
-        ] [
-            env table>> keys [ get NORMAL-LOGIC-VAR? ] filter
-            [ dup env at ] H{ } map>assoc
-            trace? get-global [ dup [ "%u: %u\n" printf ] assoc-each ] when
-            bindings push
-            t success?!
-            n/f [
-                n 1 + n!
-                n n/f >= [ return ] when
-            ] when
-        ] while drop
-    ] with-return
-    bindings dup {
-        [ empty? ]
-        [ first keys empty? ]
-    } 1|| [ drop success? ] [ >array ] if ;
-
-: query/co ( goal-def/defs -- bindings-array/success? ) f nquery/co ; inline
-
 :: nquery ( goal-def/defs n/f -- bindings-array/success? )
     *trace?* get-global :> trace?
     0 :> n!
@@ -765,6 +594,98 @@ PRIVATE>
     } 1|| [ drop success? ] [ >array ] if ;
 
 : query ( goal-def/defs -- bindings-array/success? ) f nquery ; inline
+
+! nquery, query have been modified to use generators created
+! by finite state machines to reduce stack consumption.
+! Since the processing algorithm of the code is difficult
+! to understand, the words no longer used are kept as private
+! words for verification.
+
+<PRIVATE
+
+: each-until ( seq quot -- ) find 2drop ; inline
+
+:: resolve-body ( body env cut quot: ( -- ) -- )
+    body empty? [
+        quot call( -- )
+    ] [
+        body unclip :> ( rest-goals! first-goal! )
+        first-goal !! = [  ! cut
+            rest-goals env cut quot resolve-body
+            t cut set-info
+        ] [
+            first-goal callable? [
+                first-goal call( -- goal ) first-goal!
+            ] when
+            *trace?* get-global [
+                first-goal
+                [ pred>> name>> "in: { %s " printf ]
+                [ args>> [ "%u " printf ] each "}\n" printf ] bi
+            ] when
+            <env> :> d-env!
+            f <cut> :> d-cut!
+            first-goal pred>> defs>> [
+                first2 :> ( d-head d-body )
+                first-goal d-head [ args>> length ] same? [
+                    d-cut cut? cut cut? or [ t ] [
+                        V{ } clone :> trail
+                        first-goal env d-head d-env trail d-env unify* [
+                            d-body callable? [
+                                d-env trail <callback-env> d-body call( cb-env -- ? ) [
+                                    rest-goals env cut quot resolve-body
+                                ] when
+                            ] [
+                                d-body d-env d-cut [
+                                    rest-goals env cut quot resolve-body
+                                    cut cut? d-cut set-info-if-f
+                                ] resolve-body
+                            ] if
+                        ] when
+                        trail [ first2 env-delete ] each
+                        d-env env-clear
+                        f
+                    ] if
+               ] [ f ] if
+            ] each-until
+        ] if
+    ] if ;
+
+:: (resolve) ( goal-def/defs quot: ( env -- ) -- )
+    goal-def/defs replace-'__' normalize [ def>goal ] map :> goals
+    <env> :> env
+    goals env f <cut> [ env quot call( env -- ) ] resolve-body ;
+
+: resolve ( goal-def/defs quot: ( env -- ) -- ) (resolve) ;
+
+: resolve* ( goal-def/defs -- ) [ drop ] resolve ;
+
+:: nquery/rec ( goal-def/defs n/f -- bindings-array/success? )
+    *trace?* get-global :> trace?
+    0 :> n!
+    f :> success?!
+    V{ } clone :> bindings
+    [
+        goal-def/defs normalize [| env |
+            env table>> keys [ get NORMAL-LOGIC-VAR? ] filter
+            [ dup env at ] H{ } map>assoc
+            trace? get-global [ dup [ "%u: %u\n" printf ] assoc-each ] when
+            bindings push
+            t success?!
+            n/f [
+                n 1 + n!
+                n n/f >= [ return ] when
+            ] when
+        ] (resolve)
+    ] with-return
+    bindings dup {
+        [ empty? ]
+        [ first keys empty? ]
+    } 1|| [ drop success? ] [ >array ] if ;
+
+: query/rec ( goal-def/defs -- bindings-array/success? )
+    f nquery/rec ; inline
+
+PRIVATE>
 
 ! Built-in predicate definitions -----------------------------------------------------
 
