@@ -484,9 +484,9 @@ When you query with logic variable(s), you will get the answer for the logic var
     "t\nf\n{ H{ { X Jerry } } H{ { X Nibbles } } }"
   }
 }
-{ $see-also query-n } ;
+{ $see-also nquery } ;
 
-HELP: query-n
+HELP: nquery
 { $values
     { "goal-def/defs" "a goal def or an array of goal defs" } { "n/f" "the highest number of responses" }
     { "bindings-array/success?" "anser" }
@@ -743,9 +743,9 @@ $nl
   "Gh { Gb6 } rule"
 } $nl
 { $snippet "logic" } " actually converts the disjunction in that way. You may need to be careful about that when deleting definitions that you registered using " { $link rule } ", etc." $nl
-"You can use " { $link query-n } " to limit the number of answers to a query. Specify a number greater than or equal to 1." $nl
+"You can use " { $link nquery } " to limit the number of answers to a query. Specify a number greater than or equal to 1." $nl
 { $unchecked-example
-"{ creatureo Y } 2 query-n ."
+"{ creatureo Y } 2 nquery ."
 "{ H{ { Y Tom } } H{ { Y Jerry } } }"
 } $nl
 "Use " { $link \+ } " to express " { $strong "negation" } ". " { $link \+ } " acts on the goal immediately following it." $nl
@@ -776,7 +776,9 @@ $nl
 "Such quotations are called only once when converting the goal definitions to internal representations." $nl
 { $link membero } " is a built-in logic predicate for the relationship an element is in a list." $nl
 { $unchecked-example
-  "SYMBOL: Spike
+  "USE: lists
+SYMBOL: Spike
+
 { membero Jerry L{ Tom Jerry Nibbles } } query .
 { membero Spike [ Tom Jerry Nibbles L{ } cons cons cons ] } query ."
 "t\nf"
@@ -886,7 +888,7 @@ mouseo clear-pred
 
 { mouseo Y } query .
 
-{ creatureo Y } 2 query-n ."
+{ creatureo Y } 2 nquery ."
 "{ H{ { Y Nibbles } } H{ { Y Jerry } } }\n{ H{ { Y Tom } } H{ { Y Nibbles } } }"
 } $nl
 "While " { $link clear-pred } " clears all the definition information for a given logic predicate, " { $link retract } " and " { $link retract-all } " provide selective clearing." $nl
