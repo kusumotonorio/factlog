@@ -112,9 +112,9 @@ Gh { Gb6 } rule
 ```
 The disjunction is actually converted in that way. You may need to be careful about that when deleting definitions that you registered using `rule`, etc.
 
-You can use `query-n` to limit the number of answers to a query. Specify a number greater than or equal to 1.
+You can use `nquery` to limit the number of answers to a query. Specify a number greater than or equal to 1.
 ```
-{ creatureo Y } 2 query-n .
+{ creatureo Y } 2 nquery .
 ⟹ { H{ { Y Tom } } H{ { Y Jerry } } }
 ```
 Use `\+` to express **negation**. `\+` acts on the goal immediately following it.
@@ -279,7 +279,7 @@ mouseo clear-pred
 { mouseo Y } query .
 ⟹ { H{ { Y Nibbles } } H{ { Y Jerry } } }
 
-{ creatureo Y } 2 query-n .
+{ creatureo Y } 2 nquery .
 ⟹ { H{ { Y Tom } } H{ { Y Nibbles } } }
 ```
 While `clear-pred` clears all the definition information for a given logic predicate, `retract` and `retract-all` provide selective clearing.
