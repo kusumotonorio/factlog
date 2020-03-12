@@ -67,12 +67,12 @@ SYNTAX: %!
 TUPLE: logic-goal pred args ;
 
 : called-args ( args -- args' )
-    [ dup callable? [ call( -- term ) ] when ] map ;
+    [ dup callable? [ call( -- term ) ] when ] map ; inline
 
 :: <goal> ( pred args -- goal )
     pred get args called-args logic-goal boa ; inline
 
-: def>goal ( goal-def -- goal ) unclip swap <goal> ; inline
+: def>goal ( goal-def -- goal ) unclip swap <goal> ;
 
 : normalize ( goal-def/defs -- goal-defs )
     dup {
@@ -93,7 +93,7 @@ TUPLE: logic-env table ;
 : env-clear ( env -- ) table>> clear-assoc ; inline
 
 : dereference ( term env -- term' env' )
-    [ 2dup env-get [ 2nip first2 t ] [ f ] if* ] loop ;
+    [ 2dup env-get [ 2nip first2 t ] [ f ] if* ] loop ; inline
 
 PRIVATE>
 
@@ -107,19 +107,19 @@ M: logic-env at*
         { [ over sequence? ] [
               '[ _ at ] map t ] }
         [ drop t ]
-    } cond ;
+    } cond ; inline
 
 <PRIVATE
 
 TUPLE: callback-env env trail ;
 
-C: <callback-env> callback-env
+C: <callback-env> callback-env inline
 
-M: callback-env at* env>> at* ;
+M: callback-env at* env>> at* ; inline
 
 TUPLE: cut-info cut? ;
 
-C: <cut> cut-info
+C: <cut> cut-info inline
 
 : cut? ( cut-info -- ? ) cut?>> ; inline
 
@@ -201,7 +201,7 @@ DEFER: unify*
         success? [ "==> Success\n" ] [ "==> Fail\n" ] if "%s\n" printf
         *trace-depth* get-global 1 - *trace-depth* set-global
     ] when
-    success? ;
+    success? ; inline
 
 SYMBOLS:
     s-start:
@@ -224,7 +224,7 @@ TUPLE: resolver-gen
 
 :: <resolver> ( body env cut -- resolver )
     resolver-gen new
-        body >>body env >>env cut >>cut ;
+        body >>body env >>env cut >>cut ; inline
 
 GENERIC: next ( generator -- yield? )
 
@@ -442,17 +442,17 @@ SYMBOLS: at-the-beginning at-the-end ;
 
 PRIVATE>
 
-: rule ( head body -- ) at-the-end (rule) ; inline
+: rule ( head body -- ) at-the-end (rule) ;
 
-: rule* ( head body -- ) at-the-beginning (rule) ; inline
+: rule* ( head body -- ) at-the-beginning (rule) ;
 
-: rules ( defs -- ) [ first2 rule ] each ; inline
+: rules ( defs -- ) [ first2 rule ] each ;
 
-: fact ( head -- ) at-the-end (fact) ; inline
+: fact ( head -- ) at-the-end (fact) ;
 
-: fact* ( head -- ) at-the-beginning (fact) ; inline
+: fact* ( head -- ) at-the-beginning (fact) ;
 
-: facts ( defs -- ) [ fact ] each ; inline
+: facts ( defs -- ) [ fact ] each ;
 
 :: callback ( head quot: ( callback-env -- ? ) -- )
     head def>goal :> head-goal
@@ -570,7 +570,7 @@ PRIVATE>
         [ first keys empty? ]
     } 1|| [ drop success? ] [ >array ] if ;
 
-: query ( goal-def/defs -- bindings-array/success? ) f nquery ; inline
+: query ( goal-def/defs -- bindings-array/success? ) f nquery ;
 
 ! nquery has been modified to use generators created by finite
 ! state machines to reduce stack consumption.
@@ -658,7 +658,7 @@ PRIVATE>
     } 1|| [ drop success? ] [ >array ] if ;
 
 : query/rec ( goal-def/defs -- bindings-array/success? )
-    f nquery/rec ; inline
+    f nquery/rec ;
 
 PRIVATE>
 
