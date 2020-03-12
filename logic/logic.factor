@@ -3,10 +3,10 @@
 USING: accessors arrays assocs classes classes.tuple combinators
 combinators.short-circuit compiler.units continuations
 formatting fry io kernel lexer lists locals make math multiline
-namespaces parser prettyprint prettyprint.backend prettyprint.config
-prettyprint.custom prettyprint.sections quotations sequences
-sequences.deep sets splitting strings words words.symbol
-vectors ;
+namespaces parser prettyprint prettyprint.backend
+prettyprint.config prettyprint.custom prettyprint.sections
+quotations sequences sequences.deep sequences.generalizations
+sets splitting strings vectors words words.symbol ;
 
 IN: logic
 
@@ -128,6 +128,8 @@ C: <cut> cut-info
 : set-info-if-f ( ? cut-info -- )
     dup cut?>> [ 2drop ] [ cut?<< ] if ; inline
 
+: 2each-until ( seq1 seq2 quot -- all-failed? ) 2 nfind 2drop f = ; inline
+
 DEFER: unify*
 
 :: (unify*) ( x! x-env! y! y-env! trail tmp-env -- success? )
@@ -167,31 +169,18 @@ DEFER: unify*
             {
                 { [ x y [ tuple? ] both? ] [
                       x y [ class-of ] same? [
-                          x y [ tuple-slots ] bi@ :> ( x-slots y-slots )
-                          0 :> i!  x-slots length 1 - :> stop-i  t :> loop?!
-                          [ i stop-i <= loop? and ] [
-                              x-slots y-slots [ i swap nth ] bi@
-                                  :> ( x-item y-item )
-                              x-item x-env y-item y-env trail tmp-env unify* [
-                                  f loop?!
-                                  f ret-value!
-                              ] unless
-                              i 1 + i!
-                          ] while
-                      ] [ f ret-value! ] if ] }
+                          x y [ tuple-slots ] bi@
+                          [| x-item y-item |
+                              x-item x-env y-item y-env trail tmp-env unify* not
+                          ] 2each-until
+                      ] [ f ] if ret-value! ] }
                 { [ x y [ sequence? ] both? ] [
                       x y [ class-of ] same? x y [ length ] same? and [
-                          0 :> i!  x length 1 - :> stop-i  t :> loop?!
-                          [ i stop-i <= loop? and ] [
-                              x y [ i swap nth ] bi@ :> ( x-item y-item )
-                              x-item x-env y-item y-env trail tmp-env unify* [
-                                  f loop?!
-                                  f ret-value!
-                              ] unless
-                              i 1 + i!
-                          ] while
-                      ] [ f ret-value! ] if ] }
-                [  x y = ret-value! ]
+                          x y [| x-item y-item |
+                               x-item x-env y-item y-env trail tmp-env unify* not
+                          ] 2each-until
+                      ] [ f ] if ret-value! ] }
+                [ x y = ret-value! ]
             } cond
         ] unless
     ] unless
@@ -235,9 +224,11 @@ TUPLE: resolver-gen
 
 :: <resolver> ( body env cut -- resolver )
     resolver-gen new
-    body >>body env >>env cut >>cut ;
+        body >>body env >>env cut >>cut ;
 
-:: next ( resolver -- yield? )
+GENERIC: next ( generator -- yield? )
+
+M:: resolver-gen next ( resolver -- yield? )
     [
         f resolver return?<<
         f resolver yield?<<
@@ -248,8 +239,7 @@ TUPLE: resolver-gen
                       s-end: resolver state<<
                   ] [
                       s-not-empty: resolver state<<
-                  ] if
-              ] }
+                  ] if ] }
             { s-not-empty: [
                   resolver body>> unclip
                   [ resolver rest-goals<< ] [ resolver first-goal<< ] bi*
@@ -257,21 +247,18 @@ TUPLE: resolver-gen
                       s-cut: resolver state<<
                   ] [
                       s-not-cut: resolver state<<
-                  ] if
-              ] }
+                  ] if ] }
             { s-cut: [
                   resolver [ rest-goals>> ] [ env>> ] [ cut>> ] tri <resolver>
                   resolver sub-resolver1<<
-                  s-cut/iter: resolver state<<
-              ] }
+                  s-cut/iter: resolver state<< ] }
             { s-cut/iter: [
                   resolver sub-resolver1>> next [
                       t resolver yield?<<
                   ] [
                       t resolver cut>> set-info
                       s-end: resolver state<<
-                  ] if
-              ] }
+                  ] if ] }
             { s-not-cut: [
                   resolver first-goal>> callable? [
                       resolver first-goal>> call( -- goal ) resolver first-goal<<
@@ -291,8 +278,7 @@ TUPLE: resolver-gen
                   ] [
                       drop
                       s-end: resolver state<<
-                  ] if
-              ] }
+                  ] if ] }
             { s-defs-loop: [
                   resolver [ i>> ] [ defs>> ] bi nth
                   first2 [ resolver d-head<< ] [ resolver d-body<< ] bi*
@@ -316,8 +302,7 @@ TUPLE: resolver-gen
                       ] [
                           s-unify?-exit: resolver state<<
                       ] if
-                  ] if
-              ] }
+                  ] if ] }
             { s-callable: [
                   resolver [ d-env>> ] [ trail>> ] bi <callback-env>
                   resolver d-body>> call( cb-env -- ? ) [
@@ -326,20 +311,17 @@ TUPLE: resolver-gen
                       s-callable/iter: resolver state<<
                   ] [
                       s-unify?-exit: resolver state<<
-                  ] if
-              ] }
+                  ] if ] }
             { s-callable/iter: [
                   resolver sub-resolver1>> next [
                       t resolver yield?<<
                   ] [
                       s-unify?-exit: resolver state<<
-                  ] if
-              ] }
+                  ] if ] }
             { s-not-callable: [
                   resolver [ d-body>> ] [ d-env>> ] [ d-cut>> ] tri <resolver>
                   resolver sub-resolver1<<
-                  s-not-callable/outer-iter: resolver state<<
-              ] }
+                  s-not-callable/outer-iter: resolver state<< ] }
             { s-not-callable/outer-iter: [
                   resolver sub-resolver1>> next [
                       resolver [ rest-goals>> ] [ env>> ] [ cut>> ] tri <resolver>
@@ -347,32 +329,27 @@ TUPLE: resolver-gen
                       s-not-callable/inner-iter: resolver state<<
                   ] [
                       s-unify?-exit: resolver state<<
-                  ] if
-              ] }
+                  ] if ] }
             { s-not-callable/inner-iter: [
                   resolver sub-resolver2>> next [
                       t resolver yield?<<
                   ] [
                       resolver cut>> cut? resolver d-cut>> set-info-if-f
                       s-not-callable/outer-iter: resolver state<<
-                  ] if
-              ] }
+                  ] if ] }
             { s-unify?-exit: [
                   resolver trail>> [ first2 env-delete ] each
                   resolver d-env>> env-clear
-                  s-defs-loop-end: resolver state<<
-              ] }
+                  s-defs-loop-end: resolver state<< ] }
             { s-defs-loop-end: [
                   resolver [ i>> ] [ loop-end>> ] bi >= [
                       s-end: resolver state<<
                   ] [
                       resolver [ 1 + ] change-i drop
                       s-defs-loop: resolver state<<
-                  ] if
-              ] }
+                  ] if ] }
             { s-end: [
-                  t resolver return?<<
-              ] }
+                  t resolver return?<< ] }
         } case
         resolver [ yield?>> ] [ return?>> ] bi or [ f ] [ t ] if
     ] loop
@@ -415,7 +392,7 @@ SYMBOL: dummy-item
     negation-pred goal args>> clone logic-goal boa :> negation-goal
     V{
         { negation-goal { goal !! f-goal } } ! \+P_ { P !! { failo_ } } rule
-        { negation-goal { } }                ! \+P fact
+        { negation-goal { } }                ! \+P_ fact
     } negation-pred defs<<
     negation-goal ;
 
@@ -595,8 +572,8 @@ PRIVATE>
 
 : query ( goal-def/defs -- bindings-array/success? ) f nquery ; inline
 
-! nquery, query have been modified to use generators created
-! by finite state machines to reduce stack consumption.
+! nquery has been modified to use generators created by finite
+! state machines to reduce stack consumption.
 ! Since the processing algorithm of the code is difficult
 ! to understand, the words no longer used are kept as private
 ! words for verification.
@@ -657,8 +634,6 @@ PRIVATE>
 
 : resolve ( goal-def/defs quot: ( env -- ) -- ) (resolve) ;
 
-: resolve* ( goal-def/defs -- ) [ drop ] resolve ;
-
 :: nquery/rec ( goal-def/defs n/f -- bindings-array/success? )
     *trace?* get-global :> trace?
     0 :> n!
@@ -694,8 +669,7 @@ LOGIC-PREDS:
     varo nonvaro
     (<) (>) (>=) (=<) (==) (\==) (=) (\=)
     writeo writenlo nlo
-    membero appendo lengtho listo
-;
+    membero appendo lengtho listo ;
 
 { trueo } [ drop t ] callback
 
