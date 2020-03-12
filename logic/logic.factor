@@ -169,15 +169,14 @@ DEFER: unify*
             {
                 { [ x y [ tuple? ] both? ] [
                       x y [ class-of ] same? [
-                          x y [ tuple-slots ] bi@
-                          [| x-item y-item |
+                          x y [ tuple-slots ] bi@ [| x-item y-item |
                               x-item x-env y-item y-env trail tmp-env unify* not
                           ] 2each-until
                       ] [ f ] if ret-value! ] }
                 { [ x y [ sequence? ] both? ] [
                       x y [ class-of ] same? x y [ length ] same? and [
                           x y [| x-item y-item |
-                               x-item x-env y-item y-env trail tmp-env unify* not
+                              x-item x-env y-item y-env trail tmp-env unify* not
                           ] 2each-until
                       ] [ f ] if ret-value! ] }
                 [ x y = ret-value! ]
