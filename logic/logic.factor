@@ -134,35 +134,38 @@ DEFER: unify*
 
 :: (unify*) ( x! x-env! y! y-env! trail tmp-env -- success? )
     f :> ret-value!  f :> ret?!  f :> ret2?!
-    t :> loop?!
-    [ loop? ] [
-        { { [ x logic-var? ] [
-                x x-env env-get :> xp!
-                xp not [
-                    y y-env dereference y-env! y!
-                    x y = x-env y-env eq? and [
-                        x { y y-env } x-env env-put
-                        x-env tmp-env eq? [
-                            { x x-env } trail push
-                        ] unless
-                    ] unless
-                    f loop?!  t ret?!  t ret-value!
-                ] [
-                    xp first2 x-env! x!
-                    x x-env dereference x-env! x!
-                ] if ] }
-          { [ y logic-var? ] [
-                x y x! y!  x-env y-env x-env! y-env! ] }
-          [ f loop?! ]
+    [
+        {
+            { [ x logic-var? ] [
+                  x x-env env-get :> xp
+                  xp [
+                      xp first2 x-env! x!
+                      x x-env dereference x-env! x!
+                      t
+                  ] [
+                      y y-env dereference y-env! y!
+                      x y = x-env y-env eq? and [
+                          x { y y-env } x-env env-put
+                          x-env tmp-env eq? [
+                              { x x-env } trail push
+                          ] unless
+                      ] unless
+                      t ret?!  t ret-value!
+                      f
+                  ] if ] }
+            { [ y logic-var? ] [
+                  x y x! y!  x-env y-env x-env! y-env!
+                  t ] }
+            [ f ]
         } cond
-    ] while
+    ] loop
     ret? [
         t ret-value!
         x y [ logic-goal? ] both? [
             x pred>> y pred>> = [
                 x args>> x!  y args>> y!
             ] [
-                f ret-value! t ret2?!
+                f ret-value!  t ret2?!
             ] if
         ] when
         ret2? [
