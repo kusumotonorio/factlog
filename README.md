@@ -13,7 +13,7 @@ LOGIC-PREDS: cato mouseo creatureo ;
 LOGIC-VARS: X Y ;
 SYMBOLS: Tom Jerry Nibbles ;
 ```
-In factlog, words that represent relationships are called **logic predicates**. Use `LOGIC-PREDS:` to declare the predicates you want to use. **Logic variables** are used to represent relationships. use `LOGIC-VARS:` to declare the logic variables you want to use.
+In factlog, words that represent relationships are called **logic predicates**. Use `LOGIC-PRED:` or `LOGIC-PREDS:` to declare the predicates you want to use. **Logic variables** are used to represent relationships. use `LOGIC_VAR:` or `LOGIC-VARS:` to declare the logic variables you want to use.
 
 In the above code, logic predicates end with the character `o`, which is a convention borrowed from miniKanren and so on, and means relation. This is not necessary, but it is useful for reducing conflicts with the words of, the parent language, Factor. We really want to write them as: `cat°`, `mouse°` and `creature°`, but we use `o` because it's easy to type.
 
@@ -95,7 +95,7 @@ Let's describe that mice are also creatures.
 ```
 To tell the truth, we were able to describe at once that cats and mice were creatures by doing the following.
 ```
-LOGIC-PREDS: creatureo ;
+LOGIC-PRED: creatureo
 
 { creatureo Y } {
     { cato Y } ;; { mouseo Y }
@@ -168,7 +168,7 @@ SYMBOL: Spike
 Recently, they moved into a small house. The house has a living room, a dining room and a kitchen. Well, humans feel that way. Each of them seems to be in their favorite room.
 ```
 TUPLE: house living dining kitchen in-the-wall ;
-LOGIC-PREDS: houseo ;
+LOGIC-PRED: houseo
 
 { houseo T{ house { living Tom } { dining f } { kitchen Nibbles } { in-the-wall Jerry } } } fact
 ```
@@ -227,7 +227,7 @@ Well, what about Tom?
 ```
 This is a problematical answer. We have to redefine `consumeso`.
 ```
-LOGIC-PREDS: consumeso ;
+LOGIC-PRED: consumeso
 
 { consumeso X milk } {
     { is-ao X mouse } ;;
@@ -413,7 +413,7 @@ Let's think about how to do the same thing with factlog. It is mostly the follow
 ```
 USE: logic
 
-LOGIC-PREDS: factorialo ;
+LOGIC-PRED: factorialo
 LOGIC-VARS: N N2 F F2 ;
 
 { factorialo 0 1 } fact
@@ -480,7 +480,7 @@ If you use these features to rewrite the definition of `factorialo`:
 ```
 USE: logic
 
-LOGIC-PREDS: factorialo ;
+LOGIC-PRED: factorialo
 LOGIC-VARS: N N2 F F2 ;
 
 { factorialo 0 1 } fact

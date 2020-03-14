@@ -36,27 +36,31 @@ INSTANCE: ANONYMOUSE-LOGIC-VAR LOGIC-VAR
 
 SYMBOLS: *trace?* *trace-depth* ;
 
+: define-logic-var ( name -- )
+    create-word-in
+    [ reset-generic ]
+    [ define-symbol ]
+    [ NORMAL-LOGIC-VAR swap set-global ] tri ;
+
+: define-logic-pred ( name -- )
+    create-word-in
+    [ reset-generic ]
+    [ define-symbol ]
+    [ [ name>> <pred> ] keep set-global ] tri ;
+
 PRIVATE>
 
 : trace ( -- ) t *trace?* set-global ;
 
 : notrace ( -- ) f *trace?* set-global ;
 
-SYNTAX: LOGIC-VARS: ";"
-    [
-        create-word-in
-        [ reset-generic ]
-        [ define-symbol ]
-        [ NORMAL-LOGIC-VAR swap set-global ] tri
-    ] each-token ;
+SYNTAX: LOGIC-VAR: scan-token define-logic-var ;
 
-SYNTAX: LOGIC-PREDS: ";"
-    [
-        create-word-in
-        [ reset-generic ]
-        [ define-symbol ]
-        [ [ name>> <pred> ] keep set-global ] tri
-    ] each-token ;
+SYNTAX: LOGIC-VARS: ";" [ define-logic-var ] each-token ;
+
+SYNTAX: LOGIC-PRED: scan-token define-logic-pred ;
+
+SYNTAX: LOGIC-PREDS: ";" [ define-logic-pred ] each-token ;
 >>
 
 SYNTAX: %!
