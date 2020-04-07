@@ -13,7 +13,7 @@ LOGIC-PREDS: cato mouseo creatureo ;
 LOGIC-VARS: X Y ;
 SYMBOLS: Tom Jerry Nibbles ;
 ```
-In factlog, words that represent relationships are called **logic predicates**. Use `LOGIC-PRED:` or `LOGIC-PREDS:` to declare the predicates you want to use. **Logic variables** are used to represent relationships. use `LOGIC_VAR:` or `LOGIC-VARS:` to declare the logic variables you want to use.
+In factlog, words that represent relationships are called **logic predicates**. Use `LOGIC-PRED:` or `LOGIC-PREDS:` to declare the predicates you want to use. **Logic variables** are used to represent relationships. use `LOGIC-VAR:` or `LOGIC-VARS:` to declare the logic variables you want to use.
 
 In the above code, logic predicates end with the character `o`, which is a convention borrowed from miniKanren and so on, and means relation. This is not necessary, but it is useful for reducing conflicts with the words of, the parent language, Factor. We really want to write them as: `cat°`, `mouse°` and `creature°`, but we use `o` because it's easy to type.
 
